@@ -1,11 +1,78 @@
 .App {
-  text-align: center;
 }
+
+
+/** Menu Container **/
+.App {
+  background-color: #EEE;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-width: 1600px;
+}
+
+.App > .header > .title-text {
+  text-align: center;
+  background-color: #DDD;
+  margin: 0;
+  padding: 0.5em;
+}
+
+.App > .header > .menu-container,
+.App > .footer > .menu-container {
+  background-color: #AAA;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  z-index: 3;
+  justify-content: center;
+}
+
+.App > .header > .menu-container > a,
+.App > .footer > .menu-container > a {
+  padding: .2em 1vw;
+  font-size: x-large;
+}
+
+
+
+
+.App .button-link {
+  display: inline-block;
+  padding: 1em 2em;
+  margin: 1em;
+  background-color: #61dafb;
+  border-radius: 1em;
+  font-size: x-large;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
+
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

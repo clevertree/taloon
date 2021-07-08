@@ -1,0 +1,125 @@
+
+
+.clickable {
+    display: inline-flex;
+    cursor: pointer;
+    margin: 0 0;
+    padding: 0 2px;
+    /*position: relative;*/
+    align-items: center;
+    /*justify-content: center;*/
+    /*cursor: pointer;*/
+    white-space: nowrap;
+}
+
+
+/*div.clickable.dropdown {*/
+/*    position: relative;*/
+/*}*/
+
+
+
+/** Button Style **/
+button.clickable {
+    font-family: monospace;
+    min-height: 20px;
+    /*z-index: 3;*/
+
+    background: linear-gradient(#f6f6f6, #dddddd);
+    border: 1px outset #EEE;
+}
+
+/** Selection **/
+button.clickable.selected {
+    border: 1px inset #DDD;
+    background: linear-gradient(#ccc, #aaa);
+}
+
+
+/** Selected **/
+div.clickable.selected,
+div.clickable.stick {
+    background-color: #999;
+    /*border: 1px inset #AAA;*/
+}
+
+
+
+
+
+/** Menu Arrow **/
+.clickable > div.arrow {
+    display: inline-block;
+    font-size: small;
+    margin: 1px 2px 1px auto;
+    padding-left: 0.5em;
+}
+
+/** Loading **/
+.clickable.loading {
+    background: linear-gradient(-45deg, #96e76bFF, #e73c7e66, #23a6d500, #23d5ab66) !important;
+    background-size: 400% 400%;
+    animation: gradientBG 5s ease infinite;
+    cursor: progress;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/** Hover **/
+
+.clickable:hover {
+    background: linear-gradient(#ddd, #bbb);
+}
+
+/** Disabled **/
+.clickable.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/** Styles **/
+.clickable.wide {
+    padding: 0 6px;
+}
+.clickable.small {
+    font-size: small;
+}
+
+.clickable.large {
+    padding: 1em;
+    font-weight: bold;
+}
+
+.clickable.center {
+    justify-content: center;
+}
+
+
+/** Hover **/
+div.clickable:hover {
+    background-color: #999 !important;
+}
+
+/** Disabled Menu **/
+div.clickable.disabled {
+    /*opacity: 0.5;*/
+    color: #777;
+    cursor: not-allowed;
+}
+
+/** Menu Stick **/
+div.clickable.stick {
+    background-color: #999;
+}
+
+

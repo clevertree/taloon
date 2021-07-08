@@ -1,0 +1,6 @@
+{
+  "contentURL": "./content/",
+  "dev": {
+    "contentURL": "./content/"
+  }
+}
