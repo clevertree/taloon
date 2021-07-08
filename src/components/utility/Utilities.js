@@ -1,4 +1,4 @@
-import serverConfig from "../../.config.json";
+import serverConfig from "../../config.json";
 
 export default class Utilities {
     static isDevMode() {

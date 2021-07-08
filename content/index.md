@@ -6,9 +6,7 @@ We are laser-focused on helping with homelessness issues in AZ.
 
 AFOH is supported by local contributions and works with other organizations, groups, and individuals to give the homeless of Arizona the support they need every day on the street.
 
-```
-Many hands make light work.
-```
+> Many hands make light work.
 
 ## Social media
 <a href="https://www.paypal.com/fundraiser/charity/3680352?fbclid=IwAR12FkbMQRyhQ76RU8TIKZ5Zw3qOHvgWsEHa-XgPiVlzTFEu3aUXb4yvjU4" class="button-link">PayPal</a>

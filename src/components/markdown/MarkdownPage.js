@@ -2,9 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import Markdown from 'markdown-to-jsx';
 import Utilities from "../utility/Utilities";
-import 'github-markdown-css/github-markdown.css';
 
-let devRefreshIntervalID = null
+import './MarkdownPage.css'
+
+const REFRESH_INTERVAL = 5000;
+
 // noinspection HtmlRequiredAltAttribute
 export default class MarkdownPage extends React.Component {
     /** Property validation **/
@@ -23,6 +25,7 @@ export default class MarkdownPage extends React.Component {
                 img: (props) => this.processTag('img', props),
             },
         };
+        this.devRefreshIntervalID = null
         // console.log('props', props);
     }
 
@@ -31,19 +34,23 @@ export default class MarkdownPage extends React.Component {
     }
 
     componentWillUnmount() {
-        clearInterval(devRefreshIntervalID);
+        clearInterval(this.devRefreshIntervalID);
     }
 
     async fetchSrc() {
         const url = Utilities.resolveContentURL(this.props.src);
-        console.log("Fetching: ", url);
         const response = await fetch(url);
-        // console.log("response: ", response);
-        const content = await response.text();
-        this.setState({content});
+        const responseType = response.headers.get('content-type');
+        // console.log("response: ", response, response.headers, responseType);
+        // if(!responseType.startsWith('text/html')) {
+            const content = await response.text();
+            this.setState({content});
+        // } else {
+        //     this.setState({content: "Invalid Type: " + responseType});
+        // }
         if(Utilities.isDevMode()) {
-            clearInterval(devRefreshIntervalID);
-            devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), 2000);
+            clearInterval(this.devRefreshIntervalID);
+            this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), REFRESH_INTERVAL);
         }
     }
 

@@ -4,6 +4,9 @@ import DropDownMenu from "./components/menu/dropdown/DropDownMenu";
 import './App.css';
 import MarkdownPage from "./components/markdown/MarkdownPage";
 
+import './components/menu/style/Menu.css';
+
+import 'typeface-open-sans/index.css'
 
 class App extends Component {
     constructor(props) {
@@ -69,7 +72,9 @@ class App extends Component {
         let src = "./index.md";
         const currentPath = document.location.pathname;
         if(currentPath && currentPath !== '/')
-            src = currentPath + '/index.md';
+            src = '.' + currentPath + '/index.md';
+        console.log("Content: ", src, currentPath);
+
         return <MarkdownPage
             className={"content"}
             src={src}

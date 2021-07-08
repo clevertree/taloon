@@ -1,3 +1,13 @@
+body {
+  margin: 0;
+  /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',*/
+  /*'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',*/
+  /*sans-serif;*/
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
 .App {
 }
 
@@ -11,30 +21,16 @@
   max-width: 1600px;
 }
 
+.App > .content {
+  padding: 0 1em;
+}
+
 .App > .header > .title-text {
   text-align: center;
   background-color: #DDD;
   margin: 0;
   padding: 0.5em;
 }
-
-.App > .header > .menu-container,
-.App > .footer > .menu-container {
-  background-color: #AAA;
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  z-index: 3;
-  justify-content: center;
-}
-
-.App > .header > .menu-container > a,
-.App > .footer > .menu-container > a {
-  padding: .2em 1vw;
-  font-size: x-large;
-}
-
-
 
 
 .App .button-link {

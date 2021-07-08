@@ -1,0 +1,45 @@
+
+/** Paragraph **/
+
+.markdown-body p {
+    text-indent: 4px;
+    font-family: "Open Sans", SansSerif, serif;
+    text-align: justify;
+}
+
+
+/** Blockquote & Code **/
+
+.markdown-body > blockquote,
+.markdown-body > pre {
+    border-radius: 4px;
+    background: #CCC;
+    padding: 0.5em 10px;
+    margin: 0 0;
+}
+
+
+
+/** Blockquote **/
+
+.markdown-body > blockquote {
+    border-left: 10px solid #AAA;
+    quotes: "\201C""\201D""\2018""\2019";
+    font-style: italic;
+}
+.markdown-body > blockquote:before {
+    color: #AAA;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin: 0 0.20em 0 -0.15em;
+    vertical-align: -0.4em;
+}
+.markdown-body > blockquote p {
+    display: inline;
+}
+
+/** Code **/
+
+.markdown-body > pre > code {
+}
