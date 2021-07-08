@@ -14,8 +14,9 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "install": "scripts/install.sh",
+    "start": "scripts/start.sh",
+    "build": "scripts/build.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
