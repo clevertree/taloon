@@ -1,3 +1,8 @@
+<meta name="title" content="Arizona Friends of Homeless">
+<meta name="description" content="AFOH’s mission is to provide services, resources, and a dose of kindness to the local homeless population in Phoenix and other parts of Arizona. This is accomplished via local outreach, social media, and our projects. We are laser-focused on helping with homelessness issues in AZ."
+<meta name="keywords" content="Arizona, Homeless, Outreach, Services">
+<meta property="og:image" content="./assets/afoh-768x94.png">
+
 
 # Welcome to Arizona Friends of Homeless.
 

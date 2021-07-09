@@ -1,6 +1,5 @@
 {
   "contentURL": "./content/",
-  "dev": {
-    "contentURL": "./content/"
-  }
+  "apiURL": ":3001",
+  "apiPort": ":3001"
 }

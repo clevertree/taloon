@@ -1,3 +1,4 @@
+<meta name="title" content="About Arizona Friends of Homeless">
 
 # About Page.
 

@@ -19,7 +19,6 @@
 
 
 .ContextMenuContainer menu > li {
-    padding: .5em 2vw;
     list-style: none;
     border-radius: 14px;
     text-align: center;
@@ -36,6 +35,8 @@
 
 
 .ContextMenuContainer menu > li > a {
+    display: inline-block;
+    padding: .5em 2vw;
     text-decoration: none;
 }
 

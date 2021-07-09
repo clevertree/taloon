@@ -7,8 +7,8 @@ export default class Utilities {
 
     static resolveContentURL(src) {
         let config = serverConfig;
-        if(this.isDevMode())
-            config = config.dev;
+        // if(this.isDevMode())
+        //     config = config.dev;
         if(!config.contentURL)
             return src;
         const contentURL = new URL(config.contentURL, document.location.origin).toString();

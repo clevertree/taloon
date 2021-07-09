@@ -14,6 +14,11 @@ export default class MarkdownPage extends React.Component {
         src: PropTypes.string.isRequired,
     };
 
+    // Default Properties
+    static defaultProps = {
+        onEachTag: function(tagName, props) {}
+    };
+
 
     constructor(props) {
         super(props);
@@ -23,6 +28,7 @@ export default class MarkdownPage extends React.Component {
         this.options={
             overrides: {
                 img: (props) => this.processTag('img', props),
+                meta: (props) => this.processTag('meta', props),
             },
         };
         this.devRefreshIntervalID = null
@@ -35,6 +41,11 @@ export default class MarkdownPage extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.devRefreshIntervalID);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(this.props.src !== prevProps.src)
+            this.fetchSrc().then();
     }
 
     async fetchSrc() {
@@ -66,12 +77,25 @@ export default class MarkdownPage extends React.Component {
     }
 
     processTag(tagName, props) {
-        let src = props.src;
-        if(src) {
-            const sourceURL = Utilities.resolveContentURL(this.props.src);
-            src = new URL(props.src, sourceURL).toString();
+        if(this.props.onEachTag)
+            this.props.onEachTag(tagName, props);
+        switch(tagName) {
+            case 'img':
+                const imgProps = {
+                    className: props.className,
+                    src: props.src
+                }
+                if(props.src) {
+                    const sourceURL = Utilities.resolveContentURL(this.props.src);
+                    imgProps.src = new URL(props.src, sourceURL).toString();
+                }
+                // console.log(tagName, props);
+                return <img {...imgProps}/>;
+
+            case 'meta':
+                return null;
+            default:
+                return <div>Unknown Tag: {tagName}</div>;
         }
-        // console.log(tagName, props);
-        return <img {...props} src={src}/>
     }
 }

@@ -13,7 +13,8 @@ class App extends Component {
         super(props);
         this.state = {
             portrait: false,
-            title: "The Traveling Merchant"
+            title: "The Traveling Merchant",
+            pathname: document.location.pathname
         };
 
         this.ref = {
@@ -31,8 +32,17 @@ class App extends Component {
                 'view':     () => this.renderSubMenu(),
                 'options':  () => this.renderSubMenu(),
                 'server':   () => this.renderSubMenu(),
-            }
+            },
+            handleClick: e => this.handleClick(e),
+            onEachTag: (tagName, props) => this.onEachTag(tagName, props)
         };
+    }
+
+    componentDidMount() {
+        document.addEventListener('click', this.cb.handleClick);
+    }
+    componentWillUnmount() {
+        document.removeEventListener('click', this.cb.handleClick);
     }
 
     render() {
@@ -70,13 +80,19 @@ class App extends Component {
 
     renderContent() {
         let src = "./index.md";
-        const currentPath = document.location.pathname;
+        const currentPath = this.state.pathname;
         if(currentPath && currentPath !== '/')
             src = '.' + currentPath + '/index.md';
-        console.log("Content: ", src, currentPath);
+
+        // Remove previous meta tags
+        for(const metaElm of document.head.querySelectorAll(
+            "title, meta[name='description'], meta[name='keywords'], meta[name='title']")) {
+            metaElm.remove();
+        }
 
         return <MarkdownPage
             className={"content"}
+            onEachTag={this.cb.onEachTag}
             src={src}
         />
     }
@@ -106,6 +122,73 @@ class App extends Component {
         </>);
     }
 
+    /** Events **/
+
+    onEachTag(tagName, props) {
+        // console.log('tag', tagName, props);
+        switch(tagName) {
+            case 'meta':
+                let paramName = typeof props.property !== "undefined" ? 'property' : 'name';
+                const key = props[paramName];
+                const content = props.content;
+                switch(props.name.toLowerCase()) {
+                    case 'title':
+                        document.title = props.content;
+                        break;
+                    default:
+                        let elm = document.head.querySelector(`meta[${props.name}="${key}"]`)
+                        if(!elm) {
+                            elm = document.createElement('meta');
+                            elm[paramName] = key;
+                            document.head.appendChild(elm);
+                        }
+                        elm.content = content;
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    handleClick(e) {
+
+        let target = e.target;
+        while(target && target.nodeName.toLowerCase() !== 'a') {
+            target = target.parentNode;
+        }
+        if(target
+            && target.nodeName.toLowerCase() === 'a'
+            && target.target !== '_blank') {
+            // console.log("Click target: ", target);
+
+            const url = new URL(target.href);
+            if(url.origin !== window.location.origin) {
+                target.setAttribute('target', '_blank');
+                // Allow navigation
+            } else if(url.hash
+                || url.pathname.endsWith('.pdf')
+            ) {
+
+                // Allow local navigation
+            } else {
+                e.preventDefault();
+                // console.log('click', target, url);
+                // let history = useHistory();
+                this.setState({
+                    pathname: url.pathname
+                });
+                window.history.pushState("", null, url.pathname);
+
+                window.scroll({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }
+
 }
 
 export default App;
+
