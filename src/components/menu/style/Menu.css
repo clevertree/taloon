@@ -21,9 +21,9 @@
 .ContextMenuContainer menu > li {
     padding: .5em 2vw;
     list-style: none;
-    transition: background-color 1s, letter-spacing 1s, font-weight 1s;
     border-radius: 14px;
     text-align: center;
+    transition: background-color 1s, letter-spacing 1s, font-weight 1s;
 }
 .ContextMenuContainer menu > li:hover {
     background-color: #6a737d;

@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  font-family: "Open Sans", SansSerif, serif;
   /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',*/
   /*'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',*/
   /*sans-serif;*/
@@ -31,21 +32,6 @@ body {
   margin: 0;
   padding: 0.5em;
 }
-
-
-.App .button-link {
-  display: inline-block;
-  padding: 1em 2em;
-  margin: 1em;
-  background-color: #61dafb;
-  border-radius: 1em;
-  font-size: x-large;
-}
-
-
-
-
-
 
 
 

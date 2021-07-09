@@ -3,7 +3,7 @@
 
 .markdown-body p {
     text-indent: 4px;
-    font-family: "Open Sans", SansSerif, serif;
+    /*font-family: "Open Sans", SansSerif, serif;*/
     text-align: justify;
 }
 
@@ -43,3 +43,33 @@
 
 .markdown-body > pre > code {
 }
+
+/** Button Links **/
+
+.markdown-body a.button {
+    display: block;
+    padding: 1em 2em;
+    margin: 0.5em;
+    background-color: #61dafb;
+    border-radius: 1em;
+    text-decoration: none;
+    transition: background-color 1s, letter-spacing 1s, color 1s;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+@media only screen and (min-width: 1600px) {
+    .markdown-body a.button {
+        /*font-size: 1vw;*/
+    }
+}
+.markdown-body a.button:hover {
+    color: white;
+    background-color: #6a737d;
+    text-shadow: #FFA 0 0 10px;
+    letter-spacing: .2rem;
+}
+
+
+
+
+

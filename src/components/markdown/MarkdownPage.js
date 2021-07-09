@@ -42,12 +42,12 @@ export default class MarkdownPage extends React.Component {
         const response = await fetch(url);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
-        // if(!responseType.startsWith('text/html')) {
+        if(responseType.startsWith('text/markdown')) {
             const content = await response.text();
             this.setState({content});
-        // } else {
-        //     this.setState({content: "Invalid Type: " + responseType});
-        // }
+        } else {
+            this.setState({content: "Invalid Type: " + responseType});
+        }
         if(Utilities.isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
             this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), REFRESH_INTERVAL);

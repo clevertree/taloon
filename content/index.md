@@ -8,18 +8,23 @@ AFOH is supported by local contributions and works with other organizations, gro
 
 > Many hands make light work.
 
+## Services
+<a class="button" href="/services/request">I need a service</a>
+
+<a class="button" href="/services/post">I am offering a service</a>
+
 ## Social media
-<a href="https://www.paypal.com/fundraiser/charity/3680352?fbclid=IwAR12FkbMQRyhQ76RU8TIKZ5Zw3qOHvgWsEHa-XgPiVlzTFEu3aUXb4yvjU4" class="button-link">PayPal</a>
+<a class="button" href="https://www.paypal.com/fundraiser/charity/3680352">PayPal</a>
 
-<a href="https://www.amazon.com/hz/wishlist/ls/2SR1GI6QZTLG6" class="button-link">Amazon</a>
+<a class="button" href="https://www.amazon.com/hz/wishlist/ls/2SR1GI6QZTLG6">Amazon</a>
 
-<a href="http://cash.app/$AZFRIENDSOFHOMELESS" class="button-link">Cash App</a>
+<a class="button" href="http://cash.app/$AZFRIENDSOFHOMELESS">Cash App</a>
 
-<a href="https://charity.ebay.com/charity/Arizona-Friends-of-Homeless/3680352" class="button-link">Ebay</a>
+<a class="button" href="https://charity.ebay.com/charity/Arizona-Friends-of-Homeless/3680352">Ebay</a>
 
-<a href="https://www.facebook.com/groups/arizonafriendsofhomeless" class="button-link">Facebook</a>
+<a class="button" href="https://www.facebook.com/groups/arizonafriendsofhomeless">Facebook</a>
 
-<a href="https://www.frysfood.com/i/community/community-rewards" class="button-link">Frys NPO is PD434</a>
+<a class="button" href="https://www.frysfood.com/i/community/community-rewards">Frys NPO is PD434</a>
 
 ## Facebook Feed
 
