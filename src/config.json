@@ -1,5 +1,6 @@
 {
   "contentURL": "./content/",
   "apiURL": ":3001",
-  "apiPort": ":3001"
+  "apiPort": ":3001",
+  "versionURL": "https://travelingmerchant.net/manifest.json"
 }

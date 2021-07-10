@@ -70,7 +70,7 @@ export default class MarkdownPage extends React.Component {
         if(this.props.className)
             className += ' ' + this.props.className;
         return (
-            <Markdown {...this.props} src={null} className={className} options={this.options}>
+            <Markdown className={className} options={this.options}>
                 {this.state.content || "Loading " + this.props.file}
             </Markdown>
         );
@@ -81,16 +81,13 @@ export default class MarkdownPage extends React.Component {
             this.props.onEachTag(tagName, props);
         switch(tagName) {
             case 'img':
-                const imgProps = {
-                    className: props.className,
-                    src: props.src
-                }
+                let src = props.src;
                 if(props.src) {
                     const sourceURL = Utilities.resolveContentURL(this.props.src);
-                    imgProps.src = new URL(props.src, sourceURL).toString();
+                    src = new URL(props.src, sourceURL).toString();
                 }
                 // console.log(tagName, props);
-                return <img {...imgProps}/>;
+                return <img src={src} alt={props.alt} className={props.className}/>;
 
             case 'meta':
                 return null;

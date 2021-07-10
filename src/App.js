@@ -1,12 +1,13 @@
 import ContextMenuContainer from "./components/menu/ContextMenuContainer";
 import React, {Component} from "react";
+
 import DropDownMenu from "./components/menu/dropdown/DropDownMenu";
-import './App.css';
 import MarkdownPage from "./components/markdown/MarkdownPage";
 
-import './components/menu/style/Menu.css';
-
 import 'typeface-open-sans/index.css'
+import './components/menu/style/Menu.css';
+import './App.css';
+
 
 class App extends Component {
     constructor(props) {
@@ -131,7 +132,7 @@ class App extends Component {
                 let paramName = typeof props.property !== "undefined" ? 'property' : 'name';
                 const key = props[paramName];
                 const content = props.content;
-                switch(props.name.toLowerCase()) {
+                switch(key.toLowerCase()) {
                     case 'title':
                         document.title = props.content;
                         break;
@@ -187,6 +188,8 @@ class App extends Component {
             }
         }
     }
+
+
 
 }
 
