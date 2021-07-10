@@ -26,31 +26,37 @@ reportWebVitals();
 // Learn more about service workers: https://cra.link/PWA
 serviceWorkerRegistration.register();
 
-
 // Check for version upgrade
 fetch(serverConfig.versionURL)
     .then(response => response.json())
     .then(manifestJSON => {
-        if(!manifestJSON.minVersion)
-            console.error("Error checking App version: manifest.json has no minVersion value");
-        else if(semver.lte(manifestJSON.minVersion, packageJson.version))
-            console.log(`Version: manifest.minVersion (${manifestJSON.minVersion}) <= package.version (${packageJson.version})`);
-        else
-            forceRefresh(manifestJSON.minVersion);
+        const isRefreshed = getCookie('version');
+        console.log("Current Version: ", packageJson.version, ", Manifest Version: ", manifestJSON.version);
+        if(!manifestJSON.version)
+            console.error("Error checking App version: manifest.json has no version value");
+        else if(semver.lte(manifestJSON.version, packageJson.version))
+            console.log(`Version: manifest (${manifestJSON.version}) <= package (${packageJson.version})`);
+        else  {
+            if(isRefreshed !== manifestJSON.version) {
+                console.log("Forcing an upgrade to version: ", manifestJSON.version);
+                document.cookie = "version=" + (manifestJSON.version) + "; path=/";
+                forceRefresh();
+            } else {
+                console.error("Upgrade to version has already been forced: ", isRefreshed);
+            }
+        }
+
     })
 
 
 
-function forceRefresh(minVersion) {
-    const isRefreshed = getCookie('minVersion');
-    if(isRefreshed !== minVersion) {
-        console.log("Forcing an upgrade to version: ", minVersion);
-        document.cookie = "minVersion=" + (minVersion) + "; path=/";
-        serviceWorkerRegistration.unregister();
-        document.location.reload();
-    } else {
-        console.error("Upgrade to version has already been forced: ", minVersion);
-    }
+function forceRefresh() {
+    serviceWorkerRegistration.unregister();
+    caches.keys().then(function(names) {
+        for (let name of names)
+            caches.delete(name);
+    });
+    document.location.reload();
 }
 
 function getCookie(name) {
@@ -63,3 +69,5 @@ function getCookie(name) {
     }
     return null;
 }
+
+window.forceRefresh = forceRefresh;
