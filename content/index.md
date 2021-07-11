@@ -18,18 +18,7 @@ AFOH is supported by local contributions and works with other organizations, gro
 
 <a class="button" href="/services/post">I am offering a service</a>
 
-## Social media
-<a class="button" href="https://www.paypal.com/fundraiser/charity/3680352">PayPal</a>
 
-<a class="button" href="https://www.amazon.com/hz/wishlist/ls/2SR1GI6QZTLG6">Amazon</a>
-
-<a class="button" href="http://cash.app/$AZFRIENDSOFHOMELESS">Cash App</a>
-
-<a class="button" href="https://charity.ebay.com/charity/Arizona-Friends-of-Homeless/3680352">Ebay</a>
-
-<a class="button" href="https://www.facebook.com/groups/arizonafriendsofhomeless">Facebook</a>
-
-<a class="button" href="https://www.frysfood.com/i/community/community-rewards">Frys NPO is PD434</a>
-
-## Facebook Feed
-
+```
+This section is a work in progress. Please check back soon.
+```

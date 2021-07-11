@@ -10,8 +10,9 @@
 
 /** Blockquote & Code **/
 
-.markdown-body > blockquote,
-.markdown-body > pre {
+.markdown-body blockquote,
+.markdown-body code {
+    display: block;
     border-radius: 4px;
     background: #CCC;
     padding: 0.5em 10px;
@@ -22,12 +23,12 @@
 
 /** Blockquote **/
 
-.markdown-body > blockquote {
+.markdown-body blockquote {
     border-left: 10px solid #AAA;
     quotes: "\201C""\201D""\2018""\2019";
     font-style: italic;
 }
-.markdown-body > blockquote:before {
+.markdown-body blockquote:before {
     color: #AAA;
     content: open-quote;
     font-size: 4em;
@@ -35,14 +36,10 @@
     margin: 0 0.20em 0 -0.15em;
     vertical-align: -0.4em;
 }
-.markdown-body > blockquote p {
+.markdown-body blockquote p {
     display: inline;
 }
 
-/** Code **/
-
-.markdown-body > pre > code {
-}
 
 /** Button Links **/
 
@@ -57,11 +54,7 @@
     font-size: 1.5em;
     font-weight: bold;
 }
-@media only screen and (min-width: 1600px) {
-    .markdown-body a.button {
-        /*font-size: 1vw;*/
-    }
-}
+
 .markdown-body a.button:hover {
     color: white;
     background-color: #6a737d;

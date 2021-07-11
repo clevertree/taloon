@@ -6,7 +6,7 @@ echo "Removing content symlink"
 rm ./public/content
 
 
-echo "Updating Manifest version"
+echo "Updating manifest version"
 VERSION=`jq -r '.version' ./package.json`
 jq --arg version $VERSION '.version=$version' ./public/manifest.json > ./public/manifest2.json
 rm ./public/manifest.json;

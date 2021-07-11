@@ -22,17 +22,22 @@ body {
   max-width: 1600px;
 }
 
-.App > .content {
+.App > article {
   padding: 0 1em;
 }
 
-.App > .header > .title-text {
-  text-align: center;
-  background-color: #DDD;
-  margin: 0;
-  padding: 0.5em;
+.App > header,
+.App > footer {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
 }
 
+.App > header > a > img,
+.App > footer > a > img {
+  display: block;
+  width: 100%;
+}
 
 
 

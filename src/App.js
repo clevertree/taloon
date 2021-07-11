@@ -1,7 +1,6 @@
 import ContextMenuContainer from "./components/menu/ContextMenuContainer";
 import React, {Component} from "react";
 
-import DropDownMenu from "./components/menu/dropdown/DropDownMenu";
 import MarkdownPage from "./components/markdown/MarkdownPage";
 
 import 'typeface-open-sans/index.css'
@@ -27,13 +26,6 @@ class App extends Component {
             }
         }
         this.cb = {
-            menu: {
-                'root':     () => this.renderSubMenu(),
-                'file':     () => this.renderSubMenu(),
-                'view':     () => this.renderSubMenu(),
-                'options':  () => this.renderSubMenu(),
-                'server':   () => this.renderSubMenu(),
-            },
             handleClick: e => this.handleClick(e),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props)
         };
@@ -65,17 +57,17 @@ class App extends Component {
     renderHeader() {
         let src = "./header.md";
         return <MarkdownPage
-            className={"header"}
+            options={{wrapper: 'header', forceWrapper: true}}
             src={src}
-        />
+            />;
     }
 
     renderFooter() {
         let src = "./footer.md";
         return <MarkdownPage
-            className={"footer"}
+            options={{wrapper: 'footer', forceWrapper: true}}
             src={src}
-        />
+            />;
     }
 
 
@@ -92,35 +84,11 @@ class App extends Component {
         }
 
         return <MarkdownPage
+            options={{wrapper: 'article', forceWrapper: true}}
             className={"content"}
             onEachTag={this.cb.onEachTag}
             src={src}
         />
-    }
-
-    renderRootMenu(ref={}, vertical=true) {
-        const props = {
-            vertical,
-            // vertical: !this.state.portrait,
-            openOnHover: false,
-        };
-        if(!this.state.portrait)
-            props.arrow = false;
-        return (<>
-            <DropDownMenu {...props} ref={ref.file} options={this.cb.menu.file}         >File</DropDownMenu>
-            <DropDownMenu {...props} ref={ref.view} options={this.cb.menu.view}         >View</DropDownMenu>
-            <DropDownMenu {...props} ref={ref.options} options={this.cb.menu.options}      >Options</DropDownMenu>
-            <DropDownMenu {...props} ref={ref.server} options={this.cb.menu.server}       >Server</DropDownMenu>
-        </>);
-    }
-
-    renderSubMenu() {
-        return (<>
-            <DropDownMenu options={this.cb.menu.file}         >File</DropDownMenu>
-            <DropDownMenu options={this.cb.menu.view}         >View</DropDownMenu>
-            <DropDownMenu options={this.cb.menu.options}      >Options</DropDownMenu>
-            <DropDownMenu options={this.cb.menu.server}       >Server</DropDownMenu>
-        </>);
     }
 
     /** Events **/
@@ -151,8 +119,8 @@ class App extends Component {
                 break;
         }
     }
-    handleClick(e) {
 
+    handleClick(e) {
         let target = e.target;
         while(target && target.nodeName.toLowerCase() !== 'a') {
             target = target.parentNode;
@@ -166,19 +134,19 @@ class App extends Component {
             if(url.origin !== window.location.origin) {
                 target.setAttribute('target', '_blank');
                 // Allow navigation
-            } else if(url.hash
-                || url.pathname.endsWith('.pdf')
-            ) {
-
-                // Allow local navigation
+                // } else if(url.hash
             } else {
+                let pathname = url.pathname;
+                if(pathname.substr(-1, 1) !== '/'
+                    && pathname.split('/').pop().indexOf('.') === -1)
+                    pathname += '/'
                 e.preventDefault();
-                // console.log('click', target, url);
+                console.log('click', target, pathname);
                 // let history = useHistory();
                 this.setState({
-                    pathname: url.pathname
+                    pathname
                 });
-                window.history.pushState("", null, url.pathname);
+                window.history.pushState("", null, pathname);
 
                 window.scroll({
                     top: 0,

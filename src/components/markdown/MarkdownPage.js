@@ -69,8 +69,9 @@ export default class MarkdownPage extends React.Component {
         let className = 'markdown-body';
         if(this.props.className)
             className += ' ' + this.props.className;
+        const options = Object.assign({}, this.options, this.props.options || {});
         return (
-            <Markdown className={className} options={this.options}>
+            <Markdown className={className} options={options}>
                 {this.state.content || "Loading " + this.props.file}
             </Markdown>
         );

@@ -19,12 +19,14 @@
 
 
 .ContextMenuContainer menu > li {
+    font-weight: bold;
     list-style: none;
     border-radius: 14px;
     text-align: center;
     transition: background-color 1s, letter-spacing 1s, font-weight 1s;
 }
 .ContextMenuContainer menu > li:hover {
+    color: white;
     background-color: #6a737d;
     text-shadow: #FFA 0 0 10px;
     letter-spacing: .2rem;
@@ -40,6 +42,7 @@
     text-decoration: none;
 }
 
+.ContextMenuContainer menu > li > ul,
 .ContextMenuContainer menu > li > menu {
     display: none;
 }
