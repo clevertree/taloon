@@ -7,15 +7,9 @@ form.theme-default > fieldset {
     margin-bottom: 1em;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    /*align-items: center;*/
+    flex-wrap: wrap;
 }
-@media only screen and (max-width: 400px) {
-    form.theme-default > fieldset {
-        flex-direction: column;
-        align-items: start;
-    }
-}
-
 form.theme-default > fieldset:hover > legend {
     font-weight: bold;
 }
@@ -31,23 +25,32 @@ form.theme-default > fieldset > label:after {
 }
 
 
-form.theme-default > fieldset > legend {
+@media only screen and (max-width: 800px) {
+    form.theme-default > fieldset > label {
+        text-align: left;
+        flex-basis: 100%;
+    }
+}
+
+form.theme-default > fieldset {
     font-size: larger;
 }
 
 form.theme-default > fieldset > button,
 form.theme-default > fieldset > input,
+form.theme-default > fieldset > select,
 form.theme-default > fieldset > textarea {
     flex-grow: 1;
     padding: 0.5em;
     border: 1px inset #FFF;
     border-radius: 0.5em;
+    font-size: larger;
 }
 
-form.theme-default > fieldset > input[type=submit],
-form.theme-default > fieldset > input[type=button],
 form.theme-default > fieldset > button {
     border: 2px outset #FFF;
+    font-size: larger;
+    cursor: pointer;
 }
 
 form.theme-default > fieldset > input[type=text] {
@@ -61,3 +64,27 @@ form.theme-default > fieldset > input[type=checkbox] {
     /*transform: scale(2);*/
 }
 
+/** Message and Error **/
+
+form.theme-default > div.message,
+form.theme-default > div.error {
+    background-color: #bbb;
+    border: 1px inset #FFF;
+    border-radius: 0.5em;
+    font-weight: bold;
+    transition: transform 2s, max-height 2s, padding 2s;
+    transform: scale(1, 0);
+    max-height: 0;
+    padding: 0 1em;
+}
+form.theme-default > div.error {
+    background-color: #bb9a9a;
+    color: #600;
+}
+
+form.theme-default > div.message:not(:empty),
+form.theme-default > div.error:not(:empty) {
+    transform: scale(1);
+    max-height: 100px;
+    padding: 1em;
+}

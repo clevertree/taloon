@@ -32,6 +32,7 @@ export default class MarkdownPage extends React.Component {
                 img: (props) => this.processTag('img', props),
                 meta: (props) => this.processTag('meta', props),
                 form: (props) => this.processTag('form', props),
+                textarea: (props) => this.processTag('textarea', props),
             },
         };
         this.devRefreshIntervalID = null
@@ -102,6 +103,13 @@ export default class MarkdownPage extends React.Component {
                     method="post"
                     action="#"
                     />;
+            case 'textarea':
+                return <textarea
+                    {...props}
+                    defaultValue={props.value}
+                    placeholder={props.placeholder.toString().replaceAll('\\n', "\n")}
+                    children={null}
+                    />
             default:
                 return <div>Unknown Tag: {tagName}</div>;
         }

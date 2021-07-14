@@ -40,53 +40,78 @@ body {
 }
 
 
+/** Menu Container **/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.App menu {
+  margin: 0 0;
+  padding: 0 0;
+  background-color: #AAA;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  z-index: 3;
+  justify-content: space-evenly;
+  font-family: "Helvetica", Sans-serif, serif;
+  font-size: 1.5em;
 }
 
-
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+@media only screen and (max-width: 800px) {
+  .App menu {
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+
+.App menu > li {
+  font-weight: bold;
+  list-style: none;
+  border-radius: 14px;
+  text-align: center;
+  transition: background-color 1s, letter-spacing 1s, font-weight 1s;
+}
+.App menu > li:hover {
+  color: white;
+  background-color: #6a737d;
+  text-shadow: #FFA 0 0 10px;
+  letter-spacing: .2rem;
+}
+
+
+.App menu > li > a {
+  display: inline-block;
+  padding: .5em 2vw;
+  text-decoration: none;
+}
+.App menu > li:hover > a {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.App menu > li > ul,
+.App menu > li > menu {
+  display: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+
+/** Button Links **/
+
+.App form button,
+.App a.button {
+  display: block;
+  padding: 1em 2em;
+  margin: 0.5em;
+  background-color: #61dafb;
+  border-radius: 1em;
+  text-decoration: none;
+  transition: background-color 1s, letter-spacing 1s, color 1s;
+  font-size: 1.5em;
+  font-weight: bold;
 }
+
+.App form button:hover,
+.App a.button:hover {
+  color: white;
+  background-color: #6a737d;
+  text-shadow: #FFA 0 0 10px;
+  letter-spacing: .2rem;
+}
+
