@@ -1,5 +1,6 @@
 import ContextMenuContainer from "./components/menu/ContextMenuContainer";
 import React, {Component} from "react";
+import packageJSON from '../package.json';
 
 import MarkdownPage from "./components/markdown/MarkdownPage";
 
@@ -48,6 +49,7 @@ class App extends Component {
                 {this.renderHeader()}
                 {this.renderContent()}
                 {this.renderFooter()}
+                Version: {packageJSON.version}
             </ContextMenuContainer>
         );
     }

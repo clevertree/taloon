@@ -12,3 +12,5 @@ This section is a work in progress. Please check back soon.
 
 <a class="button disabled" href="#">I need a Bike</a>
 
+<a class="button disabled" href="#">Find a shelter for an animal</a>
+

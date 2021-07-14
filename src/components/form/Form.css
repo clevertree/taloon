@@ -7,8 +7,13 @@ form.theme-default > fieldset {
     margin-bottom: 1em;
     display: flex;
     flex-direction: row;
-    align-content: space-between;
     align-items: center;
+}
+@media only screen and (max-width: 400px) {
+    form.theme-default > fieldset {
+        flex-direction: column;
+        align-items: start;
+    }
 }
 
 form.theme-default > fieldset:hover > legend {
@@ -19,12 +24,12 @@ form.theme-default > fieldset > label {
     min-width: 12vw;
     text-align: right;
     padding-right: 1vw;
-    font-size: x-large;
 }
 
 form.theme-default > fieldset > label:after {
     content: ':'
 }
+
 
 form.theme-default > fieldset > legend {
     font-size: larger;
@@ -34,7 +39,6 @@ form.theme-default > fieldset > button,
 form.theme-default > fieldset > input,
 form.theme-default > fieldset > textarea {
     flex-grow: 1;
-    font-size: x-large;
     padding: 0.5em;
     border: 1px inset #FFF;
     border-radius: 0.5em;
@@ -49,8 +53,11 @@ form.theme-default > fieldset > button {
 form.theme-default > fieldset > input[type=text] {
 }
 
+form.theme-default > fieldset > input[type=radio],
 form.theme-default > fieldset > input[type=checkbox] {
     max-width: 40px;
-    transform: scale(3);
+    width: 40px;
+    height: 40px;
+    /*transform: scale(2);*/
 }
 
