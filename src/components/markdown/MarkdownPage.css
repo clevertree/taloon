@@ -17,6 +17,7 @@
     background: #CCC;
     padding: 0.5em 10px;
     margin: 0 0;
+    white-space: break-spaces;
 }
 
 
@@ -39,6 +40,7 @@
 .markdown-body blockquote p {
     display: inline;
 }
+
 
 
 /** Button Links **/

@@ -7,7 +7,6 @@ import 'typeface-open-sans/index.css'
 import './components/menu/style/Menu.css';
 import './App.css';
 
-
 class App extends Component {
     constructor(props) {
         super(props);

@@ -4,6 +4,7 @@ import Markdown from 'markdown-to-jsx';
 import Utilities from "../utility/Utilities";
 
 import './MarkdownPage.css'
+import Form from "../form/Form";
 
 const REFRESH_INTERVAL = 5000;
 
@@ -16,7 +17,8 @@ export default class MarkdownPage extends React.Component {
 
     // Default Properties
     static defaultProps = {
-        onEachTag: function(tagName, props) {}
+        onEachTag: function (tagName, props) {
+        }
     };
 
 
@@ -25,10 +27,11 @@ export default class MarkdownPage extends React.Component {
         this.state = {
             content: null
         }
-        this.options={
+        this.options = {
             overrides: {
                 img: (props) => this.processTag('img', props),
                 meta: (props) => this.processTag('meta', props),
+                form: (props) => this.processTag('form', props),
             },
         };
         this.devRefreshIntervalID = null
@@ -44,7 +47,7 @@ export default class MarkdownPage extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if(this.props.src !== prevProps.src)
+        if (this.props.src !== prevProps.src)
             this.fetchSrc().then();
     }
 
@@ -53,13 +56,13 @@ export default class MarkdownPage extends React.Component {
         const response = await fetch(url);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
-        if(responseType.startsWith('text/markdown')) {
+        if (responseType.startsWith('text/markdown')) {
             const content = await response.text();
             this.setState({content});
         } else {
             this.setState({content: "Invalid Type: " + responseType});
         }
-        if(Utilities.isDevMode()) {
+        if (Utilities.isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
             this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), REFRESH_INTERVAL);
         }
@@ -67,7 +70,7 @@ export default class MarkdownPage extends React.Component {
 
     render() {
         let className = 'markdown-body';
-        if(this.props.className)
+        if (this.props.className)
             className += ' ' + this.props.className;
         const options = Object.assign({}, this.options, this.props.options || {});
         return (
@@ -78,12 +81,12 @@ export default class MarkdownPage extends React.Component {
     }
 
     processTag(tagName, props) {
-        if(this.props.onEachTag)
+        if (this.props.onEachTag)
             this.props.onEachTag(tagName, props);
-        switch(tagName) {
+        switch (tagName) {
             case 'img':
                 let src = props.src;
-                if(props.src) {
+                if (props.src) {
                     const sourceURL = Utilities.resolveContentURL(this.props.src);
                     src = new URL(props.src, sourceURL).toString();
                 }
@@ -92,6 +95,13 @@ export default class MarkdownPage extends React.Component {
 
             case 'meta':
                 return null;
+            case 'form':
+                return <Form
+                    {...props}
+                    className={props.className || "theme-default"}
+                    method="post"
+                    action="#"
+                    />;
             default:
                 return <div>Unknown Tag: {tagName}</div>;
         }
