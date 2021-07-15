@@ -5,7 +5,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import packageJson from "../package.json";
-import serverConfig from "./config.json";
 import semver from 'semver';
 
 ReactDOM.render(
@@ -27,7 +26,7 @@ reportWebVitals();
 serviceWorkerRegistration.register();
 
 // Check for version upgrade
-fetch(serverConfig.manifestURL)
+fetch(process.env.REACT_APP_PATH_MANIFEST)
     .then(response => response.json())
     .then(manifestJSON => {
         const isRefreshed = getCookie('version');

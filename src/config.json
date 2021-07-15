@@ -1,6 +1,0 @@
-{
-  "contentURL": "./content/",
-  "apiURL": ":3001",
-  "apiPort": "3001",
-  "manifestURL": "/manifest.json"
-}

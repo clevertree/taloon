@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Markdown from 'markdown-to-jsx';
-import Utilities from "../utility/Utilities";
 
 import './MarkdownPage.css'
 import Form from "../form/Form";
@@ -64,7 +63,8 @@ export default class MarkdownPage extends React.Component {
     }
 
     async fetchSrc() {
-        const url = Utilities.resolveContentURL(this.props.src);
+        const url = resolveContentURL(this.props.src);
+
         const response = await fetch(url);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
@@ -74,7 +74,7 @@ export default class MarkdownPage extends React.Component {
         } else {
             this.setState({content: "Invalid Type: " + responseType});
         }
-        if (Utilities.isDevMode()) {
+        if (isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
             this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), REFRESH_INTERVAL);
         }
@@ -99,7 +99,7 @@ export default class MarkdownPage extends React.Component {
             case 'img':
                 let src = props.src;
                 if (props.src) {
-                    const sourceURL = Utilities.resolveContentURL(this.props.src);
+                    const sourceURL = resolveContentURL(this.props.src);
                     src = new URL(props.src, sourceURL).toString();
                 }
                 // console.log(tagName, props);
@@ -125,4 +125,14 @@ export default class MarkdownPage extends React.Component {
                 return <div>Unknown Tag: {tagName}</div>;
         }
     }
+}
+
+
+function resolveContentURL(src) {
+    const contentURL = new URL(process.env.REACT_APP_PATH_CONTENT + '/', document.location.origin).toString();
+    return new URL(src, contentURL).toString();
+}
+
+function isDevMode() {
+    return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 }
