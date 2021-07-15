@@ -72,7 +72,7 @@ form.theme-default > div.error {
     border: 1px inset #FFF;
     border-radius: 0.5em;
     font-weight: bold;
-    transition: transform 2s, max-height 2s, padding 2s;
+    transition: transform 0.8s, max-height 0.8s, padding 0.8s;
     transform: scale(1, 0);
     max-height: 0;
     padding: 0 1em;

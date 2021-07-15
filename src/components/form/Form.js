@@ -39,12 +39,23 @@ export default class Form extends React.Component {
     async onSubmit(e) {
         e.preventDefault();
         const form = this.ref.form.current;
+        let formName = form.getAttribute('name');
+        if(!formName) {
+            const forms = [...document.querySelectorAll('form')];
+            formName = forms.indexOf(form);
+        }
+
         const values = Object.values(form).reduce((obj,field) => {
             if(field.name)
                 obj[field.name] = field.value;
             return obj;
         }, {})
-        console.log("Submitting form ", form, values);
+
+        let postURL = new URL(window.location.href);
+        if(process.env.REACT_APP_API_PORT)
+            postURL.port = process.env.REACT_APP_API_PORT;
+        postURL.search = 'formName='+formName;
+        console.log("Submitting form ", postURL + '', form, values);
 
         let error = null;
         let message = "Submitting form";
@@ -54,15 +65,21 @@ export default class Form extends React.Component {
             message,
         })
         try {
-            const response = await fetch('', {
+            const response = await fetch(postURL + '', {
                 method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
                 body: JSON.stringify(values)
             });
             const responseJSON = await response.json();
             console.log("Response: ", response, responseJSON);
-            message = "Submission Successful";
+            if(response.status !== 200)
+                throw new Error(`(${response.status}) ${response.statusText}`)
+            message = responseJSON.message || "Submission Successful";
         } catch (err) {
-            error = err.message;
+            error = "Submission Failed. " + err.message;
             message = null;
         }
         this.setState({
@@ -71,6 +88,8 @@ export default class Form extends React.Component {
             message
         })
 
-        form.scrollTo()
+        form.scrollIntoView()
     }
 }
+
+

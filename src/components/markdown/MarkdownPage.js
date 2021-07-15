@@ -34,6 +34,17 @@ export default class MarkdownPage extends React.Component {
                 form: (props) => this.processTag('form', props),
                 textarea: (props) => this.processTag('textarea', props),
             },
+            createElement(type, props, children) {
+                // Filter out dangerous tags
+                switch(type) {
+                    case 'iframe':
+                    case 'applet':
+                        type = 'div';
+                        break;
+                    default:
+                }
+                return React.createElement(type, props, children)
+            },
         };
         this.devRefreshIntervalID = null
         // console.log('props', props);

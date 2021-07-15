@@ -27,7 +27,7 @@ reportWebVitals();
 serviceWorkerRegistration.register();
 
 // Check for version upgrade
-fetch(serverConfig.versionURL)
+fetch(serverConfig.manifestURL)
     .then(response => response.json())
     .then(manifestJSON => {
         const isRefreshed = getCookie('version');

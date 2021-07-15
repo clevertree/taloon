@@ -142,7 +142,7 @@ class App extends Component {
                     && pathname.split('/').pop().indexOf('.') === -1)
                     pathname += '/'
                 e.preventDefault();
-                console.log('click', target, pathname);
+                // console.log('click', target, pathname);
                 // let history = useHistory();
                 this.setState({
                     pathname

@@ -4,7 +4,7 @@
 <meta property="og:image" content="./assets/afoh-768x94.png" />
 
 
-# Welcome to Arizona Friends of Homeless.
+# Traveling Aggregate Local Online Offer Network.
 
 AFOH’s mission is to provide services, resources, and a dose of kindness to the local homeless population in Phoenix and other parts of Arizona. This is accomplished via local outreach, social media, and our projects.
 We are laser-focused on helping with homelessness issues in AZ.
@@ -14,9 +14,9 @@ AFOH is supported by local contributions and works with other organizations, gro
 > Many hands make light work.
 
 ## Services
-<a class="button" href="/services/request">I need a service</a>
+<a class="button" href="/service/request">I need a service</a>
 
-<a class="button" href="/services/post">I am offering a service</a>
+<a class="button" href="/service/post">I am offering a service</a>
 
 
 ```
