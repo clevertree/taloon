@@ -5,13 +5,13 @@ import Markdown from 'markdown-to-jsx';
 import './MarkdownPage.css'
 import Form from "../form/Form";
 
-const REFRESH_INTERVAL = 5000;
 
 // noinspection HtmlRequiredAltAttribute
 export default class MarkdownPage extends React.Component {
     /** Property validation **/
     static propTypes = {
         src: PropTypes.string.isRequired,
+        refreshInterval: 5000
     };
 
     // Default Properties
@@ -76,7 +76,7 @@ export default class MarkdownPage extends React.Component {
         }
         if (isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
-            this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), REFRESH_INTERVAL);
+            this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.props.refreshInterval || 5000);
         }
     }
 

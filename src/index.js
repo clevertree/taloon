@@ -26,7 +26,8 @@ reportWebVitals();
 serviceWorkerRegistration.register();
 
 // Check for version upgrade
-fetch(process.env.REACT_APP_PATH_MANIFEST)
+const manifestURL = new URL(process.env.REACT_APP_PATH_MANIFEST, document.location.origin).toString();
+fetch(manifestURL)
     .then(response => response.json())
     .then(manifestJSON => {
         const isRefreshed = getCookie('version');

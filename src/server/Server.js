@@ -4,6 +4,7 @@ import path from "path";
 import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
 import FormHandler from "../components/form/FormHandler";
+import EmailServer from "./email/EmailServer";
 
 
 export default class Server {
@@ -22,7 +23,13 @@ export default class Server {
             extended: true
         }));
 
+        // Setup email server routing
+        EmailServer.setupRoutes(app);
+
         app.post('*', (req, res, next) => {
+            return FormHandler.handleRequest(req, res, next);
+        });
+        app.put('*', (req, res, next) => {
             return FormHandler.handleRequest(req, res, next);
         });
 
@@ -99,7 +106,7 @@ function updateMetaTags(document, paramName, key, content) {
 }
 function allowAccessControl(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
 }

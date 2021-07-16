@@ -58,6 +58,7 @@ class App extends Component {
     renderHeader() {
         let src = "./header.md";
         return <MarkdownPage
+            refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
             src={src}
             />;
@@ -66,6 +67,7 @@ class App extends Component {
     renderFooter() {
         let src = "./footer.md";
         return <MarkdownPage
+            refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}
             src={src}
             />;

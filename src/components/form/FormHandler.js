@@ -40,9 +40,9 @@ class FormHandler {
             throw new Error("No Forms were found: " + req.path);
         } catch (err) {
             console.error("Error submitting form: ", err.message);
-            res.statusMessage = err.message;
+            // res.statusMessage = err.message;
             return res.status(400).send(JSON.stringify({
-                message: err.message
+                errors: [err.message]
             }));
         }
     }
@@ -52,27 +52,24 @@ class FormHandler {
         if(!actionName)
             throw new Error("Invalid form action");
 
-        // Validate form
-        const errors = [];
-        for(const element of form.elements) {
-            const name = element.name;
-            if(name) {
-                element.value = req.body[name];
-                if(!element.checkValidity()) {
-                    errors.push(`Field ${name} failed validation`);
-                }
-            }
-        }
-
-        if(errors.length > 0)
-            throw new Error("Form failed validation: \n" + errors.join("\n"))
-
         if(!this.formHandlers[actionName])
             throw new Error(`Form action not found: ${actionName}`)
         const formHandler = this.formHandlers[actionName];
 
-        const jsonResponse = formHandler(form, req) || {
-            message: "No response from form handler"
+        // Validate form
+        const validation = {};
+        for(const element of form.elements) {
+            const name = element.name;
+            if(name) {
+                element.value = req.body[name];
+                // if(!element.checkValidity()) {
+                //     validation[name] = `Field ${name} failed validation`;
+                // }
+            }
+        }
+
+        const jsonResponse = formHandler(req, form, validation) || {
+            errors: ["No response from form handler"]
         }
 
         res.status(200).send(jsonResponse);
