@@ -77,7 +77,10 @@ export default class Form extends React.Component {
         }
         newState.processing = false;
         this.setState(newState);
-        // TODO: element validations
+
+
+        // Element Validations
+        this.setCustomValidations(form, newState.validations || {});
 
         form.scrollIntoView()
     }
@@ -99,13 +102,21 @@ export default class Form extends React.Component {
     }
 
     getFormValues(form) {
-        const values = Object.values(form).reduce((obj,field) => {
-            if(field.name)
+        return Object.values(form).reduce((obj, field) => {
+            if (field.name)
                 obj[field.name] = field.value;
             return obj;
-        }, {})
+        }, {});
+    }
 
-        return values;
+    setCustomValidations(form, validations) {
+        return Object.values(form.elements).reduce((obj, field) => {
+            if (field.name) {
+                field.setCustomValidity(validations[field.name] || "");
+                console.log(field.name, validations[field.name]);
+            }
+            return obj;
+        }, {});
     }
 }
 

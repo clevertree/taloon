@@ -25,7 +25,7 @@ class FormHandler {
 
             let formName = req.query.formName || 0;
             const forms = [...document.querySelectorAll('form')];
-            if (!Number.isNaN(formName)) {
+            if (!Number.isNaN(Number.parseInt(formName))) {
                 const formID = Number.parseInt(formName);
                 if (!forms[formID])
                     throw new Error(`Form ID ${formID} not found`);
@@ -48,13 +48,13 @@ class FormHandler {
     }
 
     processFormRequest(form, req, res) {
-        const actionName = form.action;
-        if(!actionName)
-            throw new Error("Invalid form action");
+        const formName = form.name;
+        if(!formName)
+            throw new Error("Invalid form name");
 
-        if(!this.formHandlers[actionName])
-            throw new Error(`Form action not found: ${actionName}`)
-        const formHandler = this.formHandlers[actionName];
+        if(!this.formHandlers[formName])
+            throw new Error(`Form name not found: ${formName}`)
+        const formHandler = this.formHandlers[formName];
 
         // Validate form
         const validation = {};

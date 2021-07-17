@@ -1,6 +1,7 @@
 import ContextMenuContainer from "./components/menu/ContextMenuContainer";
 import React, {Component} from "react";
 import packageJSON from '../package.json';
+import path from 'path';
 
 import MarkdownPage from "./components/markdown/MarkdownPage";
 
@@ -78,7 +79,7 @@ class App extends Component {
         let src = "./index.md";
         const currentPath = this.state.pathname;
         if(currentPath && currentPath !== '/')
-            src = '.' + currentPath + '/index.md';
+            src = '.' + path.resolve(currentPath, 'index.md');
 
         // Remove previous meta tags
         for(const metaElm of document.head.querySelectorAll(

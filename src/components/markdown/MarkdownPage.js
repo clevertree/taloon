@@ -10,12 +10,12 @@ import Form from "../form/Form";
 export default class MarkdownPage extends React.Component {
     /** Property validation **/
     static propTypes = {
-        src: PropTypes.string.isRequired,
-        refreshInterval: 5000
+        src: PropTypes.string.isRequired
     };
 
     // Default Properties
     static defaultProps = {
+        refreshInterval: 5000,
         onEachTag: function (tagName, props) {
         }
     };
@@ -112,7 +112,6 @@ export default class MarkdownPage extends React.Component {
                     {...props}
                     className={props.className || "theme-default"}
                     method="post"
-                    action="#"
                     />;
             case 'textarea':
                 return <textarea
