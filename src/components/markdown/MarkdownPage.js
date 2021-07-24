@@ -4,6 +4,9 @@ import Markdown from 'markdown-to-jsx';
 
 import './MarkdownPage.css'
 import Form from "../form/Form";
+import Input from "../form/input/Input";
+import Select from "../form/input/Select";
+import TextArea from "../form/input/TextArea";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -31,6 +34,7 @@ export default class MarkdownPage extends React.Component {
                 img: (props) => this.processTag('img', props),
                 meta: (props) => this.processTag('meta', props),
                 form: (props) => this.processTag('form', props),
+                input: (props) => this.processTag('input', props),
                 textarea: (props) => this.processTag('textarea', props),
             },
             createElement(type, props, children) {
@@ -113,13 +117,9 @@ export default class MarkdownPage extends React.Component {
                     className={props.className || "theme-default"}
                     method="post"
                     />;
-            case 'textarea':
-                return <textarea
-                    {...props}
-                    defaultValue={props.value}
-                    placeholder={props.placeholder.toString().replaceAll('\\n', "\n")}
-                    children={null}
-                    />
+            case 'input':       return <Input {...props} />
+            case 'textarea':    return <TextArea {...props} />
+            case 'select':      return <Select {...props} />
             default:
                 return <div>Unknown Tag: {tagName}</div>;
         }
@@ -135,3 +135,4 @@ function resolveContentURL(src) {
 function isDevMode() {
     return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 }
+

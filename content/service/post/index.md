@@ -22,4 +22,8 @@ Post a service you would like to offer:
 
 <a class="button disabled" href="#">I can offer animal services</a>
 
+<a class="button disabled" href="#">I can deliver services to a location</a>
+
+<a class="button disabled" href="#">I have storage to drop off and pick up donations </a>
+
 <a class="button disabled" href="#">I would like to offer something else</a>

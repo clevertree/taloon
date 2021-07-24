@@ -42,9 +42,17 @@ form.theme-default > fieldset > select,
 form.theme-default > fieldset > textarea {
     flex-grow: 1;
     padding: 0.5em;
-    border: 1px inset #FFF;
+    border: 2px inset #FFF;
     border-radius: 0.5em;
     font-size: larger;
+    transition: box-shadow 1s, border-color 1s;
+}
+
+form.theme-default > fieldset > input.invalid,
+form.theme-default > fieldset > select.invalid,
+form.theme-default > fieldset > textarea.invalid {
+    border-color: #F00;
+    box-shadow: #F00 0 0 12px;
 }
 
 form.theme-default > fieldset > button {

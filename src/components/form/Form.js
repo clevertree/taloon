@@ -1,5 +1,6 @@
 import React from "react";
 import "./Form.css";
+import {FormContext} from "./FormContext";
 
 const TIMEOUT_CHANGE = 1000;
 
@@ -17,6 +18,7 @@ export default class Form extends React.Component {
         this.state = {
             processing: false,
             errors: {},
+            showErrors: false,
             message: null,
         }
         this.onChangeTimeout = null;
@@ -28,18 +30,20 @@ export default class Form extends React.Component {
         let className = this.getClassName();
         if(this.props.className)
             className += ' ' + this.props.className;
-        const errors = this.state.errors;
-        return <form
-            {...this.props}
-            className={className}
-            ref={this.ref.form}
-            onSubmit={this.cb.onSubmit}
-            onChange={this.cb.onChange}
-        >
-            <div className="message" children={this.state.message} />
-            {Object.keys(this.state.errors).map(key => <div className="error" children={this.state.errors[key]} />)}
-            {this.props.children}
-        </form>;
+
+        return <FormContext.Provider value={this.state}>
+            <form
+                {...this.props}
+                className={className}
+                ref={this.ref.form}
+                onSubmit={this.cb.onSubmit}
+                onChange={this.cb.onChange}
+            >
+                <div className="message" children={this.state.message} />
+                {this.state.showErrors ? Object.keys(this.state.errors).map(key => <div className="error" children={this.state.errors[key]} />) : null}
+                {this.props.children}
+            </form>
+        </FormContext.Provider>;
     }
 
 
@@ -59,8 +63,8 @@ export default class Form extends React.Component {
         let newState = {
             processing: true,
             message: null,
-            errors: [],
-            validations: {},
+            errors: {},
+            showErrors: !preview
         }
         this.setState(newState);
 
@@ -73,14 +77,14 @@ export default class Form extends React.Component {
             newState = await response.json();
             console.log(`${preview ? "Preview " : ""}Response: `, response, newState);
         } catch (err) {
-            newState.errors = ["Invalid JSON Response: " + err.message];
+            newState.errors = {_: "Invalid JSON Response: " + err.message};
         }
         newState.processing = false;
         this.setState(newState);
 
 
         // Element Validations
-        this.setCustomValidations(form, newState.validations || {});
+        // this.setCustomValidations(form, newState.errors || {});
 
         form.scrollIntoView()
     }
@@ -109,15 +113,17 @@ export default class Form extends React.Component {
         }, {});
     }
 
-    setCustomValidations(form, validations) {
-        return Object.values(form.elements).reduce((obj, field) => {
-            if (field.name) {
-                field.setCustomValidity(validations[field.name] || "");
-                console.log(field.name, validations[field.name]);
-            }
-            return obj;
-        }, {});
-    }
+    // setCustomValidations(form, errors) {
+    //     return Object.values(form.elements).reduce((obj, field) => {
+    //         if (field.name) {
+    //             const customValidity = errors[field.name] || "";
+    //             field.setCustomValidity(customValidity);
+    //             field.classList.toggle("invalid", !!customValidity);
+    //             console.log(field.name, customValidity);
+    //         }
+    //         return obj;
+    //     }, {});
+    // }
 }
 
 

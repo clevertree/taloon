@@ -4,7 +4,8 @@ import path from "path";
 import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
 import FormHandler from "../components/form/FormHandler";
-import EmailServer from "./email/EmailServer";
+import EmailServer from "./email/SessionServer";
+import SessionServer from "./email/SessionServer";
 
 
 export default class Server {
@@ -17,11 +18,15 @@ export default class Server {
         const app = express();
         this.app = app;
 
+
         app.use(allowAccessControl);
         app.use( bodyParser.json() );       // to support JSON-encoded bodies
         app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
             extended: true
         }));
+
+        // Setup Sessions
+        SessionServer.setupRoutes(app);
 
         // Setup email server routing
         EmailServer.setupRoutes(app);
