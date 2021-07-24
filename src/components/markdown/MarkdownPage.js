@@ -4,9 +4,9 @@ import Markdown from 'markdown-to-jsx';
 
 import './MarkdownPage.css'
 import Form from "../form/Form";
-import Input from "../form/input/Input";
 import Select from "../form/input/Select";
 import TextArea from "../form/input/TextArea";
+import Input from "../form/input/Input";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -19,8 +19,7 @@ export default class MarkdownPage extends React.Component {
     // Default Properties
     static defaultProps = {
         refreshInterval: 5000,
-        onEachTag: function (tagName, props) {
-        }
+        onEachTag: function (tagName, props) {}
     };
 
 
@@ -30,26 +29,10 @@ export default class MarkdownPage extends React.Component {
             content: null
         }
         this.options = {
-            overrides: {
-                img: (props) => this.processTag('img', props),
-                meta: (props) => this.processTag('meta', props),
-                form: (props) => this.processTag('form', props),
-                input: (props) => this.processTag('input', props),
-                textarea: (props) => this.processTag('textarea', props),
-            },
-            createElement(type, props, children) {
-                // Filter out dangerous tags
-                switch(type) {
-                    case 'iframe':
-                    case 'applet':
-                        type = 'div';
-                        break;
-                    default:
-                }
-                return React.createElement(type, props, children)
-            },
+            createElement: (type, props, children) => this.createElement(type, props, children),
         };
         this.devRefreshIntervalID = null
+        this.devRefreshIntervalAmount = props.refreshInterval || 5000;
         // console.log('props', props);
     }
 
@@ -66,10 +49,11 @@ export default class MarkdownPage extends React.Component {
             this.fetchSrc().then();
     }
 
-    async fetchSrc() {
+    async fetchSrc(options={}) {
         const url = resolveContentURL(this.props.src);
 
-        const response = await fetch(url);
+        options.cache = "force-cache";
+        const response = await fetch(url, options);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
         if (responseType.startsWith('text/markdown')) {
@@ -80,7 +64,7 @@ export default class MarkdownPage extends React.Component {
         }
         if (isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
-            this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.props.refreshInterval || 5000);
+            // this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.devRefreshIntervalAmount);
         }
     }
 
@@ -96,10 +80,12 @@ export default class MarkdownPage extends React.Component {
         );
     }
 
-    processTag(tagName, props) {
+    createElement(type, props, children) {
         if (this.props.onEachTag)
-            this.props.onEachTag(tagName, props);
-        switch (tagName) {
+            this.props.onEachTag(type, props, children);
+        switch(type) {
+            case 'meta':
+                return null;
             case 'img':
                 let src = props.src;
                 if (props.src) {
@@ -108,22 +94,29 @@ export default class MarkdownPage extends React.Component {
                 }
                 // console.log(tagName, props);
                 return <img src={src} alt={props.alt} className={props.className}/>;
-
-            case 'meta':
-                return null;
             case 'form':
                 return <Form
                     {...props}
                     className={props.className || "theme-default"}
                     method="post"
-                    />;
+                    children={children}
+                />;
             case 'input':       return <Input {...props} />
             case 'textarea':    return <TextArea {...props} />
-            case 'select':      return <Select {...props} />
+            case 'select':      return <Select {...props} children={children}/>
+
+            // Filter out dangerous tags
+            case 'iframe':
+            case 'script':
+            case 'applet':
+                console.error("Filtered out Tag: ", type);
+                type = 'div';
+                break;
             default:
-                return <div>Unknown Tag: {tagName}</div>;
         }
+        return React.createElement(type, props, children)
     }
+
 }
 
 

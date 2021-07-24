@@ -1,6 +1,6 @@
 import React from "react";
-import "./Form.css";
 import {FormContext} from "./FormContext";
+import "./Form.css";
 
 const TIMEOUT_CHANGE = 1000;
 
@@ -27,6 +27,17 @@ export default class Form extends React.Component {
     getClassName() { return 'theme-default'; }
 
     render() {
+        let content = this.renderForm();
+        if(this.state.errors['@session_required'])
+            content = [
+                content,
+                <div className="Login window"/>
+            ];
+
+        return content;
+    }
+
+    renderForm() {
         let className = this.getClassName();
         if(this.props.className)
             className += ' ' + this.props.className;
@@ -40,7 +51,7 @@ export default class Form extends React.Component {
                 onChange={this.cb.onChange}
             >
                 <div className="message" children={this.state.message} />
-                {this.state.showErrors ? Object.keys(this.state.errors).map(key => <div className="error" children={this.state.errors[key]} />) : null}
+                {this.state.showErrors ? Object.keys(this.state.errors).map(key => <div key={key} className="error" children={this.state.errors[key]} />) : null}
                 {this.props.children}
             </form>
         </FormContext.Provider>;
@@ -85,8 +96,8 @@ export default class Form extends React.Component {
 
         // Element Validations
         // this.setCustomValidations(form, newState.errors || {});
-
-        form.scrollIntoView()
+        if(!preview)
+            form.scrollIntoView();
     }
 
 
@@ -112,18 +123,6 @@ export default class Form extends React.Component {
             return obj;
         }, {});
     }
-
-    // setCustomValidations(form, errors) {
-    //     return Object.values(form.elements).reduce((obj, field) => {
-    //         if (field.name) {
-    //             const customValidity = errors[field.name] || "";
-    //             field.setCustomValidity(customValidity);
-    //             field.classList.toggle("invalid", !!customValidity);
-    //             console.log(field.name, customValidity);
-    //         }
-    //         return obj;
-    //     }, {});
-    // }
 }
 
 

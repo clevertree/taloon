@@ -6,18 +6,20 @@ form.theme-default {
 form.theme-default > fieldset {
     margin-bottom: 1em;
     display: flex;
-    flex-direction: row;
     /*align-items: center;*/
     flex-wrap: wrap;
+    font-size: larger;
+
 }
 form.theme-default > fieldset:hover > legend {
     font-weight: bold;
 }
 
 form.theme-default > fieldset > label {
-    min-width: 12vw;
-    text-align: right;
-    padding-right: 1vw;
+    /*min-width: 12vw;*/
+    /*text-align: right;*/
+    padding-right: 1em;
+    flex-basis: 100px;
 }
 
 form.theme-default > fieldset > label:after {
@@ -25,21 +27,18 @@ form.theme-default > fieldset > label:after {
 }
 
 
-@media only screen and (max-width: 800px) {
+@media only screen and (min-width: 600px) {
     form.theme-default > fieldset > label {
-        text-align: left;
-        flex-basis: 100%;
+        text-align: right;
+        /*flex-basis: 100%;*/
     }
 }
 
-form.theme-default > fieldset {
-    font-size: larger;
-}
 
-form.theme-default > fieldset > button,
-form.theme-default > fieldset > input,
-form.theme-default > fieldset > select,
-form.theme-default > fieldset > textarea {
+form.theme-default button,
+form.theme-default input,
+form.theme-default select,
+form.theme-default textarea {
     flex-grow: 1;
     padding: 0.5em;
     border: 2px inset #FFF;
@@ -48,24 +47,17 @@ form.theme-default > fieldset > textarea {
     transition: box-shadow 1s, border-color 1s;
 }
 
-form.theme-default > fieldset > input.invalid,
-form.theme-default > fieldset > select.invalid,
-form.theme-default > fieldset > textarea.invalid {
-    border-color: #F00;
-    box-shadow: #F00 0 0 12px;
-}
-
-form.theme-default > fieldset > button {
+form.theme-default button {
     border: 2px outset #FFF;
     font-size: larger;
     cursor: pointer;
 }
 
-form.theme-default > fieldset > input[type=text] {
+form.theme-default input[type=text] {
 }
 
-form.theme-default > fieldset > input[type=radio],
-form.theme-default > fieldset > input[type=checkbox] {
+form.theme-default input[type=radio],
+form.theme-default input[type=checkbox] {
     max-width: 40px;
     width: 40px;
     height: 40px;
@@ -95,4 +87,32 @@ form.theme-default > div.error:not(:empty) {
     transform: scale(1);
     max-height: 100px;
     padding: 1em;
+}
+
+/** Validation Text **/
+
+form.theme-default .validation-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+form.theme-default .validation-container > .validation-text{
+    color: #F00;
+    font-style: italic;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s, opacity 1s, margin 1s;
+}
+form.theme-default .validation-container.invalid > .validation-text{
+    max-height: 999px;
+    margin-top: 0.5em;
+}
+
+form.theme-default .validation-container.invalid > input,
+form.theme-default .validation-container.invalid > select,
+form.theme-default .validation-container.invalid > textarea {
+    border-color: #F00;
+    box-shadow: #F00 0 0 12px;
 }
