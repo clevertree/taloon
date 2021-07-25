@@ -35,20 +35,6 @@ export default class Form extends React.Component {
 
         let children = this.props.children;
 
-        if(this.state.validations['@session_required']) {
-            // TODO: add login button and do  modal instead of replaced form
-            children = <>
-                <fieldset>
-                    <legend>
-                        {this.state.validations['@session_required']}
-                    </legend>
-                    <label>Log in</label>
-                    <button>Login</button>
-                </fieldset>
-                {children}
-            </>
-        }
-
         return <FormContext.Provider value={this.state}>
             <form
                 {...this.props}
@@ -72,7 +58,7 @@ export default class Form extends React.Component {
         let formName = this.getFormName(form);
         const formValues = this.getFormValues(form);
 
-        let postURL = new URL(window.location.href);
+        let postURL = new URL(window.location.href); // TODO: process.env.REACT_APP_API_ENDPOINT
         if(process.env.REACT_APP_API_PORT)
             postURL.port = process.env.REACT_APP_API_PORT;
         postURL.search = `formName=${formName}${preview ? '&preview=true' : ''}`;
@@ -88,6 +74,7 @@ export default class Form extends React.Component {
 
         try {
             const response = await fetch(postURL + '', {
+                credentials: "include",
                 method: 'post',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formValues)
@@ -131,5 +118,3 @@ export default class Form extends React.Component {
         }, {});
     }
 }
-
-

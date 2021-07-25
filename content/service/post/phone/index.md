@@ -10,6 +10,11 @@ This section is a work in progress. Please check back soon.
 
 <form name="service-phone-post">
   <fieldset>
+    <legend>Your Account</legend>
+    <label for="title">Email</label>
+    <session name="email"></session>
+  </fieldset>
+  <fieldset>
     <legend>Your Offer Title</legend>
     <label for="title">Title</label>
     <input type="text" name="title" id="title" placeholder="Offering Nexus5X with Sim (Text & Talk)" required />

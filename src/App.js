@@ -57,7 +57,7 @@ class App extends Component {
 
 
     renderHeader() {
-        let src = "./header.md";
+        let src = "./site/header.md";
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
@@ -66,7 +66,7 @@ class App extends Component {
     }
 
     renderFooter() {
-        let src = "./footer.md";
+        let src = "./site/footer.md";
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}

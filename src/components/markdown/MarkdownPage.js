@@ -8,6 +8,7 @@ import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
+import Session from "../form/input/Session";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -87,10 +88,8 @@ export default class MarkdownPage extends React.Component {
             this.props.onEachTag(type, props, children);
         // console.log('createElement', type, props, children)
         switch(type) {
-            case 'meta':
-                return null;
-            // case 'img':         return <Img {...props}/>;
-            case 'a':         return <A {...props} children={children} />;
+            case 'meta':        return null;
+            case 'a':           return <A {...props} children={children} />;
             case 'img':         return <Img {...props} src={new URL(props.src, markdownURL).toString()} />;
             case 'form':
                 return <Form
@@ -99,10 +98,12 @@ export default class MarkdownPage extends React.Component {
                     method="post"
                     children={children}
                 />;
-            case 'fieldset':       return <FieldSet {...props} children={children}/>
+            case 'fieldset':    return <FieldSet {...props} children={children}/>
             case 'input':       return <Input {...props} />
             case 'textarea':    return <TextArea {...props} />
             case 'select':      return <Select {...props} children={children}/>
+
+            case 'session':     return <Session {...props} />
 
             // Filter out dangerous tags
             case 'iframe':
@@ -136,3 +137,4 @@ function A(props) {
     // eslint-disable-next-line jsx-a11y/anchor-has-content
     return <a {...props}/>;
 }
+

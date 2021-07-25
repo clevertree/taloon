@@ -116,16 +116,3 @@ form.theme-default .validation-container.invalid > textarea {
     border-color: #F00;
     box-shadow: #F00 0 0 12px;
 }
-
-/** Modal **/
-.modal-container {
-    position: relative;
-}
-
-.modal-container .modal-login {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    background-color: #FFFD;
-}
