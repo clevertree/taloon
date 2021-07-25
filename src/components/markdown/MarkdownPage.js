@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 import Markdown from 'markdown-to-jsx';
 
 import './MarkdownPage.css'
-import Form from "../form/Form";
 import Select from "../form/input/Select";
 import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
+import Form from "../form/Form";
+import FieldSet from "../form/FieldSet";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -81,19 +82,16 @@ export default class MarkdownPage extends React.Component {
     }
 
     createElement(type, props, children) {
+        const markdownURL = resolveContentURL(this.props.src);
         if (this.props.onEachTag)
             this.props.onEachTag(type, props, children);
+        // console.log('createElement', type, props, children)
         switch(type) {
             case 'meta':
                 return null;
-            case 'img':
-                let src = props.src;
-                if (props.src) {
-                    const sourceURL = resolveContentURL(this.props.src);
-                    src = new URL(props.src, sourceURL).toString();
-                }
-                // console.log(tagName, props);
-                return <img src={src} alt={props.alt} className={props.className}/>;
+            // case 'img':         return <Img {...props}/>;
+            case 'a':         return <A {...props} children={children} />;
+            case 'img':         return <Img {...props} src={new URL(props.src, markdownURL).toString()} />;
             case 'form':
                 return <Form
                     {...props}
@@ -101,6 +99,7 @@ export default class MarkdownPage extends React.Component {
                     method="post"
                     children={children}
                 />;
+            case 'fieldset':       return <FieldSet {...props} children={children}/>
             case 'input':       return <Input {...props} />
             case 'textarea':    return <TextArea {...props} />
             case 'select':      return <Select {...props} children={children}/>
@@ -109,7 +108,7 @@ export default class MarkdownPage extends React.Component {
             case 'iframe':
             case 'script':
             case 'applet':
-                console.error("Filtered out Tag: ", type);
+                console.warn("Filtered out Tag: ", type);
                 type = 'div';
                 break;
             default:
@@ -129,3 +128,11 @@ function isDevMode() {
     return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 }
 
+function Img(props) {
+    return <img {...props} alt={props.alt} />;
+}
+
+function A(props) {
+    // eslint-disable-next-line jsx-a11y/anchor-has-content
+    return <a {...props}/>;
+}

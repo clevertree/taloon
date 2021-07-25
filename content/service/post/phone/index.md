@@ -7,7 +7,6 @@
 This section is a work in progress. Please check back soon.
 ```
 
-<iframe src="https://paradigmthreat.net"></iframe>
 
 <form name="service-phone-post">
   <fieldset>

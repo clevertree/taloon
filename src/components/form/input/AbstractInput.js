@@ -22,12 +22,12 @@ export default class AbstractInput extends React.Component {
     render() {
         return <FormContext.Consumer>
             {(formState) => {
-                let validation = "";
+                let validation = "", validations = formState.validations || {};
                 if (this.props.name) {
-                    if (formState.errors[this.props.name])
-                        validation = formState.errors[this.props.name];
+                    if (validations[this.props.name])
+                        validation = validations[this.props.name];
                 }
-                console.log('formState', formState, {validation});
+                // console.log('formState', formState, {validation});
                 let validationClass = "validation-container";
                 if(validation)
                     validationClass += ' invalid';
@@ -35,7 +35,6 @@ export default class AbstractInput extends React.Component {
                     {this.renderInput(validation)}
                     <div className="validation-text">{validation}</div>
                 </div>;
-                // TODO: prevent text rerender
             }}
         </FormContext.Consumer>
     }

@@ -4,6 +4,7 @@ import "./Form.css";
 
 const TIMEOUT_CHANGE = 1000;
 
+
 export default class Form extends React.Component {
 
     constructor(props) {
@@ -17,8 +18,9 @@ export default class Form extends React.Component {
         }
         this.state = {
             processing: false,
-            errors: {},
-            showErrors: false,
+            validations: {
+                '@session_required': 'Please login to complete this form'
+            },
             message: null,
         }
         this.onChangeTimeout = null;
@@ -27,20 +29,25 @@ export default class Form extends React.Component {
     getClassName() { return 'theme-default'; }
 
     render() {
-        let content = this.renderForm();
-        if(this.state.errors['@session_required'])
-            content = [
-                content,
-                <div className="Login window"/>
-            ];
-
-        return content;
-    }
-
-    renderForm() {
         let className = this.getClassName();
         if(this.props.className)
             className += ' ' + this.props.className;
+
+        let children = this.props.children;
+
+        if(this.state.validations['@session_required']) {
+            // TODO: add login button and do  modal instead of replaced form
+            children = <>
+                <fieldset>
+                    <legend>
+                        {this.state.validations['@session_required']}
+                    </legend>
+                    <label>Log in</label>
+                    <button>Login</button>
+                </fieldset>
+                {children}
+            </>
+        }
 
         return <FormContext.Provider value={this.state}>
             <form
@@ -50,9 +57,9 @@ export default class Form extends React.Component {
                 onSubmit={this.cb.onSubmit}
                 onChange={this.cb.onChange}
             >
-                <div className="message" children={this.state.message} />
-                {this.state.showErrors ? Object.keys(this.state.errors).map(key => <div key={key} className="error" children={this.state.errors[key]} />) : null}
-                {this.props.children}
+                {this.state.message ? <div className="message" children={this.state.message} /> : null }
+                {this.state.error ? <div className="error" children={this.state.error} /> : null }
+                {children}
             </form>
         </FormContext.Provider>;
     }
@@ -69,13 +76,13 @@ export default class Form extends React.Component {
         if(process.env.REACT_APP_API_PORT)
             postURL.port = process.env.REACT_APP_API_PORT;
         postURL.search = `formName=${formName}${preview ? '&preview=true' : ''}`;
-        console.log("Submitting form ", postURL + '', form, formValues);
+        console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {
             processing: true,
             message: null,
-            errors: {},
-            showErrors: !preview
+            // validations: {}, // Don't clear validations until submission is finished
+            // showErrors: !preview
         }
         this.setState(newState);
 
@@ -86,16 +93,16 @@ export default class Form extends React.Component {
                 body: JSON.stringify(formValues)
             });
             newState = await response.json();
-            console.log(`${preview ? "Preview " : ""}Response: `, response, newState);
+            console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
         } catch (err) {
-            newState.errors = {_: "Invalid JSON Response: " + err.message};
+            newState.validations = {_: "Invalid JSON Response: " + err.message};
         }
         newState.processing = false;
         this.setState(newState);
 
 
         // Element Validations
-        // this.setCustomValidations(form, newState.errors || {});
+        // this.setCustomValidations(form, newState.validations || {});
         if(!preview)
             form.scrollIntoView();
     }
