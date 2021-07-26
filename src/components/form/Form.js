@@ -58,10 +58,8 @@ export default class Form extends React.Component {
         let formName = this.getFormName(form);
         const formValues = this.getFormValues(form);
 
-        let postURL = new URL(window.location.href); // TODO: process.env.REACT_APP_API_ENDPOINT
-        if(process.env.REACT_APP_API_PORT)
-            postURL.port = process.env.REACT_APP_API_PORT;
-        postURL.search = `formName=${formName}${preview ? '&preview=true' : ''}`;
+        let postURL = new URL(':form-submit', process.env.REACT_APP_API_ENDPOINT);
+        postURL.search = `path=${window.location.pathname}&name=${formName}${preview ? '&preview=true' : ''}`;
         console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {

@@ -4,8 +4,8 @@ import path from "path";
 import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
 import FormHandler from "../components/form/FormHandler";
-import EmailServer from "./email/SessionServer";
-import SessionServer from "./email/SessionServer";
+import EmailServer from "./session/SessionServer";
+import SessionServer from "./session/SessionServer";
 
 
 export default class Server {
@@ -30,13 +30,7 @@ export default class Server {
 
         // Setup email server routing
         EmailServer.setupRoutes(app);
-
-        app.post('*', (req, res, next) => {
-            return FormHandler.handleRequest(req, res, next);
-        });
-        app.put('*', (req, res, next) => {
-            return FormHandler.handleRequest(req, res, next);
-        });
+        FormHandler.setupRoutes(app);
 
         app.use(express.static(PATH_BUILD));
         // app.use(express.static(BUILD_FILES));
@@ -49,6 +43,7 @@ export default class Server {
 
                 case 'post':
                     return res.status(400).send("Invalid Post")
+                default:
             }
             let indexHTML = fs.readFileSync(fileRootHTMLPath, 'utf8');
 

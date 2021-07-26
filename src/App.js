@@ -1,9 +1,9 @@
-import ContextMenuContainer from "./components/menu/ContextMenuContainer";
 import React, {Component} from "react";
 import packageJSON from '../package.json';
 import path from 'path';
 
 import MarkdownPage from "./components/markdown/MarkdownPage";
+import MarkdownModal from "./components/modal/MarkdownModal";
 
 import 'typeface-open-sans/index.css'
 import './components/menu/style/Menu.css';
@@ -15,7 +15,8 @@ class App extends Component {
         this.state = {
             portrait: false,
             title: "The Traveling Merchant",
-            pathname: document.location.pathname
+            pathname: document.location.pathname,
+            activeModal: null
         };
 
         this.ref = {
@@ -42,16 +43,15 @@ class App extends Component {
     render() {
         let className = 'App ' + (this.state.portrait ? 'portrait' : 'landscape');
         return (
-            <ContextMenuContainer
-                className={className}
-                ref={this.ref.menu.contextContainer}
-                portrait={this.state.portrait}
-            >
-                {this.renderHeader()}
-                {this.renderContent()}
-                {this.renderFooter()}
-                Version: {packageJSON.version}
-            </ContextMenuContainer>
+            <AppContext.Provider value={this}>
+                <div className={className} >
+                    {this.renderHeader()}
+                    {this.renderContent()}
+                    {this.renderFooter()}
+                    Version: {packageJSON.version}
+                    {this.state.activeModal}
+                </div>
+            </AppContext.Provider>
         );
     }
 
@@ -161,9 +161,22 @@ class App extends Component {
         }
     }
 
-
+    async showModal(markdownPath) {
+        await new Promise((resolve, reject) => {
+            const onClose = e => {
+                resolve();
+            }
+            this.setState({
+                activeModal: <MarkdownModal
+                    src={markdownPath}
+                    onClose={onClose}
+                />
+            })
+        })
+    }
 
 }
 
 export default App;
 
+export const AppContext = React.createContext(null);

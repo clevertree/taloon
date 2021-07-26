@@ -1,3 +1,13 @@
+## Log in with Google SSO
+<form name="login-google">
+  <fieldset>
+    <legend>Click here to log in with Google SSO</legend>
+    <button type="submit">Login with Google</button>
+  </fieldset>
+</form>
+
+## Log in with Email Verification
+
 <form name="login">
   <fieldset>
     <legend>Your Email</legend>
@@ -5,7 +15,7 @@
     <input type="email" name="email" id="email" placeholder="Your Login Email Address" required />
   </fieldset>
   <fieldset>
-    <legend>Submit a new Phone Offer</legend>
-    <button type="submit">Submit</button>
+    <legend>Receive a 2-Factor Login Code</legend>
+    <button type="submit">Send Code to my Email</button>
   </fieldset>
 </form>

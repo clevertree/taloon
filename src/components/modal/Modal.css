@@ -1,13 +1,37 @@
 
 /** Modal **/
-.modal-container {
-    position: relative;
-}
-
-.modal-container .modal-login {
-    position: absolute;
-    width: 100%;
+.modal-overlay {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
     top: 0;
-    background-color: #FFFD;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #FFFE;
+    z-index: 10;
+}
+
+.modal-container {
+    background-color: #EEE;
+    min-width: 50vw;
+    padding: 3em;
+    border-radius: 1em;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    0% {
+        transform: translateX(-100%) rotate(-15deg);
+        opacity: 0;
+    }
+    100% {
+
+        transform: translateX(0%) rotate(0deg);
+        opacity: 1;
+    }
 }

@@ -66,7 +66,7 @@ export default class MarkdownPage extends React.Component {
         }
         if (isDevMode()) {
             clearInterval(this.devRefreshIntervalID);
-            // this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.devRefreshIntervalAmount);
+            this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.devRefreshIntervalAmount);
         }
     }
 
@@ -137,4 +137,6 @@ function A(props) {
     // eslint-disable-next-line jsx-a11y/anchor-has-content
     return <a {...props}/>;
 }
+
+
 
