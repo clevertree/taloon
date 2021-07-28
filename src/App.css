@@ -96,8 +96,8 @@ body {
 .App form button,
 .App a.button {
   display: block;
-  padding: 1em 2em;
-  margin: 0.5em;
+  padding: 0.5em 2em;
+  margin: 0.5em 0 0 0;
   background-color: #61dafb;
   border-radius: 1em;
   text-decoration: none;

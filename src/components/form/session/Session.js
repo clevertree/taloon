@@ -1,5 +1,5 @@
 import React from "react";
-import AbstractInput from "./AbstractInput";
+import AbstractInput from "../input/AbstractInput";
 import {AppContext} from "../../../App";
 
 export default class Session extends AbstractInput {
@@ -14,14 +14,14 @@ export default class Session extends AbstractInput {
     }
 
     async updateSession() {
-        const postURL = new URL(':session', process.env.REACT_APP_API_ENDPOINT).toString();
+        const postURL = new URL('session', process.env.REACT_APP_API_ENDPOINT).toString();
         const response = await fetch(postURL + '', {
             credentials: "include",
             method: 'post',
             headers: {'Content-Type': 'application/json'},
         });
         const responseJson = await response.json();
-        console.log(':session', postURL, responseJson);
+        console.log('session', postURL, responseJson);
         this.setState(responseJson);
     }
 

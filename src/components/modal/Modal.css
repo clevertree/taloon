@@ -1,37 +1,84 @@
 
 /** Modal **/
-.modal-overlay {
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #FFFE;
-    z-index: 10;
-}
 
 .modal-container {
+    position: fixed;
+    background-color: #FFFE;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 11;
+    cursor: pointer;
+}
+
+.modal {
+    cursor: initial;
     background-color: #EEE;
     min-width: 50vw;
     padding: 3em;
     border-radius: 1em;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-    animation: slideInUp 0.5s ease-out;
+    border: 1px solid #444;
+    box-shadow: 2px 2px 7px #000;
+    animation: fadeIn 0.5s ease-in-out;
+    margin-top: -20vh;
+
 }
 
-@keyframes slideInUp {
+.modal.closing {
+    animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+.modal-header {
+    color: white;
+    font-weight: bold;
+    background-color: #555;
+    padding: 0.5em 1em;
+    margin: -3em -3em 0 -3em;
+    border-radius: 1em 1em 0 0;
+    /*font-size: larger;*/
+}
+
+.modal-header > .button-close {
+    float: right;
+    cursor: pointer;
+    padding: 1em;
+    margin: -1em;
+    transition: text-shadow 0.5s ease-in, transform 1s;
+}
+.modal-header > .button-close:hover {
+    text-shadow: 0 0 10px #F00;
+    transform: scale(2);
+}
+
+.modal-error {
+    color: white;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 1em;
+    background-color: #660000;
+}
+
+@keyframes fadeIn {
     0% {
-        transform: translateX(-100%) rotate(-15deg);
         opacity: 0;
+        transform: rotateX(20deg) rotateY(10deg) rotateZ(-10deg) scale(0.5);
     }
     100% {
-
-        transform: translateX(0%) rotate(0deg);
         opacity: 1;
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+    }
+}
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: rotateX(-5deg) rotateY(-5deg) rotateZ(2deg) scale(0.5);
     }
 }

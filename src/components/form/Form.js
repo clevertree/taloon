@@ -1,6 +1,7 @@
 import React from "react";
 import {FormContext} from "./FormContext";
 import "./Form.css";
+import AppEvents from "../event/AppEvents";
 
 const TIMEOUT_CHANGE = 1000;
 
@@ -35,9 +36,9 @@ export default class Form extends React.Component {
 
         let children = this.props.children;
 
-        return <FormContext.Provider value={this.state}>
+        return <FormContext.Provider value={this}>
             <form
-                {...this.props}
+                action={this.props.action}
                 className={className}
                 ref={this.ref.form}
                 onSubmit={this.cb.onSubmit}
@@ -55,11 +56,11 @@ export default class Form extends React.Component {
     async onSubmit(e, preview=false) {
         e.preventDefault();
         const form = this.ref.form.current;
-        let formName = this.getFormName(form);
         const formValues = this.getFormValues(form);
+        const formPosition = this.getFormPosition(form);
 
-        let postURL = new URL(':form-submit', process.env.REACT_APP_API_ENDPOINT);
-        postURL.search = `path=${window.location.pathname}&name=${formName}${preview ? '&preview=true' : ''}`;
+        let postURL = new URL('form-submit', process.env.REACT_APP_API_ENDPOINT);
+        postURL.search = `markdownPath=${this.props.markdownPath}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
         console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {
@@ -83,13 +84,20 @@ export default class Form extends React.Component {
             newState.validations = {_: "Invalid JSON Response: " + err.message};
         }
         newState.processing = false;
-        this.setState(newState);
 
 
-        // Element Validations
-        // this.setCustomValidations(form, newState.validations || {});
-        if(!preview)
+        if(!preview) {
             form.scrollIntoView();
+            if(newState.success === true) {
+                AppEvents.emit('form:success', newState)
+            } else {
+                AppEvents.emit('form:failed', newState)
+                if(!newState.error)
+                    newState.error = "Form submission was unsuccessful";
+                console.warn(newState.error, newState);
+            }
+        }
+        this.setState(newState);
     }
 
 
@@ -98,19 +106,15 @@ export default class Form extends React.Component {
         this.onChangeTimeout = setTimeout(() => this.onSubmit(e, true), timeout);
     }
 
-
-    getFormName(form) {
-        let formName = form.getAttribute('name');
-        if(!formName) {
-            const forms = [...document.querySelectorAll('form')];
-            formName = forms.indexOf(form);
-        }
-        return formName;
+    getFormPosition(form) {
+        const bodyElm = form.closest('.markdown-body, body');
+        const formElms = bodyElm.getElementsByTagName('form');
+        return [...formElms].indexOf(form);
     }
 
     getFormValues(form) {
         return Object.values(form).reduce((obj, field) => {
-            if (field.name)
+            if (field.name && typeof field.value !== "undefined")
                 obj[field.name] = field.value;
             return obj;
         }, {});

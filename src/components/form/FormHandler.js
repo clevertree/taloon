@@ -10,51 +10,48 @@ class FormHandler {
 
     static handleRequest(req, res, next) {
         try {
-            const formPath = req.query.path;
+            const formPath = req.query.markdownPath;
             if (!formPath)
-                throw new Error("Invalid form path");
+                throw new Error("Missing parameter: markdownPath");
             const PATH_CONTENT = path.resolve(process.env.REACT_APP_PATH_CONTENT);
 
-            const pathIndexMD = path.resolve(PATH_CONTENT + formPath, 'index.md');
+            const pathIndexMD = path.resolve(PATH_CONTENT, formPath);
             if (!fs.existsSync(pathIndexMD))
-                throw new Error("Markdown page not found: " + path.resolve(formPath, 'index.md'));
+                throw new Error("Markdown page not found: " + formPath);
 
             const markdownHTML = fs.readFileSync(pathIndexMD, 'utf8');
             const DOM = new JSDOM(markdownHTML);
             const document = DOM.window.document;
 
-            let formName = req.query.name || 0;
+            if(!req.query.formPosition)
+                throw new Error("Missing parameter: formPosition");
+            if (Number.isNaN(Number.parseInt(req.query.formPosition)))
+                throw new Error("Invalid integer: formPosition");
+            let formPosition = Number.parseInt(req.query.formPosition);
             const forms = [...document.querySelectorAll('form')];
-            if (!Number.isNaN(Number.parseInt(formName))) {
-                const formID = Number.parseInt(formName);
-                if (!forms[formID])
-                    throw new Error(`Form ID ${formID} not found`);
-                const form = forms[formID];
-                return this.processFormRequest(form, req, res);
-            }
+            if (!forms[formPosition])
+                throw new Error(`Form Position ${formPosition} not found`);
+            const form = forms[formPosition];
+            return FormHandler.processFormRequest(form, req, res);
 
-            for (const form of forms)
-                if (form.getAttribute('name') === formName)
-                    return this.processFormRequest(form, req, res);
-
-            throw new Error("No Forms were found: " + formPath);
         } catch (err) {
             console.error("Error submitting form: ", err.message);
             // res.statusMessage = err.message;
             return res.status(400).send(JSON.stringify({
-                errors: [err.message]
+                error: err.message,
+                success: false
             }));
         }
     }
 
     static processFormRequest(form, req, res) {
-        const formName = form.name;
-        if (!formName)
-            throw new Error("Invalid form name");
+        const action = form.action;
+        if (!action)
+            throw new Error("Invalid form action");
 
-        if (!formHandlers[formName])
-            throw new Error(`Form name not found: ${formName}`)
-        const formHandler = formHandlers[formName];
+        if (!formHandlers[action])
+            throw new Error(`Form action not found: ${action}`)
+        const formHandler = formHandlers[action];
 
         // Validate form
         const validation = {};
@@ -69,14 +66,15 @@ class FormHandler {
         }
 
         const jsonResponse = formHandler(req, form, validation) || {
-            errors: ["No response from form handler"]
+            error: "No response from form handler",
+            success: false
         }
 
         res.status(200).send(jsonResponse);
     }
 
     static setupRoutes(app) {
-        app.post('/:form-submit', this.handleRequest.bind(this));
+        app.post('/form-submit', FormHandler.handleRequest);
 
     }
 }

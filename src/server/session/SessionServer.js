@@ -12,7 +12,7 @@ export default class SessionServer {
             keys: process.env.REACT_APP_SESSION_KEYS.split(/[,;]+/g), // should be a large unguessable string
         }));
 
-        app.post('/:session', this.handleSessionRequest)
+        app.post('/session', this.handleSessionRequest)
     }
 
     static handleSessionRequest(req, res, next) {

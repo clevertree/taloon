@@ -162,16 +162,18 @@ class App extends Component {
     }
 
     async showModal(markdownPath) {
-        await new Promise((resolve, reject) => {
-            const onClose = e => {
-                resolve();
-            }
+        console.log("Showing Modal: ", markdownPath);
+        const result = await new Promise((resolve, reject) => {
             this.setState({
                 activeModal: <MarkdownModal
                     src={markdownPath}
-                    onClose={onClose}
+                    onClose={resolve}
                 />
             })
+        });
+        console.log("Closing Modal: ", {result, markdownPath});
+        this.setState({
+            activeModal: null
         })
     }
 

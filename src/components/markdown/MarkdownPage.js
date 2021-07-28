@@ -8,7 +8,7 @@ import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
-import Session from "../form/input/Session";
+import Session from "../form/session/Session";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -33,6 +33,7 @@ export default class MarkdownPage extends React.Component {
         this.options = {
             createElement: (type, props, children) => this.createElement(type, props, children),
         };
+        // this.formCount = 0;
         this.devRefreshIntervalID = null
         this.devRefreshIntervalAmount = props.refreshInterval || 5000;
         // console.log('props', props);
@@ -76,7 +77,10 @@ export default class MarkdownPage extends React.Component {
             className += ' ' + this.props.className;
         const options = Object.assign({}, this.options, this.props.options || {});
         return (
-            <Markdown className={className} options={options}>
+            <Markdown
+                className={className}
+                options={options}>
+
                 {this.state.content || "Loading " + this.props.file}
             </Markdown>
         );
@@ -95,6 +99,7 @@ export default class MarkdownPage extends React.Component {
                 return <Form
                     {...props}
                     className={props.className || "theme-default"}
+                    markdownPath={this.props.src}
                     method="post"
                     children={children}
                 />;
