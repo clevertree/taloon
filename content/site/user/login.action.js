@@ -1,12 +1,10 @@
-module.exports = function LoginAction(req, res, form) {
-    const validations = {};
-    const values = req.body;
-    console.log("Login: ", values);
+import UserClient from "../../../src/user/UserClient";
 
-    // req.session.reset();
-    // console.log('req.session.test', req.session.test);
-    // req.session.test = 'wut';
+module.exports = async function LoginAction(req, res, form) {
 
+    // User Client class handles the login requests
+    const user = UserClient.fromRequest(req);
+    const validations = await user.handleLoginRequest(req);
 
     // Return Errors or Preview
     if (req.query.preview

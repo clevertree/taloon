@@ -104,7 +104,7 @@ export default class MarkdownPage extends React.Component {
                     children={children}
                 />;
             case 'fieldset':    return <FieldSet {...props} children={children}/>
-            case 'input':       return <Input {...props} />
+            case 'input':       return <Input {...props} skipValidationContainer={props.type === 'hidden'} />
             case 'textarea':    return <TextArea {...props} />
             case 'select':      return <Select {...props} children={children}/>
 

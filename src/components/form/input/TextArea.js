@@ -9,7 +9,7 @@ export default class TextArea extends AbstractInput {
     renderInput(validation) {
         return <textarea {...this.props}
                          defaultValue={this.props.value}
-                         placeholder={(this.props.placeholder||'').toString().replaceAll('\\n', "\n")}
+                         placeholder={this.getPlaceholder()}
                          children={null}
                          />;
     }

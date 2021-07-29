@@ -9,7 +9,7 @@ export default class Input extends AbstractInput {
     renderInput(validation) {
         return <input
             {...this.props}
-            placeholder={(this.props.placeholder||'').toString().replaceAll('\\n', "\n")}
+            placeholder={this.getPlaceholder()}
             ref={ref => {
                 ref && ref.setCustomValidity(validation)
             }}

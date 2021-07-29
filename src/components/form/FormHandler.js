@@ -9,16 +9,11 @@ class FormHandler {
         actionHandlers[actionName] = callback;
     }
 
-    static handleFormRequest(req, res, formActionCallback) {
+    static async handleFormRequest(req, res, formActionCallback) {
         try {
             const formPath = req.query.markdownPath;
             if (!formPath)
                 throw new Error("Missing parameter: markdownPath");
-
-            const PATH_CONTENT = path.resolve(process.env.REACT_APP_PATH_CONTENT);
-            const pathIndexMD = path.resolve(PATH_CONTENT, formPath);
-            if (!fs.existsSync(pathIndexMD))
-                throw new Error("Markdown page not found: " + formPath);
 
             if(!req.query.formPosition)
                 throw new Error("Missing parameter: formPosition");
@@ -26,6 +21,12 @@ class FormHandler {
                 throw new Error("Invalid integer: formPosition");
 
             let formPosition = Number.parseInt(req.query.formPosition);
+
+            const pathIndexMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, formPath);
+            // const pathIndexMD = path.resolve(PATH_CONTENT, formPath);
+            if (!fs.existsSync(pathIndexMD))
+                throw new Error("Markdown page not found: " + formPath);
+
             const markdownHTML = fs.readFileSync(pathIndexMD, 'utf8');
             const DOM = new JSDOM(markdownHTML);
             const document = DOM.window.document;
@@ -34,7 +35,7 @@ class FormHandler {
             if (!forms[formPosition])
                 throw new Error(`Form Position ${formPosition} not found`);
             const form = forms[formPosition];
-            formActionCallback(req, res, form);
+            await formActionCallback(req, res, form);
 
         } catch (err) {
             console.error("Error submitting form: ", err.message);

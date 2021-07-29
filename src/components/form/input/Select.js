@@ -9,7 +9,7 @@ export default class Select extends AbstractInput {
     renderInput(validation) {
         return <select {...this.props}
                        defaultValue={this.props.value}
-                       placeholder={(this.props.placeholder||'').toString().replaceAll('\\n', "\n")}
+                       placeholder={this.getPlaceholder()}
                 />;
     }
 }

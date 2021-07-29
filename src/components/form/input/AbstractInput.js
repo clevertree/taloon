@@ -27,6 +27,8 @@ export default class AbstractInput extends React.Component {
                     if (validations[this.props.name])
                         validation = validations[this.props.name];
                 }
+                if(this.props.skipValidationContainer)
+                    return this.renderInput(validation);
                 // console.log('formState', formState, {validation});
                 let validationClass = "validation-container";
                 if(validation)
@@ -43,6 +45,11 @@ export default class AbstractInput extends React.Component {
         throw new Error("Unimplemented");
     }
 
+    getPlaceholder() {
+        if(!this.props.placeholder)
+            return null;
+        return this.props.placeholder.toString().replaceAll('\\n', "\n");
+    }
     // onChange(e) {
     //     console.log('e.target.value', e.target.value);
     //     this.setState({value: e.target.value})

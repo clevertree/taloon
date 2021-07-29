@@ -37,7 +37,7 @@ export default class Session extends AbstractInput {
                 } else {
                     return <button {...this.props}
                                    defaultValue={this.props.value}
-                                   placeholder={(this.props.placeholder||'').toString().replaceAll('\\n', "\n")}
+                                   placeholder={this.getPlaceholder()}
                                    onClick={e => this.onClick(e, app)}
                                    children={"Login"}
                     />;
@@ -48,7 +48,7 @@ export default class Session extends AbstractInput {
 
     async onClick(e, app) {
         e.preventDefault();
-        await app.showModal('./user/login.md');
+        await app.showModal(`${process.env.REACT_APP_PATH_SITE}/user/login.md`);
         await this.updateSession();
     }
 }
