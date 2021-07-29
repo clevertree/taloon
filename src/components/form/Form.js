@@ -61,7 +61,7 @@ export default class Form extends React.Component {
 
         let postURL = new URL('form-submit', process.env.REACT_APP_API_ENDPOINT);
         postURL.search = `markdownPath=${this.props.markdownPath}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
-        console.log("Submitting form ", postURL + '', formValues, form);
+        // console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {
             processing: true,
@@ -79,7 +79,7 @@ export default class Form extends React.Component {
                 body: JSON.stringify(formValues)
             });
             newState = await response.json();
-            console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
+            // console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
         } catch (err) {
             newState.validations = {_: "Invalid JSON Response: " + err.message};
         }

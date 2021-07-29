@@ -48,7 +48,7 @@ export default class Session extends AbstractInput {
 
     async onClick(e, app) {
         e.preventDefault();
-        await app.showModal('./site/modal/login.md');
+        await app.showModal('./user/login.md');
         await this.updateSession();
     }
 }

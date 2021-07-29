@@ -18,23 +18,30 @@ export default class MarkdownModal extends React.Component {
             stopPropagation: e => e.stopPropagation()
         }
         this.state = {
-            status: 'error',
-            error: 'omfg'
+            status: 'open',
+            error: null
+        }
+        this.ref = {
+            modal: React.createRef()
         }
     }
 
     componentDidMount() {
         AppEvents.addEventListener('form:success', this.cb.onClose);
+        if(this.ref.modal.current)
+            this.ref.modal.current.focus();
     }
     componentWillUnmount() {
         AppEvents.removeEventListener('form:success', this.cb.onClose)
     }
 
     render() {
-        console.log("TODO", this.props)
         return <div className={"modal-container"}
-                 onClick={this.cb.onClose}>
+                    onKeyDown={this.cb.onClose}
+                    onClick={this.cb.onClose}>
             <div className={"modal " + this.state.status}
+                 ref={this.ref.modal}
+                 tabIndex={0}
                 onClick={this.cb.stopPropagation}>
                 <div className="modal-header">
                     Title
@@ -51,6 +58,14 @@ export default class MarkdownModal extends React.Component {
     }
 
     async onClose(e) {
+        switch(e.type) {
+            case 'click': break;
+            case 'keydown':
+                if (e.keyCode === 27)
+                    break;
+                return;
+            default: return;
+        }
         try {
             this.setState({status: 'closing'});
             await sleep (500);

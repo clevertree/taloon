@@ -1,8 +1,4 @@
-import FormHandler from "../../components/form/FormHandler";
-
-FormHandler.addFormActionHandler('service-phone-post', ServicePhonePost);
-
-function ServicePhonePost(req, form) {
+export default function PhonePost(req, form) {
     const validations = {};
     const values = req.body;
 
@@ -32,6 +28,4 @@ function ServicePhonePost(req, form) {
     return { success: true, message: "Form submitted successfully"};
 }
 
-export {
-    ServicePhonePost
-}
+

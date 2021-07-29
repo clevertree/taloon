@@ -77,10 +77,15 @@ class App extends Component {
 
     renderContent() {
         let src = "./index.md";
-        const currentPath = this.state.pathname;
-        if(currentPath && currentPath !== '/')
-            src = '.' + path.resolve(currentPath, 'index.md');
-
+        if(this.state.pathname)
+            src = '.' + this.state.pathname;
+        if(!src.endsWith('.md')) {
+            if(src.endsWith('/'))
+                src += 'index.md';
+            else if(!src.endsWith('.md'))
+                src += '.md';
+        }
+console.log('src', src);
         // Remove previous meta tags
         for(const metaElm of document.head.querySelectorAll(
             "title, meta[name='description'], meta[name='keywords'], meta[name='title']")) {

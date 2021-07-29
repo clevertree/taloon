@@ -8,7 +8,7 @@
 
 ## Log in with Email Verification
 
-<form action="user-login-email">
+<form action="user/login-email.js">
   <fieldset>
     <legend>Your Email</legend>
     <label for="email">Email</label>
