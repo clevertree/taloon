@@ -2,6 +2,7 @@ import React from "react";
 import {FormContext} from "./FormContext";
 import "./Form.css";
 import AppEvents from "../event/AppEvents";
+import path from "path";
 
 const TIMEOUT_CHANGE = 1000;
 
@@ -56,10 +57,11 @@ export default class Form extends React.Component {
     async onSubmit(e, preview=false) {
         e.preventDefault();
         const form = this.ref.form.current;
+        const formAction = path.resolve(path.dirname(this.props.markdownPath), form.getAttribute('action'));
         const formValues = this.getFormValues(form);
         const formPosition = this.getFormPosition(form);
 
-        let postURL = new URL('form-submit', process.env.REACT_APP_API_ENDPOINT);
+        let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
         postURL.search = `markdownPath=${this.props.markdownPath}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
         // console.log("Submitting form ", postURL + '', formValues, form);
 
@@ -92,8 +94,10 @@ export default class Form extends React.Component {
                 AppEvents.emit('form:success', newState)
             } else {
                 AppEvents.emit('form:failed', newState)
-                if(!newState.error)
-                    newState.error = "Form submission was unsuccessful";
+                if(!newState.error) {
+                    const validationString = Object.values(newState.validations || {}).join("\n");
+                    newState.error = validationString || "Form submission was unsuccessful";
+                }
                 console.warn(newState.error, newState);
             }
         }

@@ -9,7 +9,6 @@ export default class Input extends AbstractInput {
     renderInput(validation) {
         return <input
             {...this.props}
-            value={this.props.defaultValue}
             placeholder={(this.props.placeholder||'').toString().replaceAll('\\n', "\n")}
             ref={ref => {
                 ref && ref.setCustomValidity(validation)

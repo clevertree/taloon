@@ -1,5 +1,6 @@
 ## Log in with Google SSO
-<form action="login-google">
+<form action="login">
+<input type="hidden" name="service" value="google">
   <fieldset>
     <legend>Click here to log in with Google SSO</legend>
     <button type="submit">Login with Google</button>
@@ -8,7 +9,7 @@
 
 ## Log in with Email Verification
 
-<form action="user/login-email.js">
+<form action="login">
   <fieldset>
     <legend>Your Email</legend>
     <label for="email">Email</label>

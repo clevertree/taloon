@@ -1,5 +1,4 @@
-// TODO: generate all form handlers on server run
-export default function LoginEmail(req, form) {
+module.exports = function PostAction(req, res, form) {
     const validations = {};
     const values = req.body;
 
@@ -20,8 +19,9 @@ export default function LoginEmail(req, form) {
     if (req.query.preview
         || Object.values(validations).length > 0
         || !form.checkValidity())
-        return {success: false, validations};
+        return res.status(400).send({validations});
 
     // Perform Action
-    return {success: true, message: "Form submitted successfully"};
+    return res.send({message: "Form submitted successfully"});
 }
+

@@ -1,5 +1,4 @@
 import Server from "../src/server/Server";
-import "../src/action/"
 
 import {config} from "dotenv";
 const result = config()

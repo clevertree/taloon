@@ -1,6 +1,4 @@
-import FormHandler from "../components/form/FormHandler";
-import LoginEmail from "./user/login-email";
-import PhonePost from "./service/phone-post";
+// TODO: generate all form handlers on server run
 
 FormHandler.addFormActionHandler('user-login-email', LoginEmail);
 FormHandler.addFormActionHandler('service/phone-post.js', PhonePost);

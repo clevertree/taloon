@@ -8,7 +8,7 @@ This section is a work in progress. Please check back soon.
 ```
 
 
-<form name="service-phone-post">
+<form action="post.action.js">
   <fieldset>
     <legend>Your Account</legend>
     <label for="title">Email</label>
