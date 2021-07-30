@@ -15,6 +15,12 @@ export default class Input extends AbstractInput {
             }}
             />;
     }
+
+    renderContainer(validation) {
+        if(this.props.type === 'hidden')
+            return this.renderInput(validation);
+        return super.renderContainer(validation);
+    }
 }
 
 

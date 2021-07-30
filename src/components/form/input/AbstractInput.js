@@ -1,5 +1,6 @@
 import React from "react";
 import {FormContext} from "../FormContext";
+import {valid} from "semver";
 
 export default class AbstractInput extends React.Component {
     constructor(props) {
@@ -27,18 +28,20 @@ export default class AbstractInput extends React.Component {
                     if (validations[this.props.name])
                         validation = validations[this.props.name];
                 }
-                if(this.props.skipValidationContainer)
-                    return this.renderInput(validation);
                 // console.log('formState', formState, {validation});
-                let validationClass = "validation-container";
-                if(validation)
-                    validationClass += ' invalid';
-                return <div className={validationClass}>
-                    {this.renderInput(validation)}
-                    <div className="validation-text">{validation}</div>
-                </div>;
+                return this.renderContainer(validation);
             }}
         </FormContext.Consumer>
+    }
+
+    renderContainer(validation) {
+        let validationClass = "validation-container";
+        if(validation)
+            validationClass += ' invalid';
+        return <div className={validationClass}>
+            {this.renderInput(validation)}
+            <div className="validation-text">{validation}</div>
+        </div>;
     }
 
     renderInput(validation) {

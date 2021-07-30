@@ -30,6 +30,14 @@ export default class Form extends React.Component {
 
     getClassName() { return 'theme-default'; }
 
+    componentDidMount() {
+        if(this.props.autofill || this.props["data-autofill"])
+            this.doAutoFill();
+
+        if(this.props.autosubmit || this.props["data-autosubmit"])
+            this.doAutoSubmit();
+    }
+
     render() {
         let className = this.getClassName();
         if(this.props.className)
@@ -55,7 +63,7 @@ export default class Form extends React.Component {
 
 
     async onSubmit(e, preview=false) {
-        e.preventDefault();
+        e && e.preventDefault();
         const form = this.ref.form.current;
         const formAction = path.resolve(path.dirname(this.props.markdownPath), form.getAttribute('action'));
         const formValues = this.getFormValues(form);
@@ -117,10 +125,32 @@ export default class Form extends React.Component {
     }
 
     getFormValues(form) {
-        return Object.values(form).reduce((obj, field) => {
+        return Object.values(form.elements).reduce((obj, field) => {
             if (field.name && typeof field.value !== "undefined")
                 obj[field.name] = field.value;
             return obj;
         }, {});
+    }
+
+    doAutoFill() {
+        // TODO: use localStorage
+        const form = this.ref.form.current;
+        const urlParams = new URLSearchParams(window.location.search);
+        for(const field of form.elements) {
+            if (field.name)  {
+                switch(this.props.autofill) {
+                    default:
+                        const paramValue = urlParams.get(field.name);
+                        if(paramValue)
+                            field.value = paramValue;
+                        break;
+                }
+
+            }
+        }
+    }
+
+    doAutoSubmit() {
+        this.onSubmit()
     }
 }
