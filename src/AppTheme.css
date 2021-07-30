@@ -1,0 +1,193 @@
+
+
+@keyframes buttonFadeIn {
+    0% {
+        transform: scale(1, 0.7);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1, 0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+
+.App.theme-default form {
+    /*display: flex;*/
+    /*flex-direction: column;*/
+}
+
+/** FieldSet Styles **/
+
+.App.theme-default form > fieldset {
+    margin-bottom: 1em;
+    display: flex;
+    /*align-items: center;*/
+    flex-wrap: wrap;
+    font-size: larger;
+
+}
+
+.App.theme-default form > fieldset:hover > legend {
+    font-weight: bold;
+}
+
+.App.theme-default form > fieldset > * {
+    flex-grow: 1;
+}
+.App.theme-default form > fieldset > label {
+    flex-grow: revert;
+    /*min-width: 12vw;*/
+    /*text-align: right;*/
+    padding-right: 1em;
+    flex-basis: 100px;
+}
+
+.App.theme-default form > fieldset > label:after {
+    content: ':'
+}
+
+
+@media only screen and (min-width: 600px) {
+    .App.theme-default form > fieldset > label {
+        text-align: right;
+        /*flex-basis: 100%;*/
+    }
+}
+
+/** Input Styles **/
+
+.App.theme-default button,
+.App.theme-default input,
+.App.theme-default select,
+.App.theme-default textarea {
+    /*flex-grow: 1;*/
+    padding: 0.5em;
+    border: 2px inset #FFF;
+    border-radius: 0.5em;
+    font-size: larger;
+    transition: box-shadow 1s, border-color 1s;
+}
+
+.App.theme-default form button {
+    border: 2px outset #FFF;
+    /*font-size: larger;*/
+    cursor: pointer;
+}
+
+.App.theme-default form input[type=text] {
+}
+
+.App.theme-default form input[type=radio],
+.App.theme-default form input[type=checkbox] {
+    max-width: 40px;
+    width: 40px;
+    height: 40px;
+    /*transform: scale(2);*/
+}
+
+
+
+/** Button Links **/
+
+.App.theme-default button,
+.App.theme-default a.button {
+    /*display: block;*/
+    /*padding: 1em 2em;*/
+    /*border-radius: 1em;*/
+
+    background-color: #61dafb;
+    text-decoration: none;
+    transition: background-color 1s, letter-spacing 1s, color 1s, box-shadow 1s;
+    font-weight: bold;
+    animation: buttonFadeIn 1s ease-in-out forwards;
+}
+.App.theme-default a.button {
+    display: block;
+    padding: 1em 2em;
+    border-radius: 1em;
+}
+.App.theme-default a.button + a.button {
+    margin-top: 0.5em;
+}
+.App.theme-default a.button:last-child {
+    margin-bottom: 0.5em;
+}
+
+
+.App.theme-default form button:hover,
+.App.theme-default a.button:hover {
+    color: white;
+    background-color: #6a737d;
+    text-shadow: #FFA 0 0 10px;
+    letter-spacing: .2rem;
+    box-shadow: #000 0 0 12px;
+}
+
+.App.theme-default form button.wide,
+.App.theme-default a.button.wide {
+    flex-grow: 1;
+}
+.App.theme-default form button.large,
+.App.theme-default a.button.large {
+    font-size: 1.5em;
+}
+
+
+/** Message and Error **/
+
+.App.theme-default form > div.message,
+.App.theme-default form > div.error {
+    background-color: #bbb;
+    border: 1px inset #FFF;
+    border-radius: 0.5em;
+    font-weight: bold;
+    transition: transform 0.8s, max-height 0.8s, padding 0.8s;
+    transform: scale(1, 0);
+    max-height: 0;
+    padding: 0 1em;
+}
+.App.theme-default form > div.error {
+    background-color: #bb9a9a;
+    color: #600;
+}
+
+.App.theme-default form > div.message:not(:empty),
+.App.theme-default form > div.error:not(:empty) {
+    transform: scale(1);
+    max-height: 100px;
+    padding: 1em;
+}
+
+/** Validation Text **/
+
+.App.theme-default form .validation-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.App.theme-default form .validation-container > .validation-text{
+    color: #F00;
+    font-style: italic;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s, opacity 1s, margin 1s;
+}
+.App.theme-default form .validation-container.invalid > .validation-text{
+    max-height: 999px;
+    margin-top: 0.5em;
+}
+
+.App.theme-default form .validation-container.invalid > input,
+.App.theme-default form .validation-container.invalid > select,
+.App.theme-default form .validation-container.invalid > textarea {
+    border-color: #F00;
+    box-shadow: #F00 0 0 12px;
+}

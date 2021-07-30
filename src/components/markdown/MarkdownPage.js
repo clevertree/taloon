@@ -8,7 +8,7 @@ import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
-import Session from "../form/session/Session";
+import SessionButton from "../form/session/SessionButton";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -108,7 +108,7 @@ export default class MarkdownPage extends React.Component {
             case 'textarea':    return <TextArea {...props} />
             case 'select':      return <Select {...props} children={children}/>
 
-            case 'session':     return <Session {...props} />
+            case 'session':     return <SessionButton {...props} />
 
             // Filter out dangerous tags
             case 'iframe':

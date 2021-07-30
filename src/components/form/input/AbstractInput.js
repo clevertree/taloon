@@ -1,6 +1,5 @@
 import React from "react";
 import {FormContext} from "../FormContext";
-import {valid} from "semver";
 
 export default class AbstractInput extends React.Component {
     constructor(props) {

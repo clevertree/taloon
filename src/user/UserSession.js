@@ -3,41 +3,59 @@ import crypto from 'crypto';
 
 const active2FactorLogins = {};
 
-export default class UserClient {
+export default class UserSession {
+    constructor(session={}) {
+        this.session = session;
+    }
+
+    login(req, email) {
+        console.log('Logging In ', email);
+        req.session = {
+            email,
+        };
+        this.session = req.session;
+    }
+
+    logout(req) {
+        this.session = req.session = null;
+    }
+
+    handleLogOutRequest(req, res) {
+        this.logout(req);
+        res.send({
+            message: "Session has been logged out",
+            redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+        })
+    }
 
     async handleLoginRequest(req, res, form) {
         switch(req.body.service) {
             case 'email':
-                await this.handleSend2FactorEmailRequest(req, res);
+                await this.send2FactorEmail(req);
+                res.send({
+                    message: "A 2-Factor code sent to your email address. Please use it to log in",
+                    showModal: `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md`,
+                })
                 break;
 
             case 'email-2factor-response':
-                await this.handle2FactorLoginRequest(req, res);
+                await this.loginWith2Factor(req);
+                res.send({
+                    message: "You are now logged in",
+                    showModal: `${process.env.REACT_APP_PATH_SITE}/user/login-2factor-success.md`,
+                    redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+                });
                 break;
             default:
             case 'google':
                 throw new Error("Not implemented: " + req.body.service);
         }
-
-        // req.session.reset();
-        // console.log('req.session.test', req.session.test);
-        // req.session.test = 'wut';
-
-        validations[''] = "Log in!";
-
-        return validations;
     }
 
     static fromRequest(req) {
-        return new UserClient();
+        return new UserSession();
     }
 
-    async handleSend2FactorEmailRequest(req, res) {
-        await this.send2FactorEmail(req);
-        res.send({
-            message: "A 2-Factor code sent to your email address. Please use it to log in"
-        })
-    }
 
     async send2FactorEmail(req) {
         const values = Object.assign({}, req.body);
@@ -51,7 +69,7 @@ export default class UserClient {
             null;
         values.host = process.env.REACT_APP_PATH_PUBLIC || req.headers.origin;
         values.codeUrl = new URL(
-            `${process.env.REACT_APP_PATH_SITE}/user/login2factor.md?email=${email}&code=${code2Factor}`,
+            `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${email}&code=${code2Factor}`,
             values.host);
         values.loginUrl = new URL(
             `${process.env.REACT_APP_PATH_SITE}/user/login.md?email=${email}`,
@@ -59,7 +77,8 @@ export default class UserClient {
 
         // Add 2 Factor
         active2FactorLogins[email] = code2Factor;
-        setTimeout(() => delete active2FactorLogins[email], process.env.REACT_APP_2FACTOR_TIMEOUT);
+        if(process.env.REACT_APP_2FACTOR_TIMEOUT)
+            setTimeout(() => delete active2FactorLogins[email], process.env.REACT_APP_2FACTOR_TIMEOUT);
 
         values.code = code2Factor;
         values.sessionDetails =
@@ -73,19 +92,11 @@ Ref: ${req.headers.referrer || 'N/A'}
         await EmailServer.sendMarkdownTemplateEmail(
             email,
             'Use this code to log in',
-            `${process.env.REACT_APP_PATH_SITE}/user/login2factor.email.md`,
+            `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.email.md`,
             values)
 
     }
 
-
-    async handle2FactorLoginRequest(req, res) {
-        await this.loginWith2Factor(req);
-        res.send({
-            message: "You are now logged in"
-        });
-        // TODO: redirect
-    }
 
     async loginWith2Factor(req) {
         const code2Factor = Number.parseInt(req.body.code);
@@ -93,12 +104,13 @@ Ref: ${req.headers.referrer || 'N/A'}
         if(active2FactorLogins[email] !== code2Factor)
             throw new Error("Invalid 2-Factor Code");
 
+        delete active2FactorLogins[email];
         // req.session.reset();
         // Reset session
         req.session = {
             email
         };
-        console.log('req.session', req.session);
+        // console.log('req.session', req.session);
         // req.session.test = 'wut';
     }
 }

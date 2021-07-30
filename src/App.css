@@ -51,7 +51,7 @@ body {
   z-index: 3;
   justify-content: space-evenly;
   font-family: "Helvetica", Sans-serif, serif;
-  font-size: 1.5em;
+  /*font-size: 1.5em;*/
 }
 
 @media only screen and (max-width: 800px) {
@@ -89,46 +89,4 @@ body {
   display: none;
 }
 
-
-
-/** Button Links **/
-
-.App form button,
-.App a.button {
-  display: block;
-  padding: 0.5em 2em;
-  margin: 0.5em 0;
-  background-color: #61dafb;
-  border-radius: 1em;
-  text-decoration: none;
-  transition: background-color 1s, letter-spacing 1s, color 1s, box-shadow 1s;
-  font-size: 1.5em;
-  font-weight: bold;
-  animation: buttonFadeIn 1s ease-in-out forwards;
-}
-
-.App form button:hover,
-.App a.button:hover {
-  color: white;
-  background-color: #6a737d;
-  text-shadow: #FFA 0 0 10px;
-  letter-spacing: .2rem;
-  box-shadow: #000 0 0 12px;
-}
-
-
-@keyframes buttonFadeIn {
-  0% {
-    transform: scale(1, 0.7);
-  }
-  50% {
-    transform: scale(1);
-  }
-  75% {
-    transform: scale(1, 0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
 

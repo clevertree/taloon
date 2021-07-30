@@ -1,13 +1,15 @@
 import React, {Component} from "react";
 import packageJSON from '../package.json';
-import path from 'path';
 
 import MarkdownPage from "./components/markdown/MarkdownPage";
 import MarkdownModal from "./components/modal/MarkdownModal";
 
+import AppEvents from "./components/event/AppEvents";
+
 import 'typeface-open-sans/index.css'
 import './components/menu/style/Menu.css';
 import './App.css';
+import './AppTheme.css';
 
 class App extends Component {
     constructor(props) {
@@ -29,19 +31,23 @@ class App extends Component {
         }
         this.cb = {
             handleClick: e => this.handleClick(e),
-            onEachTag: (tagName, props) => this.onEachTag(tagName, props)
+            onEachTag: (tagName, props) => this.onEachTag(tagName, props),
+            showModal: (path) => this.showModal(path)
         };
     }
 
     componentDidMount() {
         document.addEventListener('click', this.cb.handleClick);
+        AppEvents.addEventListener('app:showModal', this.cb.showModal)
+
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
+        AppEvents.removeEventListener('app:showModal', this.cb.showModal)
     }
 
     render() {
-        let className = 'App ' + (this.state.portrait ? 'portrait' : 'landscape');
+        let className = 'App theme-default ' + (this.state.portrait ? 'portrait' : 'landscape');
         return (
             <AppContext.Provider value={this}>
                 <div className={className} >

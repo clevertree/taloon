@@ -1,8 +1,8 @@
 import React from "react";
 import {FormContext} from "./FormContext";
-import "./Form.css";
 import AppEvents from "../event/AppEvents";
 import path from "path";
+import "./Form.css";
 
 const TIMEOUT_CHANGE = 1000;
 
@@ -107,6 +107,9 @@ export default class Form extends React.Component {
                     newState.error = validationString || "Form submission was unsuccessful";
                 }
                 console.warn(newState.error, newState);
+            }
+            if(newState.showModal) {
+                AppEvents.emit('app:showModal', newState.showModal);
             }
         }
         this.setState(newState);

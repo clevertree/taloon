@@ -22,11 +22,12 @@ export default class AppEvents {
         }
     }
 
-    static emit(eventName, e=null) {
+    static emit(eventName, data=null) {
+        console.info('Event', eventName, data);
         const eventList = events[eventName];
         if(eventList) {
             for(const callback of eventList) {
-                callback(e);
+                callback(data);
             }
         }
     }
