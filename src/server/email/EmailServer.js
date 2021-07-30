@@ -2,6 +2,8 @@ import React from "react";
 import nodemailer from 'nodemailer'
 import Markdown from 'markdown-to-jsx';
 import ReactDOMServer from 'react-dom/server';
+import path from "path";
+import fs from "fs";
 
 export default class EmailServer {
 
@@ -32,13 +34,29 @@ export default class EmailServer {
         return nodemailer.createTransport(EmailServer.getConfig());
     }
 
-    static async sendMarkdownEmail(to, subject, mdContent, from=process.env.REACT_APP_EMAIL_FROM) {
-        const html = ReactDOMServer.renderToString(React.createElement(Markdown, {}, mdContent))
+    static async sendMarkdownTemplateEmail(to, subject, markdownPath, values={}, from=process.env.REACT_APP_EMAIL_FROM) {
+        const pathMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, markdownPath);
+        if (!fs.existsSync(pathMD))
+            throw new Error("Email template not found: " + pathMD);
+
+        let markdownContent = fs.readFileSync(pathMD, 'utf8');
+        for(const valueName in values) {
+            if(values.hasOwnProperty(valueName)) {
+                const value = values[valueName];
+                markdownContent = markdownContent.replace(new RegExp(`\{${valueName}\}`, 'g'), value);
+                subject = subject.replace(new RegExp(`\{${valueName}\}`, 'g'), value);
+            }
+        }
+        await EmailServer.sendMarkdownEmail(to, subject, markdownContent)
+    }
+
+    static async sendMarkdownEmail(to, subject, markdownContent, from=process.env.REACT_APP_EMAIL_FROM) {
+        const html = ReactDOMServer.renderToString(React.createElement(Markdown, {}, markdownContent))
         const message = {
             from,
             to,
             subject,
-            text: mdContent,
+            text: markdownContent,
             html,
         }
 
