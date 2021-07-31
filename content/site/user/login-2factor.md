@@ -1,5 +1,7 @@
 ## Submit 2-factor Verification
 
+Please check your email for a 2-factor authorization code and type it in the form below to start your session.
+
 <form action="login" data-autosubmit>
 <input type="hidden" name="service" value="email-2factor-response">
   <fieldset>

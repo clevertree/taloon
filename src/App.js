@@ -33,20 +33,20 @@ class App extends Component {
             handleClick: e => this.handleClick(e),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props),
             showModal: (path) => this.showModal(path),
-            closeModal: () => this.closeModal()
+            closeModal: (timeout) => this.closeModal(timeout)
         };
     }
 
     componentDidMount() {
         document.addEventListener('click', this.cb.handleClick);
         AppEvents.addEventListener('modal:show', this.cb.showModal)
-        AppEvents.addEventListener('modal:close', this.cb.closeModal)
+        // AppEvents.addEventListener('modal:close', this.cb.closeModal)
 
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
         AppEvents.removeEventListener('modal:show', this.cb.showModal)
-        AppEvents.removeEventListener('modal:close', this.cb.closeModal)
+        // AppEvents.removeEventListener('modal:close', this.cb.closeModal)
     }
 
     render() {
@@ -94,7 +94,7 @@ class App extends Component {
             else if(!src.endsWith('.md'))
                 src += '.md';
         }
-console.log('src', src);
+// console.log('src', src);
         // Remove previous meta tags
         for(const metaElm of document.head.querySelectorAll(
             "title, meta[name='description'], meta[name='keywords'], meta[name='title']")) {
@@ -178,7 +178,7 @@ console.log('src', src);
     }
 
     showModal(markdownPath) {
-        console.log("Showing Modal: ", markdownPath);
+        // console.log("Showing Modal: ", markdownPath);
         this.setState({
             activeModal: <MarkdownModal
                 src={markdownPath}
@@ -192,7 +192,7 @@ console.log('src', src);
     }
 
     closeModal() {
-        console.log("Closing Modal: ", this.state.activeModal);
+        // console.log("Closing Modal: ", this.state.activeModal);
         this.setState({
             activeModal: null
         })

@@ -25,33 +25,23 @@ export default class UserSession {
         res.send({
             message: "Session has been logged out",
             redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
-            events: ['session:change']
+            events: [
+                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/logout-success.md`],
+                ['modal:close', 5000],
+                ['session:change']
+            ]
         })
     }
 
-    async handleLoginRequest(req, res, form) {
+    handleLogInRequest(req, res, form) {
         switch(req.body.service) {
             case 'email':
-                if(!req.body.email)
-                    throw new Error("Invalid email");
-                await this.send2FactorEmail(req);
-                res.send({
-                    message: "A 2-Factor code sent to your email address. Please use it to log in",
-                    events: [['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${req.body.email}`]]
-                })
+                this.handleSend2FactorEmailRequest(req, res, form)
+                    .then();
                 break;
 
             case 'email-2factor-response':
-                await this.loginWith2Factor(req);
-                res.send({
-                    message: "You are now logged in",
-                    showModal: `${process.env.REACT_APP_PATH_SITE}/user/login-2factor-success.md`,
-                    redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
-                    events: [
-                        ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor-success.md`],
-                        ['session:change']
-                    ]
-                });
+                this.handleLoginWith2FactorRequest(req, res, form);
                 break;
             default:
             case 'google':
@@ -59,13 +49,12 @@ export default class UserSession {
         }
     }
 
-    static fromRequest(req) {
-        return new UserSession();
-    }
 
 
-    async send2FactorEmail(req) {
+    async handleSend2FactorEmailRequest(req, res, form) {
         const values = Object.assign({}, req.body);
+        if(!req.body.email)
+            throw new Error("Invalid email");
         const email = values.email;
         const code2Factor = crypto.randomInt(1000,9999);
 
@@ -100,22 +89,37 @@ Ref: ${req.headers.referrer || 'N/A'}
             `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.email.md`,
             values)
 
+        res.send({
+            message: "A 2-Factor code sent to your email address. Please use it to log in",
+            events: [
+                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${email}`]
+            ]
+        })
     }
 
 
-    async loginWith2Factor(req) {
+    handleLoginWith2FactorRequest(req, res, form) {
         const code2Factor = Number.parseInt(req.body.code);
         const email = req.body.email;
         if(active2FactorLogins[email] !== code2Factor)
             throw new Error("Invalid 2-Factor Code");
 
         delete active2FactorLogins[email];
-        // req.session.reset();
+
         // Reset session
         req.session = {
             email
         };
-        // console.log('req.session', req.session);
-        // req.session.test = 'wut';
+
+        res.send({
+            message: "You are now logged in",
+            redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+            events: [
+                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-success.md`],
+                ['session:change'],
+                ['modal:close', 5000]
+            ]
+        });
     }
+
 }

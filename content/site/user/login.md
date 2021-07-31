@@ -1,5 +1,8 @@
 ## Log in with Email Verification
 
+Use this form to send a 2-factor code to your email address. 
+Once verified, you will be logged in to a new session.
+
 <form action="login">
 <input type="hidden" name="service" value="email">
   <fieldset>

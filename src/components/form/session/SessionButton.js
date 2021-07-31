@@ -32,7 +32,7 @@ export default class SessionButton extends AbstractInput {
             headers: {'Content-Type': 'application/json'},
         });
         const responseJson = await response.json();
-        console.log('session', postURL, responseJson);
+        // console.log('session', postURL, responseJson);
         this.setState(responseJson);
     }
 

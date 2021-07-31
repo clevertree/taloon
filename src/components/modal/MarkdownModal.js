@@ -14,7 +14,8 @@ export default class MarkdownModal extends React.Component {
     constructor(props) {
         super(props);
         this.cb = {
-            onClose: e => this.onClose(e),
+            onClick: e => this.onClick(e),
+            onCloseEvent: data => this.onCloseEvent(data),
             stopPropagation: e => e.stopPropagation()
         }
         this.state = {
@@ -24,21 +25,26 @@ export default class MarkdownModal extends React.Component {
         this.ref = {
             modal: React.createRef()
         }
+        this._isMounted = false;
     }
 
     componentDidMount() {
-        AppEvents.addEventListener('form:close', this.cb.onClose);
+        this._isMounted = true;
+        AppEvents.addEventListener('modal:close', this.cb.onCloseEvent)
+        AppEvents.addEventListener('form:close', this.cb.onCloseEvent);
         if(this.ref.modal.current)
             this.ref.modal.current.focus();
     }
     componentWillUnmount() {
-        AppEvents.removeEventListener('form:close', this.cb.onClose)
+        this._isMounted = false;
+        AppEvents.removeEventListener('modal:close', this.cb.onCloseEvent)
+        AppEvents.removeEventListener('form:close', this.cb.onCloseEvent)
     }
 
     render() {
         return <div className={"modal-container"}
-                    onKeyDown={this.cb.onClose}
-                    onClick={this.cb.onClose}>
+                    onKeyDown={this.cb.onClick}
+                    onClick={this.cb.onClick}>
             <div className={"modal " + this.state.status}
                  ref={this.ref.modal}
                  tabIndex={0}
@@ -46,7 +52,7 @@ export default class MarkdownModal extends React.Component {
                 <div className="modal-header">
                     Title
                     <div className="button-close"
-                         onClick={this.cb.onClose}>X</div>
+                         onClick={this.cb.onClick}>X</div>
                 </div>
                 {this.state.error ? <div className="modal-error">{this.state.error}</div> : null}
                 <MarkdownPage
@@ -57,7 +63,7 @@ export default class MarkdownModal extends React.Component {
         </div>;
     }
 
-    async onClose(e) {
+    async onClick(e) {
         switch(e.type) {
             case 'click': break;
             case 'keydown':
@@ -67,12 +73,24 @@ export default class MarkdownModal extends React.Component {
             default:
                 break;
         }
+        await this.onCloseEvent();
+    }
+
+    async onCloseEvent(delayMS=null) {
+        if(typeof delayMS === "number") {
+            console.log("Closing Modal in ", delayMS)
+            await sleep (delayMS);
+        }
+        if(!this._isMounted)
+            return console.info("Modal unmounted. Closing canceled");
         console.log("Closing Modal", this);
         try {
             this.setState({status: 'closing'});
             await sleep (500);
-            this.props.onClose();
+            if(!this._isMounted)
+                return console.info("Modal unmounted. Closing canceled");
             this.setState({status: 'closed'});
+            this.props.onClose();
 
         } catch (e) {
             this.setState({status: 'error', error: e.message});

@@ -31,7 +31,7 @@ export default class Form extends React.Component {
     getClassName() { return 'theme-default'; }
 
     componentDidMount() {
-       this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
+       // this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
        this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
     }
 
@@ -50,8 +50,7 @@ export default class Form extends React.Component {
                 onSubmit={this.cb.onSubmit}
                 onChange={this.cb.onChange}
             >
-                {this.state.message ? <div className="message" children={this.state.message} /> : null }
-                {this.state.error ? <div className="error" children={this.state.error} /> : null }
+                {this.state.message ? <div className={"message" + (this.state.success ? "" : " error")} children={this.state.message} /> : null }
                 {children}
             </form>
         </FormContext.Provider>;
@@ -60,6 +59,7 @@ export default class Form extends React.Component {
 
 
     async onSubmit(e, preview=false) {
+        clearTimeout(this.onChangeTimeout);
         e && e.preventDefault();
         const form = this.ref.form.current;
         let formAction = form.getAttribute('action');
@@ -78,11 +78,13 @@ export default class Form extends React.Component {
         let newState = {
             processing: true,
             message: null,
+            success: null,
             // validations: {}, // Don't clear validations until submission is finished
             // showErrors: !preview
         }
         this.setState(newState);
 
+        let events = [];
         try {
             const response = await fetch(postURL + '', {
                 credentials: "include",
@@ -90,14 +92,18 @@ export default class Form extends React.Component {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formValues)
             });
-            newState = await response.json();
-            console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
+            const responseJson = await response.json();
+            console.log(`${preview ? "Preview " : ""}Response: `, responseJson, response);
+            newState.message = responseJson.message;
             newState.success = response.status === 200;
+            events = responseJson.events || [];
         } catch (err) {
-            newState.validations = {_: "Invalid JSON Response: " + err.message};
+            newState.message = `Invalid JSON Response: ${err.message}`;
             newState.success = false;
         }
+
         newState.processing = false;
+        this.setState(newState);
 
 
         if(!preview) {
@@ -106,19 +112,17 @@ export default class Form extends React.Component {
                 AppEvents.emit('form:success', newState)
             } else {
                 AppEvents.emit('form:failed', newState)
-                if(!newState.error) {
+                if(!newState.message) {
                     const validationString = Object.values(newState.validations || {}).join("\n");
-                    newState.error = validationString || "Form submission was unsuccessful";
+                    newState.message = validationString || "Form submission was unsuccessful";
                 }
-                console.warn(newState.error, newState);
-            }
-            if(newState.showModal) {
-                AppEvents.emit('modal:show', newState.showModal);
-            } else {
-                AppEvents.emit('modal:close');
+                console.warn(newState.message, newState);
             }
         }
-        this.setState(newState);
+
+        for(const [eventName, eventData] of events) {
+            AppEvents.emit(eventName, eventData);
+        }
     }
 
 
@@ -141,25 +145,25 @@ export default class Form extends React.Component {
         }, {});
     }
 
-    doAutoFill(fillValue) {
-        if(!fillValue)
-            return;
-        // TODO: use localStorage
-        const form = this.ref.form.current;
-        const urlParams = new URLSearchParams(window.location.search);
-        for(const field of form.elements) {
-            if (field.name)  {
-                switch(this.props.autofill) {
-                    default:
-                        const paramValue = urlParams.get(field.name);
-                        if(paramValue)
-                            field.value = paramValue;
-                        break;
-                }
-
-            }
-        }
-    }
+    // doAutoFill(fillValue) {
+    //     if(!fillValue)
+    //         return;
+    //     // TODO: use localStorage
+    //     const form = this.ref.form.current;
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     for(const field of form.elements) {
+    //         if (field.name)  {
+    //             switch(this.props.autofill) {
+    //                 default:
+    //                     const paramValue = urlParams.get(field.name);
+    //                     if(paramValue)
+    //                         field.value = paramValue;
+    //                     break;
+    //             }
+    //
+    //         }
+    //     }
+    // }
 
     doAutoSubmit(submitValue) {
         if(!submitValue)

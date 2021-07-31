@@ -1,6 +1,8 @@
-## You are now logged in.
+## Logging in
 
-<form data-autosubmit="3">
+You are now logged in.
+
+<form>
   <fieldset>
     <legend>Click here to close this window</legend>
     <button type="submit">Continue</button>
