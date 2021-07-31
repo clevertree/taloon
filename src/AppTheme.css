@@ -17,7 +17,7 @@
 
 
 
-.App.theme-default form {
+.App.theme-default {
     /*display: flex;*/
     /*flex-direction: column;*/
 }
@@ -29,7 +29,7 @@
     display: flex;
     /*align-items: center;*/
     flex-wrap: wrap;
-    font-size: larger;
+    /*font-size: larger;*/
 
 }
 
@@ -70,7 +70,7 @@
     padding: 0.5em;
     border: 2px inset #FFF;
     border-radius: 0.5em;
-    font-size: larger;
+    font-size: calc(10px + 1vw);
     transition: box-shadow 1s, border-color 1s;
 }
 

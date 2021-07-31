@@ -27,12 +27,12 @@ export default class MarkdownModal extends React.Component {
     }
 
     componentDidMount() {
-        AppEvents.addEventListener('form:success', this.cb.onClose);
+        AppEvents.addEventListener('form:close', this.cb.onClose);
         if(this.ref.modal.current)
             this.ref.modal.current.focus();
     }
     componentWillUnmount() {
-        AppEvents.removeEventListener('form:success', this.cb.onClose)
+        AppEvents.removeEventListener('form:close', this.cb.onClose)
     }
 
     render() {
@@ -64,8 +64,10 @@ export default class MarkdownModal extends React.Component {
                 if (e.keyCode === 27)
                     break;
                 return;
-            default: return;
+            default:
+                break;
         }
+        console.log("Closing Modal", this);
         try {
             this.setState({status: 'closing'});
             await sleep (500);

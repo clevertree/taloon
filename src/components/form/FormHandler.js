@@ -11,9 +11,10 @@ class FormHandler {
 
     static async handleFormRequest(req, res, formActionCallback) {
         try {
-            const formPath = req.query.markdownPath;
+            let formPath = req.query.markdownPath;
             if (!formPath)
                 throw new Error("Missing parameter: markdownPath");
+            formPath = formPath.split('?').shift();
 
             if(!req.query.formPosition)
                 throw new Error("Missing parameter: formPosition");
@@ -21,6 +22,7 @@ class FormHandler {
                 throw new Error("Invalid integer: formPosition");
 
             let formPosition = Number.parseInt(req.query.formPosition);
+            // console.log("Form found: ", {formPath, formPosition})
 
             const pathIndexMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, formPath);
             // const pathIndexMD = path.resolve(PATH_CONTENT, formPath);

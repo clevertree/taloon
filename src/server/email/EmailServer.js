@@ -7,16 +7,12 @@ import fs from "fs";
 
 export default class EmailServer {
 
-    static handleEmailValidation(req, res, next) {
-        return undefined;
-    }
-
     static setupRoutes(app) {
         this.app = app;
 
-        app.post(':email-validation', (req, res, next) => {
-            return this.handleEmailValidation(req, res, next);
-        });
+        // app.post(':email-validation', (req, res, next) => {
+        //     return this.handleEmailValidation(req, res, next);
+        // });
     }
 
     static getConfig() {
@@ -34,19 +30,24 @@ export default class EmailServer {
         return nodemailer.createTransport(EmailServer.getConfig());
     }
 
-    static async sendMarkdownTemplateEmail(to, subject, markdownPath, values={}, from=process.env.REACT_APP_EMAIL_FROM) {
+    static async sendMarkdownTemplateEmail(to, subject, markdownPath, replaceParams={}, from=process.env.REACT_APP_EMAIL_FROM) {
         const pathMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, markdownPath);
         if (!fs.existsSync(pathMD))
             throw new Error("Email template not found: " + pathMD);
 
         let markdownContent = fs.readFileSync(pathMD, 'utf8');
-        for(const valueName in values) {
-            if(values.hasOwnProperty(valueName)) {
-                const value = values[valueName];
-                markdownContent = markdownContent.replace(new RegExp(`\{${valueName}\}`, 'g'), value);
-                subject = subject.replace(new RegExp(`\{${valueName}\}`, 'g'), value);
+
+
+        // Replace template variables
+        markdownContent = markdownContent.replace(/\${([^}]+)}/g, (match, fieldName) => {
+            // console.log({match, fieldName})
+            if(replaceParams.hasOwnProperty(fieldName)) {
+                const value = replaceParams[fieldName];
+                return value.toString().replace(/<[^>]*>?/gm, '');
             }
-        }
+            return "";
+        })
+
         await EmailServer.sendMarkdownEmail(to, subject, markdownContent)
     }
 
@@ -60,9 +61,13 @@ export default class EmailServer {
             html,
         }
 
-        const transporter = EmailServer.getTransport();
-        const info = await transporter.sendMail(message);
-        console.log('Preview URL: ' + nodemailer.getTestMessageUrl(info));
+        if(process.env.NODE_ENV === 'production') {
+            const transporter = EmailServer.getTransport();
+            const info = await transporter.sendMail(message);
+            console.log(`Email sent to ${to}: ${subject}`, info);
+        } else {
+            console.warn(`Sending email disabled when NODE_ENV!=production. Message:`, message);
+        }
     }
 }
 

@@ -31,11 +31,8 @@ export default class Form extends React.Component {
     getClassName() { return 'theme-default'; }
 
     componentDidMount() {
-        if(this.props.autofill || this.props["data-autofill"])
-            this.doAutoFill();
-
-        if(this.props.autosubmit || this.props["data-autosubmit"])
-            this.doAutoSubmit();
+       this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
+       this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
     }
 
     render() {
@@ -65,12 +62,17 @@ export default class Form extends React.Component {
     async onSubmit(e, preview=false) {
         e && e.preventDefault();
         const form = this.ref.form.current;
-        const formAction = path.resolve(path.dirname(this.props.markdownPath), form.getAttribute('action'));
+        let formAction = form.getAttribute('action');
+        if(!formAction) {
+            AppEvents.emit('modal:close', {})
+            return;
+        }
+        formAction = path.resolve(path.dirname(this.props.markdownPath), formAction);
         const formValues = this.getFormValues(form);
         const formPosition = this.getFormPosition(form);
 
         let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
-        postURL.search = `markdownPath=${this.props.markdownPath}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
+        postURL.search = `markdownPath=${this.props.markdownPath.split('?').shift()}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
         // console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {
@@ -89,9 +91,11 @@ export default class Form extends React.Component {
                 body: JSON.stringify(formValues)
             });
             newState = await response.json();
-            // console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
+            console.log(`${preview ? "Preview " : ""}Response: `, newState, response);
+            newState.success = response.status === 200;
         } catch (err) {
             newState.validations = {_: "Invalid JSON Response: " + err.message};
+            newState.success = false;
         }
         newState.processing = false;
 
@@ -109,7 +113,9 @@ export default class Form extends React.Component {
                 console.warn(newState.error, newState);
             }
             if(newState.showModal) {
-                AppEvents.emit('app:showModal', newState.showModal);
+                AppEvents.emit('modal:show', newState.showModal);
+            } else {
+                AppEvents.emit('modal:close');
             }
         }
         this.setState(newState);
@@ -135,7 +141,9 @@ export default class Form extends React.Component {
         }, {});
     }
 
-    doAutoFill() {
+    doAutoFill(fillValue) {
+        if(!fillValue)
+            return;
         // TODO: use localStorage
         const form = this.ref.form.current;
         const urlParams = new URLSearchParams(window.location.search);
@@ -153,7 +161,16 @@ export default class Form extends React.Component {
         }
     }
 
-    doAutoSubmit() {
-        this.onSubmit()
+    doAutoSubmit(submitValue) {
+        if(!submitValue)
+            return;
+        const form = this.ref.form.current;
+        if(form.checkValidity()) {
+            setTimeout(() => {
+                this.onSubmit()
+            }, submitValue || 1000);
+        } else {
+            console.warn("Form failed validation. Auto-submit canceled");
+        }
     }
 }

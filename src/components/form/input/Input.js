@@ -7,8 +7,13 @@ export default class Input extends AbstractInput {
      * @returns {JSX.Element}
      */
     renderInput(validation) {
+        const props = {...this.props};
+        if(typeof props.value !== "undefined") {
+            props.defaultValue = props.value;
+            delete props.value;
+        }
         return <input
-            {...this.props}
+            {...props}
             placeholder={this.getPlaceholder()}
             ref={ref => {
                 ref && ref.setCustomValidity(validation)

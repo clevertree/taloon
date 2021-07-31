@@ -69,11 +69,11 @@ export default class SessionButton extends AbstractInput {
 
     showLoginModal(e) {
         e.preventDefault();
-        AppEvents.emit('app:showModal', `${process.env.REACT_APP_PATH_SITE}/user/login.md`);
+        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login.md`);
     }
     showLogoutModal(e) {
         e.preventDefault();
-        AppEvents.emit('app:showModal', `${process.env.REACT_APP_PATH_SITE}/user/logout.md`);
+        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/user/logout.md`);
     }
 
 }

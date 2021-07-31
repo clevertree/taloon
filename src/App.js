@@ -32,18 +32,21 @@ class App extends Component {
         this.cb = {
             handleClick: e => this.handleClick(e),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props),
-            showModal: (path) => this.showModal(path)
+            showModal: (path) => this.showModal(path),
+            closeModal: () => this.closeModal()
         };
     }
 
     componentDidMount() {
         document.addEventListener('click', this.cb.handleClick);
-        AppEvents.addEventListener('app:showModal', this.cb.showModal)
+        AppEvents.addEventListener('modal:show', this.cb.showModal)
+        AppEvents.addEventListener('modal:close', this.cb.closeModal)
 
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
-        AppEvents.removeEventListener('app:showModal', this.cb.showModal)
+        AppEvents.removeEventListener('modal:show', this.cb.showModal)
+        AppEvents.removeEventListener('modal:close', this.cb.closeModal)
     }
 
     render() {
@@ -103,8 +106,10 @@ console.log('src', src);
             className={"content"}
             onEachTag={this.cb.onEachTag}
             src={src}
+            replaceParams={document.location.search}
         />
     }
+
 
     /** Events **/
 
@@ -172,17 +177,22 @@ console.log('src', src);
         }
     }
 
-    async showModal(markdownPath) {
+    showModal(markdownPath) {
         console.log("Showing Modal: ", markdownPath);
-        const result = await new Promise((resolve, reject) => {
-            this.setState({
-                activeModal: <MarkdownModal
-                    src={markdownPath}
-                    onClose={resolve}
-                />
-            })
-        });
-        console.log("Closing Modal: ", {result, markdownPath});
+        this.setState({
+            activeModal: <MarkdownModal
+                src={markdownPath}
+                onClose={this.cb.closeModal}
+            />
+        })
+        // console.log("Closing Modal: ", {result, markdownPath});
+        // this.setState({
+        //     activeModal: null
+        // })
+    }
+
+    closeModal() {
+        console.log("Closing Modal: ", this.state.activeModal);
         this.setState({
             activeModal: null
         })

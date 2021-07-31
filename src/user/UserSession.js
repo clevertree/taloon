@@ -25,16 +25,19 @@ export default class UserSession {
         res.send({
             message: "Session has been logged out",
             redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+            events: ['session:change']
         })
     }
 
     async handleLoginRequest(req, res, form) {
         switch(req.body.service) {
             case 'email':
+                if(!req.body.email)
+                    throw new Error("Invalid email");
                 await this.send2FactorEmail(req);
                 res.send({
                     message: "A 2-Factor code sent to your email address. Please use it to log in",
-                    showModal: `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md`,
+                    events: [['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${req.body.email}`]]
                 })
                 break;
 
@@ -44,6 +47,10 @@ export default class UserSession {
                     message: "You are now logged in",
                     showModal: `${process.env.REACT_APP_PATH_SITE}/user/login-2factor-success.md`,
                     redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+                    events: [
+                        ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor-success.md`],
+                        ['session:change']
+                    ]
                 });
                 break;
             default:
@@ -59,8 +66,6 @@ export default class UserSession {
 
     async send2FactorEmail(req) {
         const values = Object.assign({}, req.body);
-        if(!values.email)
-            throw new Error("Invalid email");
         const email = values.email;
         const code2Factor = crypto.randomInt(1000,9999);
 

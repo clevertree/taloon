@@ -54,13 +54,17 @@ export default class MarkdownPage extends React.Component {
 
     async fetchSrc(options={}) {
         const url = resolveContentURL(this.props.src);
+        let replaceParams = this.props.replaceParams;
+        if(!replaceParams && this.props.src.indexOf('?') !== -1)
+            replaceParams = this.props.src.split('?').pop();
 
         options.cache = "force-cache";
         const response = await fetch(url, options);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
         if (responseType.startsWith('text/markdown')) {
-            const content = await response.text();
+            let content = await response.text();
+            content = replaceStringParameters(content, replaceParams);
             this.setState({content});
         } else {
             this.setState({content: "Invalid Type: " + responseType});
@@ -130,9 +134,7 @@ function resolveContentURL(src) {
     return new URL(src, contentURL).toString();
 }
 
-function isDevMode() {
-    return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-}
+const isDevMode = () => !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 function Img(props) {
     return <img {...props} alt={props.alt} />;
@@ -143,5 +145,27 @@ function A(props) {
     return <a {...props}/>;
 }
 
+function replaceStringParameters(content, replaceParams) {
+    if(!replaceParams)
+        replaceParams = {};
+    if(typeof replaceParams === "string")
+        replaceParams = new URLSearchParams(replaceParams);
+    if(replaceParams instanceof URLSearchParams) {
+        const objParams = {};
+        replaceParams.forEach((value, key) => {
+            objParams[key] = value;
+        });
+        replaceParams = objParams;
+    }
 
+    // Replace template variables
+    content = content.replace(/\${([^}]+)}/g, (match, fieldName) => {
+        if(replaceParams.hasOwnProperty(fieldName)) {
+            const value = replaceParams[fieldName];
+            return value.toString().replace(/<[^>]*>?/gm, '');
+        }
+        return "";
+    })
+    return content;
+}
 
