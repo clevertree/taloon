@@ -45,6 +45,8 @@ module.exports = function PostAction(req, res, form) {
     });
 }
 
+
+// TODO: customize form for accepting phone requests
 function genMarkdownTemplate(values) {
     return `
 # ${values.title}
@@ -54,19 +56,15 @@ ${values.description}
 <form action="/service/phone/request.action.js">
   <fieldset>
     <legend>Your Request Title</legend>
-    <label for="title">Title</label>
-    <input type="text" name="title" id="title" placeholder="I need a smart phone (and optionally call/text service)" required />
-  </fieldset>
-  <fieldset>
-    <legend>My Location</legend>
-    <label for="status">Location</label>
-    <select name="location" id="location">
-    </select>
+    <label title="Title">
+        <input type="text" name="title" id="title" placeholder="I need a smart phone (and optionally call/text service)" required />
+    </label>
   </fieldset>
   <fieldset>
     <legend>Write a Description</legend>
-    <label for="description">Description</label>
-    <textarea name="description" id="description" rows="24" placeholder="I need a phone with service for employment purposes." required></textarea>
+    <label title="Description">
+        <textarea name="description" id="description" rows="24" placeholder="I need a phone with service for employment purposes." required></textarea>
+    </label>
   </fieldset>
   <fieldset>
     <legend>Submit a new Phone Request</legend>

@@ -27,21 +27,23 @@
 .App.theme-default form > fieldset {
     margin-bottom: 1em;
     display: flex;
+    flex-direction: column;
     /*align-items: center;*/
-    flex-wrap: wrap;
+    /*flex-wrap: wrap;*/
     /*font-size: larger;*/
     border: 1px #555 solid;
     border-radius: 3px;
 }
 .App.theme-default form > fieldset:hover {
     border-color: #000;
-
 }
+
 
 .App.theme-default form > fieldset > legend {
     transition: letter-spacing .5s, text-shadow .5s;
     padding: 0 4px;
 }
+.App.theme-default form > fieldset > label:hover:before,
 .App.theme-default form > fieldset:hover > legend {
     /*font-weight: bold;*/
     /*text-shadow: 0 0 2px #FFF;*/
@@ -50,27 +52,38 @@
     letter-spacing: .1rem;
 }
 
-.App.theme-default form > fieldset > * {
-    flex-grow: 1;
-}
+/** Label Style **/
+
 .App.theme-default form > fieldset > label {
-    flex-grow: revert;
+    display: flex;
+    flex-wrap: wrap;
     /*min-width: 12vw;*/
     /*text-align: right;*/
-    padding-right: 1em;
-    flex-basis: 100px;
+    /*padding-right: 1em;*/
+    /*flex-basis: 100px;*/
 }
 
-.App.theme-default form > fieldset > label:after {
-    content: ':'
+.App.theme-default form > fieldset > label:before {
+    transition: letter-spacing .5s, text-shadow .5s;
+    min-width: 12vw;
+    content: attr(title) ":";
+    padding: 6px 8px 0 0;
+    cursor: pointer;
 }
 
+.App.theme-default form > fieldset > label + label {
+    margin-top: 1em;
+}
 
 @media only screen and (min-width: 600px) {
     .App.theme-default form > fieldset > label {
         text-align: right;
         /*flex-basis: 100%;*/
     }
+}
+
+.App.theme-default form label > :first-child {
+    flex-grow: 1;
 }
 
 /** Input Styles **/

@@ -73,6 +73,7 @@ export default class MarkdownModal extends React.Component {
             default:
                 break;
         }
+        e.preventDefault();
         await this.onCloseEvent();
     }
 
@@ -82,13 +83,13 @@ export default class MarkdownModal extends React.Component {
             await sleep (delayMS);
         }
         if(!this._isMounted)
-            return console.info("Modal unmounted. Closing canceled");
-        console.log("Closing Modal", this);
+            return console.warn("Modal unmounted. Closing canceled");
+        // console.log("Closing Modal", this);
         try {
             this.setState({status: 'closing'});
             await sleep (500);
             if(!this._isMounted)
-                return console.info("Modal unmounted. Closing canceled");
+                return console.warn("Modal unmounted. Closing canceled");
             this.setState({status: 'closed'});
             this.props.onClose();
 

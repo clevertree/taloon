@@ -1,3 +1,5 @@
+// TODO: search for existing offers before posting request?
+
 module.exports = function RequestAction(req, res, form) {
     const validations = {};
     const values = req.body;

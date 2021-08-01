@@ -35,7 +35,6 @@ export default class LocationButton extends React.Component {
     }
 
     getLocation(e) {
-        e.preventDefault();
         switch(e.type) {
             default:
             case 'click': break;
@@ -44,6 +43,7 @@ export default class LocationButton extends React.Component {
                     break;
                 return;
         }
+        e.preventDefault();
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => this.onLocation(position, true));
@@ -55,7 +55,7 @@ export default class LocationButton extends React.Component {
     }
 
     onLocation(position, updateInput=false) {
-        console.log(position.coords, this.props)
+        console.log("Location found", position.coords)
         this.setState({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
