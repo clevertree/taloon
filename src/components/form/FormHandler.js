@@ -32,6 +32,14 @@ class FormHandler {
             if (!forms[formPosition])
                 throw new Error(`Form Position ${formPosition} not found`);
             const form = forms[formPosition];
+
+            for (const element of form.elements)
+                if (element.name)
+                    element.value = req.body[element.name];
+            if (!req.query.preview && !form.checkValidity()) {
+                throw new Error("Form failed validation"); // Shouldn't happen ;(
+            }
+
             await formActionCallback(req, res, form);
 
         } catch (err) {

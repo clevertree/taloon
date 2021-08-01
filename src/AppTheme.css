@@ -30,11 +30,24 @@
     /*align-items: center;*/
     flex-wrap: wrap;
     /*font-size: larger;*/
+    border: 1px #555 solid;
+    border-radius: 3px;
+}
+.App.theme-default form > fieldset:hover {
+    border-color: #000;
 
 }
 
+.App.theme-default form > fieldset > legend {
+    transition: letter-spacing .5s, text-shadow .5s;
+    padding: 0 4px;
+}
 .App.theme-default form > fieldset:hover > legend {
-    font-weight: bold;
+    /*font-weight: bold;*/
+    /*text-shadow: 0 0 2px #FFF;*/
+
+    text-shadow: #000 2px 2px 6px;
+    letter-spacing: .1rem;
 }
 
 .App.theme-default form > fieldset > * {
@@ -103,7 +116,7 @@
 
     background-color: #61dafb;
     text-decoration: none;
-    transition: background-color 1s, letter-spacing 1s, color 1s, box-shadow 1s;
+    transition: background-color 1s, letter-spacing 1s, color 1s, padding 1s, box-shadow 1s;
     font-weight: bold;
     animation: buttonFadeIn 1s ease-in-out forwards;
 }
@@ -137,6 +150,11 @@
 .App.theme-default a.button.large {
     font-size: 1.5em;
 }
+.App.theme-default form button.small,
+.App.theme-default a.button.small {
+    font-size: 0.8em;
+    flex-grow: 0.3;
+}
 
 
 /** Message and Error **/
@@ -169,7 +187,7 @@
 .App.theme-default form .validation-container {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    /*flex-grow: 1;*/
 }
 .App.theme-default form .validation-container > .validation-text{
     color: #F00;

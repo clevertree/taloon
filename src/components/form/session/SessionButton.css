@@ -3,3 +3,8 @@
 .session-button-email {
     color: darkblue;
 }
+
+.session-button-container {
+    display: flex;
+    justify-content: space-between;
+}

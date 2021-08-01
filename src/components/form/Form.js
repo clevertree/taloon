@@ -31,8 +31,13 @@ export default class Form extends React.Component {
     getClassName() { return 'theme-default'; }
 
     componentDidMount() {
-       // this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
-       this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
+        // this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
+        this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
+        AppEvents.addEventListener('session:change', this.cb.onChange)
+    }
+
+    componentWillUnmount() {
+        AppEvents.removeEventListener('session:change', this.cb.onChange)
     }
 
     render() {
@@ -85,6 +90,7 @@ export default class Form extends React.Component {
         this.setState(newState);
 
         let events = [];
+        let values = {};
         try {
             const response = await fetch(postURL + '', {
                 credentials: "include",
@@ -96,7 +102,10 @@ export default class Form extends React.Component {
             console.log(`${preview ? "Preview " : ""}Response: `, responseJson, response);
             newState.message = responseJson.message;
             newState.success = response.status === 200;
+            newState.validations = responseJson.validations || {}; // TODO: not triggering refresh
+
             events = responseJson.events || [];
+            values = responseJson.values || {};
         } catch (err) {
             newState.message = `Invalid JSON Response: ${err.message}`;
             newState.success = false;
@@ -120,6 +129,15 @@ export default class Form extends React.Component {
             }
         }
 
+        // Update values
+        for(const key in values) {
+            if(values.hasOwnProperty(key)) {
+                form.elements[key].value = values[key];
+            }
+        }
+
+
+        // Send events
         for(const [eventName, eventData] of events) {
             AppEvents.emit(eventName, eventData);
         }

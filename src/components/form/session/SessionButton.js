@@ -36,9 +36,9 @@ export default class SessionButton extends AbstractInput {
         this.setState(responseJson);
     }
 
-    renderContainer(validation) {
-        return this.renderInput(validation);
-    }
+    // renderContainer(validation) {
+    //     return this.renderInput(validation);
+    // }
 
     /**
      * @param validation
@@ -46,7 +46,7 @@ export default class SessionButton extends AbstractInput {
      */
     renderInput(validation) {
         if(this.state.isActive) {
-            return <>
+            return <div className="session-button-container">
                 <div className="session-button-email">{this.state.email}</div>
                 <button {...this.props}
                     className={"session-button small"}
@@ -55,7 +55,7 @@ export default class SessionButton extends AbstractInput {
                     onClick={this.cb.showLogoutModal}
                     children={"Log Out" }
                 />
-            </>;
+            </div>;
         } else {
             return <button {...this.props}
                            className={"session-button wide"}

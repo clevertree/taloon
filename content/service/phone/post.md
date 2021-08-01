@@ -28,9 +28,20 @@ This section is a work in progress. Please check back soon.
     </select>
   </fieldset>
   <fieldset>
+    <legend>My offer Location</legend>
+    <label for="status">Location</label>
+    <select name="location" id="location">
+    </select>
+  </fieldset>
+  <fieldset>
     <legend>Write a Description</legend>
     <label for="description">Description</label>
     <textarea name="description" id="description" rows="24" placeholder="Enter a description" required></textarea>
+  </fieldset>
+  <fieldset>
+    <legend>File Name</legend>
+    <label for="fileName">File Name</label>
+    <input type="text" name="fileName" id="fileName" placeholder="phone.md" required />
   </fieldset>
   <fieldset>
     <legend>Submit a new Phone Offer</legend>

@@ -1,11 +1,21 @@
 import EmailServer from "../server/email/EmailServer";
 import crypto from 'crypto';
+import LocalUser from "./User";
 
 const active2FactorLogins = {};
 
 export default class UserSession {
     constructor(session={}) {
         this.session = session;
+    }
+
+    isActive() { return !!this.session.email; }
+    getEmail() { return this.session.email; }
+
+    getLocalUser() {
+        if(!this.session.email)
+            throw new Error("No valid user session");
+        return new LocalUser(this.session.email);
     }
 
     login(req, email) {

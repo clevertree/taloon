@@ -42,10 +42,10 @@ export default class MarkdownModal extends React.Component {
     }
 
     render() {
-        return <div className={"modal-container"}
+        return <div className={"modal-container " + this.state.status}
                     onKeyDown={this.cb.onClick}
                     onClick={this.cb.onClick}>
-            <div className={"modal " + this.state.status}
+            <div className={"modal"}
                  ref={this.ref.modal}
                  tabIndex={0}
                 onClick={this.cb.stopPropagation}>
