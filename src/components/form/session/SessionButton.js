@@ -1,17 +1,21 @@
 import React from "react";
-import AbstractInput from "../input/AbstractInput";
 import AppEvents from "../../event/AppEvents";
 import './SessionButton.css';
 
-export default class SessionButton extends AbstractInput {
+export default class SessionButton extends React.Component {
     constructor(props) {
         super(props);
-        this.state.email = null;
-        this.state.isActive = false;
+        this.state = {
+            email: null,
+            isActive: false
+        };
         this.cb = {
             updateSession: e => this.updateSession(),
             showLoginModal: e => this.showLoginModal(e),
             showLogoutModal: e => this.showLogoutModal(e),
+        }
+        this.ref = {
+            button: React.createRef()
         }
     }
 
@@ -32,39 +36,34 @@ export default class SessionButton extends AbstractInput {
             headers: {'Content-Type': 'application/json'},
         });
         const responseJson = await response.json();
-        // console.log('session', postURL, responseJson);
+        console.log('session', postURL, responseJson);
         this.setState(responseJson);
+
+        const forInput = this.props.for || this.props.htmlFor;
+        if(forInput) {
+            const elmInput = this.ref.button.current.form.elements[forInput];
+            if(!elmInput.value)
+                elmInput.value = responseJson.email;
+        }
     }
 
     // renderContainer(validation) {
     //     return this.renderInput(validation);
     // }
 
-    /**
-     * @param validation
-     * @returns {JSX.Element}
-     */
-    renderInput(validation) {
-        if(this.state.isActive) {
-            return <div className="session-button-container">
-                <div className="session-button-email">{this.state.email}</div>
-                <button {...this.props}
-                    className={"session-button small"}
-                    defaultValue={this.props.value}
-                    placeholder={this.getPlaceholder()}
-                    onClick={this.cb.showLogoutModal}
-                    children={"Log Out" }
-                />
-            </div>;
-        } else {
-            return <button {...this.props}
-                           className={"session-button wide"}
-                           defaultValue={this.props.value}
-                           placeholder={this.getPlaceholder()}
-                           onClick={this.cb.showLoginModal}
-                           children={"Log in"}
-            />;
-        }
+    getClassName() { return 'session-button'; }
+
+    render() {
+        let className = this.getClassName();
+        if(this.props.className)
+            className += ' ' + this.props.className;
+        return <button {...this.props}
+           className={className}
+           ref={this.ref.button}
+           defaultValue={this.props.value}
+           onClick={this.state.isActive ? this.cb.showLogoutModal : this.cb.showLoginModal}
+           children={this.state.isActive ?  "Log out" : "Log in"}
+        />;
     }
 
     showLoginModal(e) {

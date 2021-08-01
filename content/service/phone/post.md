@@ -12,7 +12,8 @@ This section is a work in progress. Please check back soon.
   <fieldset>
     <legend>Your Account</legend>
     <label for="title">Email</label>
-    <session name="email"></session>
+    <input name="email" id="email" type="text" placeholder="my@email.com" disabled/>
+    <session for="email"></session>
   </fieldset>
   <fieldset>
     <legend>Your Offer Title</legend>
@@ -29,9 +30,9 @@ This section is a work in progress. Please check back soon.
   </fieldset>
   <fieldset>
     <legend>My offer Location</legend>
-    <label for="status">Location</label>
-    <select name="location" id="location">
-    </select>
+    <label for="location">Location</label>
+    <input name="location" id="location" type="text" placeholder="'85210' or 'Mesa, AZ' or '33.4115946,-111.8449462'" />
+    <location for="location"></location>
   </fieldset>
   <fieldset>
     <legend>Write a Description</legend>

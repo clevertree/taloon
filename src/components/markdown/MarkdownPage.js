@@ -9,6 +9,7 @@ import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
 import SessionButton from "../form/session/SessionButton";
+import LocationButton from "../form/location/LocationButton";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -113,7 +114,7 @@ export default class MarkdownPage extends React.Component {
             case 'select':      return <Select {...props} children={children}/>
 
             case 'session':     return <SessionButton {...props} />
-
+            case 'location':    return <LocationButton {...props} />
             // Filter out dangerous tags
             case 'iframe':
             case 'script':
