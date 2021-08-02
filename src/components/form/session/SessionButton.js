@@ -41,7 +41,8 @@ export default class SessionButton extends React.Component {
 
         const forInput = this.props.for || this.props.htmlFor;
         if(forInput) {
-            const elmInput = this.ref.button.current.form.elements[forInput];
+            const body = this.ref.button.current.closest('form, body');
+            const elmInput = body.querySelector(`input[name="${forInput}"]`);
             if(!elmInput.value)
                 elmInput.value = responseJson.email;
         }
@@ -51,18 +52,19 @@ export default class SessionButton extends React.Component {
     //     return this.renderInput(validation);
     // }
 
-    getClassName() { return 'session-button'; }
+    getClassName() { return 'button location-button'; }
 
     render() {
         let className = this.getClassName();
         if(this.props.className)
             className += ' ' + this.props.className;
-        return <button {...this.props}
-           className={className}
-           ref={this.ref.button}
-           defaultValue={this.props.value}
-           onClick={this.state.isActive ? this.cb.showLogoutModal : this.cb.showLoginModal}
-           children={this.state.isActive ?  "Log out" : "Log in"}
+        return <a
+            href="?"
+            className={className}
+            ref={this.ref.button}
+            defaultValue={this.props.value}
+            onClick={this.state.isActive ? this.cb.showLogoutModal : this.cb.showLoginModal}
+            children={this.state.isActive ?  "Log out" : "Log in"}
         />;
     }
 

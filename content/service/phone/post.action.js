@@ -2,6 +2,9 @@ import UserSession from "../../../src/user/UserSession";
 import path from "path";
 import fs from "fs";
 module.exports = function PostAction(form, req) {
+    // Load form inputs
+    let inputEmail = form.elements.email;
+    let inputFileName = form.elements.fileName;
 
     // Handle Validations
 
@@ -11,23 +14,27 @@ module.exports = function PostAction(form, req) {
         const localUser = userSession.getLocalUser();
 
         // Auto fill fileName parameter
-        if (!form.elements["fileName"].value) {
-            form.elements["fileName"].value = findAvailableFile(localUser);
+        if (!inputFileName.value) {
+            inputFileName.value = findAvailableFile(localUser);
         } else {
-            if(localUser.hasFile(form.elements["fileName"].value)) {
-                form.elements["fileName"].setCustomValidity("Please choose a unique file name.");
+            if(localUser.hasFile(inputFileName.value)) {
+                inputFileName.setCustomValidity("Please choose a unique file name.");
             }
         }
     } else {
-        form.elements["email"].setCustomValidity("Please Register or Log in to become a phone sponsor.");
+        inputEmail.required = true;
+        inputEmail.disabled = false
+        inputEmail.setCustomValidity("Please Register or Log in to become a phone sponsor.");
     }
+
+    const fileName = inputFileName.value;
 
     // Return action as a function
     return function(res) {
         // Perform Action
         const localUser = userSession.getLocalUser();
         const fileContent = genMarkdownTemplate('./service/phone/request.template.md', req.body);
-        localUser.writeFile(req.body.fileName, fileContent)
+        localUser.writeFile(fileName, fileContent)
 
         return {
             message: "Phone Post has been created successfully",
@@ -37,6 +44,8 @@ module.exports = function PostAction(form, req) {
         }
     }
 }
+
+
 
 // Support methods
 

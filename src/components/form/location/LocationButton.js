@@ -19,13 +19,14 @@ export default class LocationButton extends React.Component {
         }
     }
 
-    getClassName() { return 'location-button'; }
+    getClassName() { return 'button location-button'; }
 
     render(validation) {
         let className = this.getClassName();
         if(this.props.className)
             className += ' ' + this.props.className;
-        return <button {...this.props}
+        return <a
+            href="?"
             className={className}
             ref={this.ref.button}
             onClick={this.cb.getLocation}
@@ -63,7 +64,8 @@ export default class LocationButton extends React.Component {
 
         const forInput = this.props.for || this.props.htmlFor;
         if(updateInput && forInput) {
-            const elmInput = this.ref.button.current.form.elements[forInput];
+            const body = this.ref.button.current.closest('form, body');
+            const elmInput = body.querySelector(`input[name="${forInput}"]`);
             if(!elmInput.value)
                 elmInput.value = `${position.coords.latitude},${position.coords.longitude}`
         }

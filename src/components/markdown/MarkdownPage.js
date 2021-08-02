@@ -146,27 +146,27 @@ function A(props) {
     return <a {...props}/>;
 }
 
-function replaceStringParameters(content, replaceParams) {
-    if(!replaceParams)
-        replaceParams = {};
-    if(typeof replaceParams === "string")
-        replaceParams = new URLSearchParams(replaceParams);
-    if(replaceParams instanceof URLSearchParams) {
-        const objParams = {};
-        replaceParams.forEach((value, key) => {
-            objParams[key] = value;
-        });
-        replaceParams = objParams;
-    }
-
-    // Replace template variables
-    content = content.replace(/\${([^}]+)}/g, (match, fieldName) => {
-        if(replaceParams.hasOwnProperty(fieldName)) {
-            const value = replaceParams[fieldName];
-            return value.toString().replace(/<[^>]*>?/gm, '');
-        }
-        return "";
-    })
-    return content;
-}
+// function replaceStringParameters(content, replaceParams) {
+//     if(!replaceParams)
+//         replaceParams = {};
+//     if(typeof replaceParams === "string")
+//         replaceParams = new URLSearchParams(replaceParams);
+//     if(replaceParams instanceof URLSearchParams) {
+//         const objParams = {};
+//         replaceParams.forEach((value, key) => {
+//             objParams[key] = value;
+//         });
+//         replaceParams = objParams;
+//     }
+//
+//     // Replace template variables
+//     content = content.replace(/\${([^}]+)}/g, (match, fieldName) => {
+//         if(replaceParams.hasOwnProperty(fieldName)) {
+//             const value = replaceParams[fieldName];
+//             return value.toString().replace(/<[^>]*>?/gm, '');
+//         }
+//         return "";
+//     })
+//     return content;
+// }
 

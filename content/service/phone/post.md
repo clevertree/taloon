@@ -12,7 +12,7 @@ This section is a work in progress. Please check back soon.
   <fieldset>
     <legend>Your Account</legend>
     <label title="Email">
-        <input name="email" type="text" placeholder="my@email.com" disabled/>
+        <input name="email" type="text" placeholder="my@email.com" disabled required/>
         <session for="email"></session>
     </label>
   </fieldset>
@@ -41,13 +41,13 @@ This section is a work in progress. Please check back soon.
         <location for="location"></location>
     </label>
     <label title="Distance (mi.)">
-        <input name="distance" type="number" placeholder="10" />
+        <input name="distance" type="number" placeholder="10 (miles)" value="10" />
     </label>
   </fieldset>
   <fieldset>
     <legend>Write a Description</legend>
     <label title="Description">
-        <textarea name="description" rows="24" placeholder="Enter a description" required></textarea>
+        <textarea name="description" rows="12" placeholder="Enter a description" required></textarea>
     </label>
   </fieldset>
   <fieldset>

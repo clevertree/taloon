@@ -31,6 +31,7 @@ class App extends Component {
         }
         this.cb = {
             handleClick: e => this.handleClick(e),
+            handlePopState: e => this.handlePopState(e),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props),
             showModal: (path) => this.showModal(path),
             closeModal: (timeout) => this.closeModal(timeout)
@@ -39,12 +40,14 @@ class App extends Component {
 
     componentDidMount() {
         document.addEventListener('click', this.cb.handleClick);
+        window.addEventListener('popstate', this.cb.handlePopState);
         AppEvents.addEventListener('modal:show', this.cb.showModal)
         // AppEvents.addEventListener('modal:close', this.cb.closeModal)
 
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
+        window.removeEventListener('popstate', this.cb.handlePopState);
         AppEvents.removeEventListener('modal:show', this.cb.showModal)
         // AppEvents.removeEventListener('modal:close', this.cb.closeModal)
     }
@@ -166,7 +169,7 @@ class App extends Component {
                 this.setState({
                     pathname
                 });
-                window.history.pushState("", null, pathname);
+                window.history.pushState({}, null, pathname);
 
                 window.scroll({
                     top: 0,
@@ -175,6 +178,13 @@ class App extends Component {
                 });
             }
         }
+    }
+
+    handlePopState(e) {
+        console.log("Pop State: " + document.location.pathname + ", state: " + JSON.stringify(e.state));
+        this.setState({
+            pathname:document.location.pathname
+        });
     }
 
     showModal(markdownPath) {

@@ -22,7 +22,7 @@ body {
 }
 
 .App > article {
-  padding: 0 1em;
+  padding: 0 1em 0 1em;
 }
 
 .App > header,

@@ -1,31 +1,28 @@
+// import path from "path";
+// import fs from "fs";
+// import UserSession from "../../../src/user/UserSession";
 // TODO: search for existing offers before posting request?
 
-module.exports = function RequestAction(req, res, form) {
-    const validations = {};
-    const autofillValues = {};
-
-    // Handle Session - if no session, send 2 factor (user is attempting to create a form with your email address)
-    if (!req.session.email)
-        validations['email'] = "Please Register or Log in to become a phone sponsor.";
-
-    // req.session.reset();
-    // console.log('req.session.test', req.session.test);
-    // req.session.test = 'wut';
-
+module.exports = function RequestAction(form, req) {
     // Handle Validations
-    // if (req.body.title)
-    //     validations.title = "Title already in use: " + req.body.title;
 
+    // Check for active session
+    // const userSession = new UserSession(req.session);
+    // if (userSession.isActive()) {
+    // } else {
+    //     form.elements["email"].setCustomValidity("Please Register or Log in to request a phone.");
+    // }
 
-    // Return Validations on Preview
-    if (req.query.preview)
-        return res.status(202).send({validations, values: autofillValues, preview: true});
+    // Return action as a function
+    return function(res) {
+        // Perform Action
 
-    // Return Error on failed validation
-    if (Object.values(validations).length > 0 || !form.checkValidity())
-        return res.status(400).send({validations, values: autofillValues, preview: !!req.query.preview});
-
-    // Perform Action
-    return res.send({message: "Form submitted successfully"});
+        return {
+            message: "Phone Request has been sent",
+            events: [
+                ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 2000],
+            ]
+        }
+    }
 }
 

@@ -91,6 +91,7 @@
 
 /** Input Styles **/
 
+.App.theme-default a.button,
 .App.theme-default button,
 .App.theme-default input,
 .App.theme-default select,
@@ -103,10 +104,21 @@
     transition: box-shadow 1s, border-color 1s;
 }
 
+/** Button Links **/
+
+.App.theme-default a.button,
 .App.theme-default form button {
+    display: inline-flex;
+    align-items: center;
     border: 2px outset #FFF;
     /*font-size: larger;*/
     cursor: pointer;
+
+    background-color: #61dafb;
+    text-decoration: none;
+    transition: background-color 1s, letter-spacing 1s, color 1s, padding 1s, box-shadow 1s;
+    font-weight: bold;
+    animation: buttonFadeIn 1s ease-in-out forwards;
 }
 
 .App.theme-default form input[type=text] {
@@ -120,34 +132,14 @@
     /*transform: scale(2);*/
 }
 
+/** Button Click **/
 
+.App.theme-default form button:active,
+.App.theme-default a.button:active {
 
-/** Button Links **/
-
-.App.theme-default button,
-.App.theme-default a.button {
-    /*display: block;*/
-    /*padding: 1em 2em;*/
-    /*border-radius: 1em;*/
-
-    background-color: #61dafb;
-    text-decoration: none;
-    transition: background-color 1s, letter-spacing 1s, color 1s, padding 1s, box-shadow 1s;
-    font-weight: bold;
-    animation: buttonFadeIn 1s ease-in-out forwards;
-}
-.App.theme-default a.button {
-    display: block;
-    padding: 1em 2em;
-    border-radius: 1em;
-}
-.App.theme-default a.button + a.button {
-    margin-top: 0.5em;
-}
-.App.theme-default a.button:last-child {
-    margin-bottom: 0.5em;
 }
 
+/** Button Hover **/
 
 .App.theme-default form button:hover,
 .App.theme-default a.button:hover {
@@ -158,9 +150,12 @@
     box-shadow: #000 0 0 12px;
 }
 
+/** Button Styles **/
+
 .App.theme-default form button.wide,
 .App.theme-default a.button.wide {
     flex-grow: 1;
+    display: block;
 }
 .App.theme-default form button.large,
 .App.theme-default a.button.large {
@@ -201,11 +196,16 @@
 /** Validation Text **/
 
 .App.theme-default form .validation-container {
+    text-align: left;
     display: flex;
     flex-direction: column;
     /*flex-grow: 1;*/
 }
-.App.theme-default form .validation-container > .validation-text{
+.App.theme-default form .validation-container > :first-child {
+    flex-grow: 1;
+}
+
+.App.theme-default form .validation-container > .validation-text {
     color: #F00;
     font-style: italic;
     padding: 0;
