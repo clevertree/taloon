@@ -65,7 +65,7 @@ export default class MarkdownPage extends React.Component {
         // console.log("response: ", response, response.headers, responseType);
         if (responseType.startsWith('text/markdown')) {
             let content = await response.text();
-            content = replaceStringParameters(content, replaceParams);
+            // content = replaceStringParameters(content, replaceParams);
             this.setState({content});
         } else {
             this.setState({content: "Invalid Type: " + responseType});

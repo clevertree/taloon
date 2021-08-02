@@ -1,11 +1,9 @@
 import UserSession from "../../../src/user/UserSession";
-module.exports = function PostAction(req, res, form) {
-    const validations = {};
-    const autofillValues = {};
-
+import path from "path";
+import fs from "fs";
+module.exports = function PostAction(form, req) {
 
     // Handle Validations
-
 
     // Check for active session
     const userSession = new UserSession(req.session);
@@ -13,65 +11,51 @@ module.exports = function PostAction(req, res, form) {
         const localUser = userSession.getLocalUser();
 
         // Auto fill fileName parameter
-        if (!req.body.fileName) {
-            autofillValues.fileName = findAvailableFile(localUser);
+        if (!form.elements["fileName"].value) {
+            form.elements["fileName"].value = findAvailableFile(localUser);
         } else {
-            if(localUser.hasFile(req.body.fileName))
-                validations.fileName = "Please choose a unique file name";
+            if(localUser.hasFile(form.elements["fileName"].value)) {
+                form.elements["fileName"].setCustomValidity("Please choose a unique file name.");
+            }
         }
     } else {
-        validations['email'] = "Please Register or Log in to become a phone sponsor.";
+        form.elements["email"].setCustomValidity("Please Register or Log in to become a phone sponsor.");
     }
 
+    // Return action as a function
+    return function(res) {
+        // Perform Action
+        const localUser = userSession.getLocalUser();
+        const fileContent = genMarkdownTemplate('./service/phone/request.template.md', req.body);
+        localUser.writeFile(req.body.fileName, fileContent)
 
-    // Return Validations on Preview
-    if (req.query.preview)
-        return res.status(202).send({validations, values: autofillValues, preview: true});
-
-    // Return Error on failed validation
-    if (Object.values(validations).length > 0 || !form.checkValidity())
-        return res.status(400).send({validations, values: autofillValues, preview: !!req.query.preview});
-
-    // Perform Action
-    const localUser = userSession.getLocalUser();
-    const fileContent = genMarkdownTemplate(req.body);
-    localUser.writeFile(req.body.fileName, fileContent)
-
-    return res.send({
-        message: "Form submitted successfully. Redirecting...",
-        events: [
-            ['redirect', '/service/phone/list.md', 6000]
-        ]
-    });
+        return {
+            message: "Phone Post has been created successfully",
+            events: [
+                ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 2000],
+            ]
+        }
+    }
 }
 
+// Support methods
 
-// TODO: customize form for accepting phone requests
-function genMarkdownTemplate(values) {
-    return `
-# ${values.title}
+function genMarkdownTemplate(markdownPath, values) {
+    const pathMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, markdownPath);
+    if (!fs.existsSync(pathMD))
+        throw new Error("Markdown template not found: " + pathMD);
+    let markdownContent = fs.readFileSync(pathMD, 'utf8');
 
-${values.description}
+    // Replace template variables
+    markdownContent = markdownContent.replace(/\${([^}]+)}/g, (match, fieldName) => {
+        if(values.hasOwnProperty(fieldName)) {
+            const value = values[fieldName];
+            return value.toString().replace(/<[^>]*>?/gm, '');
+        }
+        return "";
+    })
 
-<form action="/service/phone/request.action.js">
-  <fieldset>
-    <legend>Your Request Title</legend>
-    <label title="Title">
-        <input type="text" name="title" id="title" placeholder="I need a smart phone (and optionally call/text service)" required />
-    </label>
-  </fieldset>
-  <fieldset>
-    <legend>Write a Description</legend>
-    <label title="Description">
-        <textarea name="description" id="description" rows="24" placeholder="I need a phone with service for employment purposes." required></textarea>
-    </label>
-  </fieldset>
-  <fieldset>
-    <legend>Submit a new Phone Request</legend>
-    <button type="submit">Submit</button>
-  </fieldset>
-</form>
-    `.trim();
+    return markdownContent.trim();
 }
 
 

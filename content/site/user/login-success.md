@@ -3,8 +3,8 @@
 You are now logged in.
 
 <form>
-  <fieldset>
+<fieldset>
     <legend>Click here to close this window</legend>
     <button type="submit">Continue</button>
-  </fieldset>
+</fieldset>
 </form>

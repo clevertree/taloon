@@ -5,24 +5,24 @@ Once verified, you will be logged in to a new session.
 
 <form action="login">
 <input type="hidden" name="service" value="email">
-  <fieldset>
+<fieldset>
     <legend>Your Email</legend>
     <label title="Email">
-        <input type="email" name="email" id="email" placeholder="Your Login Email Address" value="${email}" required />
+        <input type="email" name="email" id="email" placeholder="Your Login Email Address" value="" required />
     </label>
-  </fieldset>
-  <fieldset>
+</fieldset>
+<fieldset>
     <legend>Receive a 2-Factor Login Code</legend>
     <button type="submit">Send Code to my Email</button>
-  </fieldset>
+</fieldset>
 </form>
 
 
 ## Log in with Google SSO
 <form action="login">
 <input type="hidden" name="service" value="google">
-  <fieldset>
+<fieldset>
     <legend>Click here to log in with Google SSO</legend>
     <button type="submit">Login with Google</button>
-  </fieldset>
+</fieldset>
 </form>

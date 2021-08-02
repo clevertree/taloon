@@ -36,11 +36,29 @@ class FormHandler {
             for (const element of form.elements)
                 if (element.name)
                     element.value = req.body[element.name];
-            if (!req.query.preview && !form.checkValidity()) {
-                throw new Error("Form failed validation"); // Shouldn't happen ;(
-            }
 
-            await formActionCallback(req, res, form);
+
+            const callback = formActionCallback(form, req);
+            if(typeof callback !== "function")
+                throw new Error("Form action callback returned a non-function: " + typeof callback);
+
+            const validations = getFormValidations(form);
+            const valueChanges = getFormValueChanges(form, req.body);
+
+            // Return Validations on Preview
+            if (req.query.preview)
+                return res.status(202).send({validations, valueChanges, preview: true});
+
+            if (!form.checkValidity())
+                return res.status(400).send({validations, valueChanges, message: "Form failed validation"});
+
+            // Perform action
+            const responseJSON = callback(res);
+            if(responseJSON) {
+                if(typeof responseJSON !== "object")
+                    throw new Error("Invalid action response object");
+                return res.status(200).send(responseJSON);
+            }
 
         } catch (err) {
             console.error("Error submitting form: ", err.message);
@@ -79,6 +97,32 @@ class FormHandler {
 
 }
 export default FormHandler;
+
+
+function getFormValidations(form) {
+    const validations = {};
+    for (const element of form.elements) {
+        if(!element.name)
+            continue;
+        if(!element.checkValidity()) {
+            validations[element.name] = element.validationMessage;
+        }
+    }
+    return validations;
+}
+
+function getFormValueChanges(form, oldValues) {
+    const valueChanges = {};
+    for (const element of form.elements) {
+        if(!element.name)
+            continue;
+        if(element.value !== oldValues[element.name]) {
+            valueChanges[element.name] = element.value;
+        }
+    }
+    return valueChanges;
+
+}
 
 var walk = function(dir, callback) {
     var list = fs.readdirSync(dir);

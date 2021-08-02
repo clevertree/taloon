@@ -70,6 +70,9 @@
     padding: 6px 8px 0 0;
     cursor: pointer;
 }
+.App.theme-default form > fieldset > label:not([title]):before {
+    display: none;
+}
 
 .App.theme-default form > fieldset > label + label {
     margin-top: 1em;

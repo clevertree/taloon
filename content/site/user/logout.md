@@ -3,8 +3,8 @@
 Use this form to log out of the current session.
 
 <form action="logout">
-  <fieldset>
+<fieldset>
     <legend>Log out of the current session</legend>
     <button type="submit">Log out</button>
-  </fieldset>
+</fieldset>
 </form>
