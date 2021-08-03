@@ -70,11 +70,11 @@ export default class SessionButton extends React.Component {
 
     showLoginModal(e) {
         e.preventDefault();
-        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login.md`);
+        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/session/login.md`);
     }
     showLogoutModal(e) {
         e.preventDefault();
-        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/user/logout.md`);
+        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/session/logout.md`);
     }
 
 }

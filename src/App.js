@@ -116,7 +116,6 @@ class App extends Component {
             className={"content"}
             onEachTag={this.cb.onEachTag}
             src={src}
-            replaceParams={document.location.search}
         />
     }
 

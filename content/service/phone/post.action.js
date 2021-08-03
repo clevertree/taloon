@@ -1,7 +1,7 @@
 import UserSession from "../../../src/user/UserSession";
 import path from "path";
 import fs from "fs";
-module.exports = function PostAction(form, req) {
+module.exports = async function PostPhoneServiceAction(form, req) {
     // Load form inputs
     let inputEmail = form.elements.email;
     let inputFileName = form.elements.fileName;
@@ -11,7 +11,7 @@ module.exports = function PostAction(form, req) {
     // Check for active session
     const userSession = new UserSession(req.session);
     if (userSession.isActive()) {
-        const localUser = userSession.getLocalUser();
+        const localUser = await userSession.loadLocalUser();
 
         // Auto fill fileName parameter
         if (!inputFileName.value) {
@@ -31,16 +31,16 @@ module.exports = function PostAction(form, req) {
     const fileName = inputFileName.value;
 
     // Return action as a function
-    return function(res) {
+    return async function(res) {
         // Perform Action
-        const localUser = userSession.getLocalUser();
+        const localUser = await userSession.loadLocalUser();
         const fileContent = genMarkdownTemplate('./service/phone/request.template.md', req.body);
-        localUser.writeFile(fileName, fileContent)
+        const relativePath = localUser.writeFile(fileName, fileContent);
 
         return {
             message: "Phone Post has been created successfully",
             events: [
-                ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 2000],
+                ['redirect', relativePath, 2000],
             ]
         }
     }

@@ -3,7 +3,7 @@
 // import UserSession from "../../../src/user/UserSession";
 // TODO: search for existing offers before posting request?
 
-module.exports = function RequestAction(form, req) {
+module.exports = function RequestPhoneServiceAction(form, req) {
     // Handle Validations
 
     // Check for active session

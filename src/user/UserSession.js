@@ -1,6 +1,6 @@
 import EmailServer from "../server/email/EmailServer";
 import crypto from 'crypto';
-import LocalUser from "./User";
+import LocalUser from "./LocalUser";
 
 const active2FactorLogins = {};
 
@@ -12,10 +12,15 @@ export default class UserSession {
     isActive() { return !!this.session.email; }
     getEmail() { return this.session.email; }
 
-    getLocalUser() {
+    /**
+     *
+     * @param orCreate
+     * @returns {Promise<null|LocalUser>}
+     */
+    async loadLocalUser(orCreate=true) {
         if(!this.session.email)
             throw new Error("No valid user session");
-        return new LocalUser(this.session.email);
+        return await LocalUser.loadFromEmail(this.session.email, orCreate);
     }
 
     login(req, email) {
@@ -34,9 +39,9 @@ export default class UserSession {
         this.logout(req);
         return {
             message: "You have been logged out. This modal will close automatically.",
-            redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+            redirect: `${process.env.REACT_APP_PATH_SITE}/session/`,
             events: [
-                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/logout-success.md`],
+                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/session/logout-success.md`],
                 ['modal:close', 5000],
                 ['session:change']
             ]
@@ -70,10 +75,10 @@ export default class UserSession {
             null;
         values.host = process.env.REACT_APP_PATH_PUBLIC || req.headers.origin;
         values.codeUrl = new URL(
-            `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${email}&code=${code2Factor}`,
+            `${process.env.REACT_APP_PATH_SITE}/session/login-2factor.md?email=${email}&code=${code2Factor}`,
             values.host);
         values.loginUrl = new URL(
-            `${process.env.REACT_APP_PATH_SITE}/user/login.md?email=${email}`,
+            `${process.env.REACT_APP_PATH_SITE}/session/login.md?email=${email}`,
             values.host);
 
         // Add 2 Factor
@@ -93,7 +98,7 @@ Ref: ${req.headers.referrer || 'N/A'}
         await EmailServer.sendMarkdownTemplateEmail(
             email,
             'Use this code to log in',
-            `/${process.env.REACT_APP_PATH_SITE}/user/login-2factor.email.md`,
+            `/${process.env.REACT_APP_PATH_SITE}/session/login-2factor.email.md`,
             values)
 
         let storeFormValues = {email};
@@ -103,8 +108,8 @@ Ref: ${req.headers.referrer || 'N/A'}
         return {
             message: "A 2-Factor code sent to your email address. Please use it to log in",
             events: [
-                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/user/login.action.js`, storeFormValues],
-                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md`]
+                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/session/login.action.js`, storeFormValues],
+                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/session/login-2factor.md`]
             ]
         };
     }
@@ -125,9 +130,9 @@ Ref: ${req.headers.referrer || 'N/A'}
 
         return {
             message: "You are now logged in. This modal will close automatically.",  // Redirecting...
-            redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
+            redirect: `${process.env.REACT_APP_PATH_SITE}/session/`,
             events: [
-                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/user/login-success.md`],
+                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/session/login-success.md`],
                 ['modal:close', 5000],
                 ['session:change'],
                 // ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 5000], // TODO: redirect optionally

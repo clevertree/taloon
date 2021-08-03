@@ -53,17 +53,16 @@ export default class MarkdownPage extends React.Component {
             this.fetchSrc().then();
     }
 
-    async fetchSrc(options={}) {
+    async fetchSrc(options={cache: "force-cache"}) {
         const url = resolveContentURL(this.props.src);
-        let replaceParams = this.props.replaceParams;
-        if(!replaceParams && this.props.src.indexOf('?') !== -1)
-            replaceParams = this.props.src.split('?').pop();
 
-        options.cache = "force-cache";
         const response = await fetch(url, options);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
-        if (responseType.startsWith('text/markdown')) {
+        if(response.status !== 200) {
+            this.setState({content: "Markdown file not found: " + this.props.src});
+
+        } else if (responseType.startsWith('text/markdown')) {
             let content = await response.text();
             // content = replaceStringParameters(content, replaceParams);
             this.setState({content});

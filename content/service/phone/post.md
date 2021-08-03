@@ -55,3 +55,7 @@ This section is a work in progress. Please check back soon.
     <button type="submit">Submit</button>
   </fieldset>
 </form>
+
+# Existing Offers
+
+[Search or manage existing offers](index.md)

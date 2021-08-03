@@ -31,6 +31,7 @@ export default class Server {
         FormHandler.setupRoutes(app);
 
         app.use(express.static(process.env.REACT_APP_PATH_BUILD));
+        app.use('/content', express.static(process.env.REACT_APP_PATH_CONTENT, {fallthrough: false}));
         // app.use(express.static(BUILD_FILES));
 
         const fileRootHTMLPath = path.join(process.env.REACT_APP_PATH_BUILD, 'index.html');
@@ -43,6 +44,8 @@ export default class Server {
                     return res.status(400).send("Invalid Post")
                 default:
             }
+            // if(req.path.startsWith(`/${process.env.REACT_APP_PATH_CONTENT}`) && req.path.endsWith('.md'))
+            //     return res.status(404).send("Markdown page not found")
             let indexHTML = fs.readFileSync(fileRootHTMLPath, 'utf8');
 
             const pathIndexMD = path.join(process.env.REACT_APP_PATH_CONTENT, req.path, 'index.md');
