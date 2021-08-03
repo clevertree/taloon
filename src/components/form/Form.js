@@ -13,7 +13,7 @@ export default class Form extends React.Component {
         super(props);
         this.cb = {
             onSubmit: e => this.onSubmit(e),
-            onChange: e => this.onChangeDelay(e)
+            onChange: e => this.onChangeDelay(e),
         }
         this.ref = {
             form: React.createRef()
@@ -25,20 +25,28 @@ export default class Form extends React.Component {
             },
             message: null,
         }
-        this.onChangeTimeout = null;
+        this.timeouts = {
+            onChange: null,
+            autoFill: null
+        }
     }
 
     getClassName() { return 'theme-default'; }
 
     componentDidMount() {
-        // this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
-        this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
         AppEvents.addEventListener('session:change', this.cb.onChange);
         this.cb.onChange();
+        this.doAuto();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.markdownPath !== this.props.markdownPath)
+            this.doAuto();
     }
 
     componentWillUnmount() {
-        AppEvents.removeEventListener('session:change', this.cb.onChange)
+        AppEvents.removeEventListener('session:change', this.cb.onChange);
+        this.clearTimeouts();
     }
 
     render() {
@@ -65,17 +73,18 @@ export default class Form extends React.Component {
 
 
     async onSubmit(e, preview=false) {
-        clearTimeout(this.onChangeTimeout);
+        this.clearTimeouts();
         e && e.preventDefault();
         const form = this.ref.form.current;
         let formAction = form.getAttribute('action');
         if(!formAction) {
-            AppEvents.emit('modal:close', {})
+            if(!preview)
+                AppEvents.emit('modal:close', 500)
             return;
         }
         formAction = path.resolve(path.dirname(this.props.markdownPath), formAction);
-        const formValues = this.getFormValues(form);
-        const formPosition = this.getFormPosition(form);
+        const formValues = this.getFormValues();
+        const formPosition = this.getFormPosition();
 
         let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
         postURL.search = `markdownPath=${this.props.markdownPath.split('?').shift()}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
@@ -119,6 +128,7 @@ export default class Form extends React.Component {
         if(!preview) {
             form.scrollIntoView();
             if(newState.success === true) {
+                this.clearFormStorage();
                 AppEvents.emit('form:success', newState)
             } else {
                 AppEvents.emit('form:failed', newState)
@@ -136,23 +146,31 @@ export default class Form extends React.Component {
                 form.elements[key].value = valueChanges[key];
 
         // Send events
-        for(const [eventName, eventData] of events)
-            AppEvents.emit(eventName, eventData);
+        for(const [eventName, ...eventArgs] of events)
+            AppEvents.emit(eventName, ...eventArgs);
     }
 
 
     async onChangeDelay(e, timeout=TIMEOUT_CHANGE) {
-        clearTimeout(this.onChangeTimeout);
-        this.onChangeTimeout = setTimeout(() => this.onSubmit(e, true), timeout);
+        clearTimeout(this.timeouts.onChange);
+        this.timeouts.onChange = setTimeout(() => {
+            this.saveFormToStorage();
+            this.onSubmit(e, true)
+        }, timeout);
     }
 
-    getFormPosition(form) {
+
+    getFormPosition() {
+        const form = this.ref.form.current;
         const bodyElm = form.closest('.markdown-body, body');
         const formElms = bodyElm.getElementsByTagName('form');
         return [...formElms].indexOf(form);
     }
 
-    getFormValues(form) {
+    getFormValues() {
+        const form = this.ref.form.current;
+        if(!form)
+            throw new Error("Form is no longer active");
         return Object.values(form.elements).reduce((obj, field) => {
             if (field.name && typeof field.value !== "undefined")
                 obj[field.name] = field.value;
@@ -160,30 +178,42 @@ export default class Form extends React.Component {
         }, {});
     }
 
-    // doAutoFill(fillValue) {
-    //     if(!fillValue)
-    //         return;
-    //     // TODO: use localStorage
-    //     const form = this.ref.form.current;
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     for(const field of form.elements) {
-    //         if (field.name)  {
-    //             switch(this.props.autofill) {
-    //                 default:
-    //                     const paramValue = urlParams.get(field.name);
-    //                     if(paramValue)
-    //                         field.value = paramValue;
-    //                     break;
-    //             }
-    //
-    //         }
-    //     }
-    // }
+    doAuto(timeout=500) {
+        this.timeouts.autoFill = setTimeout(() => {
+            this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
+            this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
+        }, timeout);
+    }
+
+    doAutoFill(fillValue) {
+        const actionPath = this.getFormActionPath();
+        let values = actionPath ? loadFormData(actionPath) : {};
+
+        switch(fillValue) {
+            default:
+            case 'search':
+                Object.assign(values, Object.fromEntries(new URLSearchParams(document.location.search)))
+                break;
+        }
+
+        const form = this.ref.form.current;
+        for(const field of form.elements) {
+            if (!field.value && field.name && values[field.name]) {
+                field.value = values[field.name];
+                delete values[field.name];
+                // if(process.env.NODE_ENV === 'development')
+                //     console.log("Auto-filling value ", field.name, field.value);
+            }
+        }
+        if(Object.values(values) > 0)
+            console.warn("Unused values were not added to form: ", values);
+    }
 
     doAutoSubmit(submitValue) {
         if(!submitValue)
             return;
         const form = this.ref.form.current;
+        if(!form) throw new Error("Form is unavailable")
         if(form.checkValidity()) {
             setTimeout(() => {
                 this.onSubmit()
@@ -192,4 +222,70 @@ export default class Form extends React.Component {
             console.warn("Form failed validation. Auto-submit canceled");
         }
     }
+
+    saveFormToStorage() {
+        const autoSaveValue = this.props.autosave || this.props["data-autosave"];
+        if((autoSaveValue||'').toLowerCase() === 'off') // !autoSaveValue ||
+            return;
+        const values = this.getFormValues();
+        const actionPath = this.getFormActionPath();
+        if(actionPath)
+            storeFormData(actionPath, values);
+    }
+
+    clearFormStorage() {
+        const actionPath = this.getFormActionPath();
+        if(actionPath)
+            clearFormData(actionPath);
+    }
+
+    clearTimeouts() {
+        for(const key in this.timeouts)
+            if(this.timeouts.hasOwnProperty(key))
+                clearTimeout(this.timeouts[key]);
+    }
+
+    getFormActionPath() {
+        const form = this.ref.form.current;
+        if(!form)
+            throw new Error("Form is unavailable")
+        const action = form.getAttribute('action');
+        if(!action)
+            return null;
+        const markdownDir = path.dirname(this.props.markdownPath);
+        if(!markdownDir)
+            throw new Error("Invalid Markdown directory: " + this.props.markdownPath);
+        return path.resolve(markdownDir, action)
+    }
+}
+
+AppEvents.addEventListener('form:save', storeFormData);
+
+function storeFormData(actionPath, values) {
+    const key = 'form:' + actionPath;
+    localStorage.setItem(key, JSON.stringify(values));
+    // if(process.env.NODE_ENV === 'development')
+    //     console.log("Storing Form Values: ", key, values);
+}
+
+function clearFormData(actionPath) {
+    const key = 'form:' + actionPath;
+    localStorage.removeItem(key);
+    if(process.env.NODE_ENV === 'development')
+        console.log("Removing Form Values: ", key);
+}
+
+
+function loadFormData(actionPath) {
+    if(!localStorage)
+        return {};
+
+    const key = 'form:' + actionPath;
+    let formData = localStorage.getItem(key);
+    let values = {};
+    if (formData)
+        values = JSON.parse(formData);
+    if(process.env.NODE_ENV === 'development')
+        console.log("Loading Form Values: ", key, values);
+    return values;
 }

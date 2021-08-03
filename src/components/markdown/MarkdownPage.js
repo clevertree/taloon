@@ -131,6 +131,8 @@ export default class MarkdownPage extends React.Component {
 
 
 function resolveContentURL(src) {
+    if(src[0] === '/')
+        src = '.' + src;
     const contentURL = new URL(process.env.REACT_APP_PATH_CONTENT + '/', document.location.origin).toString();
     return new URL(src, contentURL).toString();
 }

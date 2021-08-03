@@ -33,7 +33,7 @@ export default class UserSession {
     processLogOutRequest(req) {
         this.logout(req);
         return {
-            message: "Session has been logged out",
+            message: "You have been logged out. This modal will close automatically.",
             redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
             events: [
                 ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/logout-success.md`],
@@ -93,13 +93,18 @@ Ref: ${req.headers.referrer || 'N/A'}
         await EmailServer.sendMarkdownTemplateEmail(
             email,
             'Use this code to log in',
-            `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.email.md`,
+            `/${process.env.REACT_APP_PATH_SITE}/user/login-2factor.email.md`,
             values)
+
+        let storeFormValues = {email};
+        if(process.env.NODE_ENV === 'development')
+            storeFormValues.code = code2Factor;
 
         return {
             message: "A 2-Factor code sent to your email address. Please use it to log in",
             events: [
-                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md?email=${email}`]
+                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/user/login.action.js`, storeFormValues],
+                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/user/login-2factor.md`]
             ]
         };
     }
@@ -119,12 +124,13 @@ Ref: ${req.headers.referrer || 'N/A'}
         };
 
         return {
-            message: "You are now logged in",
+            message: "You are now logged in. This modal will close automatically.",  // Redirecting...
             redirect: `${process.env.REACT_APP_PATH_SITE}/user/`,
             events: [
-                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/user/login-success.md`],
+                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/user/login-success.md`],
+                ['modal:close', 5000],
                 ['session:change'],
-                ['modal:close', 5000]
+                // ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 5000], // TODO: redirect optionally
             ]
         };
     }

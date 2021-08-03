@@ -1,6 +1,6 @@
 ## Logging in
 
-You are now logged in.
+You are being logged in...
 
 <form>
 <fieldset>

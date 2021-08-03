@@ -11,8 +11,6 @@ import SessionServer from "./session/SessionServer";
 export default class Server {
     constructor() {
 
-        const PATH_BUILD = path.resolve(process.env.REACT_APP_PATH_BUILD);
-        const PATH_CONTENT = path.resolve(process.env.REACT_APP_PATH_CONTENT);
 // const BUILD_FILES = path.resolve(BUILD_INDEX, 'files');
 
         const app = express();
@@ -32,10 +30,10 @@ export default class Server {
         EmailServer.setupRoutes(app);
         FormHandler.setupRoutes(app);
 
-        app.use(express.static(PATH_BUILD));
+        app.use(express.static(process.env.REACT_APP_PATH_BUILD));
         // app.use(express.static(BUILD_FILES));
 
-        const fileRootHTMLPath = path.resolve(PATH_BUILD, 'index.html');
+        const fileRootHTMLPath = path.join(process.env.REACT_APP_PATH_BUILD, 'index.html');
         app.use((req, res) => {
             switch(req.method.toLowerCase()) {
                 case 'options':
@@ -47,7 +45,7 @@ export default class Server {
             }
             let indexHTML = fs.readFileSync(fileRootHTMLPath, 'utf8');
 
-            const pathIndexMD = path.resolve(PATH_CONTENT + req.path, 'index.md');
+            const pathIndexMD = path.join(process.env.REACT_APP_PATH_CONTENT, req.path, 'index.md');
             if(fs.existsSync(pathIndexMD)) {
                 const markdownHTML = fs.readFileSync(pathIndexMD, 'utf8');
                 indexHTML = updateMetaTagsMD(req, indexHTML, markdownHTML)

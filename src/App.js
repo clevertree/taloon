@@ -11,6 +11,8 @@ import './components/menu/style/Menu.css';
 import './App.css';
 import './AppTheme.css';
 
+const TIMEOUT_REDIRECT = 5000;
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -32,6 +34,7 @@ class App extends Component {
         this.cb = {
             handleClick: e => this.handleClick(e),
             handlePopState: e => this.handlePopState(e),
+            handleRedirect: e => this.handleRedirect(e),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props),
             showModal: (path) => this.showModal(path),
             closeModal: (timeout) => this.closeModal(timeout)
@@ -41,7 +44,8 @@ class App extends Component {
     componentDidMount() {
         document.addEventListener('click', this.cb.handleClick);
         window.addEventListener('popstate', this.cb.handlePopState);
-        AppEvents.addEventListener('modal:show', this.cb.showModal)
+        AppEvents.addEventListener('modal:show', this.cb.showModal);
+        AppEvents.addEventListener('redirect', this.cb.handleRedirect);
         // AppEvents.addEventListener('modal:close', this.cb.closeModal)
 
     }
@@ -49,6 +53,7 @@ class App extends Component {
         document.removeEventListener('click', this.cb.handleClick);
         window.removeEventListener('popstate', this.cb.handlePopState);
         AppEvents.removeEventListener('modal:show', this.cb.showModal)
+        AppEvents.removeEventListener('redirect', this.cb.handleRedirect);
         // AppEvents.removeEventListener('modal:close', this.cb.closeModal)
     }
 
@@ -90,14 +95,16 @@ class App extends Component {
     renderContent() {
         let src = "./index.md";
         if(this.state.pathname)
-            src = '.' + this.state.pathname;
+            src = this.state.pathname;
+        if(src[0] === '/')
+            src = '.' + src;
         if(!src.endsWith('.md')) {
             if(src.endsWith('/'))
                 src += 'index.md';
             else if(!src.endsWith('.md'))
                 src += '.md';
         }
-// console.log('src', src);
+        // console.log('src', src);
         // Remove previous meta tags
         for(const metaElm of document.head.querySelectorAll(
             "title, meta[name='description'], meta[name='keywords'], meta[name='title']")) {
@@ -166,16 +173,7 @@ class App extends Component {
                 e.preventDefault();
                 // console.log('click', target, pathname);
                 // let history = useHistory();
-                this.setState({
-                    pathname
-                });
-                window.history.pushState({}, null, pathname);
-
-                window.scroll({
-                    top: 0,
-                    left: 0,
-                    behavior: 'smooth'
-                });
+                this.handleRedirect(pathname, 0);
             }
         }
     }
@@ -187,10 +185,26 @@ class App extends Component {
         });
     }
 
-    showModal(markdownPath) {
+    handleRedirect(pathname, timeout=TIMEOUT_REDIRECT) {
+        setTimeout(() => {
+            console.info("Redirecting to ", pathname);
+            this.setState({
+                pathname
+            });
+            window.history.pushState({}, null, new URL(pathname, document.location.origin)+'');
+            window.scroll({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }, timeout);
+    }
+
+    showModal(markdownPath, modalOptions={}) {
         // console.log("Showing Modal: ", markdownPath);
         this.setState({
             activeModal: <MarkdownModal
+                {...modalOptions}
                 src={markdownPath}
                 onClose={this.cb.closeModal}
             />

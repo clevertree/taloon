@@ -8,7 +8,7 @@ export default class AppEvents {
         if(eventList.includes(callback)) {
             console.warn("Callback already exists for event ", eventName, callback);
         } else {
-            eventList.push(callback)
+            eventList.push(callback);
         }
     }
 
@@ -22,12 +22,12 @@ export default class AppEvents {
         }
     }
 
-    static emit(eventName, data=null) {
-        console.info('Event', eventName, data);
+    static emit(eventName, ...eventArgs) {
+        console.info('Event', eventName, ...eventArgs);
         const eventList = events[eventName];
         if(eventList) {
             for(const callback of eventList) {
-                callback(data);
+                callback(...eventArgs);
             }
         }
     }

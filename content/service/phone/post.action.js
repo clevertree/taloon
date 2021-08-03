@@ -22,8 +22,9 @@ module.exports = function PostAction(form, req) {
             }
         }
     } else {
+        // Email field may need to be set enabled and required
         inputEmail.required = true;
-        inputEmail.disabled = false
+        inputEmail.disabled = false;
         inputEmail.setCustomValidity("Please Register or Log in to become a phone sponsor.");
     }
 
@@ -50,10 +51,10 @@ module.exports = function PostAction(form, req) {
 // Support methods
 
 function genMarkdownTemplate(markdownPath, values) {
-    const pathMD = path.resolve(process.env.REACT_APP_PATH_CONTENT, markdownPath);
-    if (!fs.existsSync(pathMD))
-        throw new Error("Markdown template not found: " + pathMD);
-    let markdownContent = fs.readFileSync(pathMD, 'utf8');
+    const markdownContentPath = path.join(process.env.REACT_APP_PATH_CONTENT, markdownPath);
+    if (!fs.existsSync(markdownContentPath))
+        throw new Error("Markdown template not found: " + markdownContentPath);
+    let markdownContent = fs.readFileSync(markdownContentPath, 'utf8');
 
     // Replace template variables
     markdownContent = markdownContent.replace(/\${([^}]+)}/g, (match, fieldName) => {

@@ -2,7 +2,7 @@
 
 Please check your email for a 2-factor authorization code and type it in the form below to start your session.
 
-<form action="login" data-autosubmit>
+<form action="login.action.js" autosubmit autofill autosave="off">
 <input type="hidden" name="service" value="email-2factor-response">
 <fieldset>
     <legend>Your Email</legend>
@@ -21,3 +21,5 @@ Please check your email for a 2-factor authorization code and type it in the for
     <button type="submit">Submit</button>
 </fieldset>
 </form>
+
+## [Resend 2-factor code](./login.md)
