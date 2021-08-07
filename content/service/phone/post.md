@@ -8,7 +8,7 @@ This section is a work in progress. Please check back soon.
 ```
 
 
-<form action="post.action.js">
+<form action="post.js">
   <fieldset>
     <legend>Your Account</legend>
     <label title="Email">

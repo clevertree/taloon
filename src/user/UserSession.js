@@ -1,12 +1,14 @@
 import EmailServer from "../server/email/EmailServer";
 import crypto from 'crypto';
-import LocalUser from "./LocalUser";
+import UserDoc from "./UserDoc";
+import UserDB from "./UserDB";
 
 const active2FactorLogins = {};
 
 export default class UserSession {
-    constructor(session={}) {
+    constructor(session={}, db) {
         this.session = session;
+        this.db = db;
     }
 
     isActive() { return !!this.session.email; }
@@ -15,12 +17,17 @@ export default class UserSession {
     /**
      *
      * @param orCreate
-     * @returns {Promise<null|LocalUser>}
+     * @returns {Promise<null|UserDoc>}
      */
-    async loadLocalUser(orCreate=true) {
+    async getOrCreateLocalUser() {
         if(!this.session.email)
             throw new Error("No valid user session");
-        return await LocalUser.loadFromEmail(this.session.email, orCreate);
+        const email = this.session.email;
+        const userDB = new UserDB(this.db);
+        let foundUser = await userDB.getUser({email}, false);
+        if(foundUser)
+            return foundUser;
+        return await userDB.createUser(email);
     }
 
     login(req, email) {
@@ -108,7 +115,7 @@ Ref: ${req.headers.referrer || 'N/A'}
         return {
             message: "A 2-Factor code sent to your email address. Please use it to log in",
             events: [
-                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/session/login.action.js`, storeFormValues],
+                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/session/login.js`, storeFormValues],
                 ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/session/login-2factor.md`]
             ]
         };

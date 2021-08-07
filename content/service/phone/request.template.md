@@ -2,7 +2,7 @@
 
 ${description}
 
-<form action="/service/phone/request.action.js">
+<form action="/service/phone/request.js">
   <input type="hidden" name="withinLocation" value="${location}">
   <input type="hidden" name="withinDistance" value="${distance}">
   <fieldset>

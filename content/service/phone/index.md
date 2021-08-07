@@ -8,7 +8,7 @@ This section is a work in progress. Please check back soon.
 ```
 
 
-<form action="request.action.js">
+<form action="request.js">
   <fieldset>
     <legend>Your Request Title</legend>
     <label title="Title">

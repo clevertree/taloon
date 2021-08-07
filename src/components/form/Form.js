@@ -87,7 +87,8 @@ export default class Form extends React.Component {
         const formPosition = this.getFormPosition();
 
         let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
-        postURL.search = `markdownPath=${this.props.markdownPath.split('?').shift()}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
+        const formPath = this.props.markdownPath.split('?').shift();
+        // postURL.search = `markdownPath=${this.props.markdownPath.split('?').shift()}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
         // console.log("Submitting form ", postURL + '', formValues, form);
 
         let newState = {
@@ -105,7 +106,13 @@ export default class Form extends React.Component {
             const response = await fetch(postURL + '', {
                 credentials: "include",
                 method: 'post',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Handler-Type': 'form',
+                    'Form-Path': formPath,
+                    'Form-Position': formPosition,
+                    'Form-Preview': preview ? 'true' : 'false',
+                },
                 body: JSON.stringify(formValues)
             });
             const responseJson = await response.json();

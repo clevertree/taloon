@@ -3,7 +3,7 @@
 Use this form to send a 2-factor code to your email address. 
 Once verified, you will be logged in to a new session.
 
-<form action="login.action.js" autosave="off">
+<form action="login.js" autosave="off">
 <input type="hidden" name="service" value="email">
 <fieldset>
     <legend>Your Email</legend>
@@ -19,7 +19,7 @@ Once verified, you will be logged in to a new session.
 
 
 ## Log in with Google SSO
-<form action="login.action.js" autosave="off">
+<form action="login.js" autosave="off">
 <input type="hidden" name="service" value="google">
 <fieldset>
     <legend>Click here to log in with Google SSO</legend>
