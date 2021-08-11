@@ -1,12 +1,19 @@
 module.exports = {
 
-    handleGetRequest: (req, res) => {
-        res.send("# WTF  " + req.query._id);
+    handleGetRequest: async (req, res, server) => {
+        // const userSession = server.getUserSession(req.session);
+        const userContentCollection = server.getUserContentCollection();
+        const contentDoc = await userContentCollection.queryUserFile(req.query);
+
         // Return markdown content
+        res.send(contentDoc.getContent());
+
+        // TODO: allow loading markdown content out of GET express router???
     },
 
-    handleFormRequest: async (form, req, stats) => {
-        const {userSession} = stats;
+    handleFormRequest: async (form, req, server) => {
+        const userSession = server.getUserSession(req.session);
+
         // Load form inputs
         let inputEmail = form.elements.email;
         // let inputFileName = form.elements.fileName;
@@ -15,7 +22,7 @@ module.exports = {
 
         // Check for active session
         if (userSession.isActive()) {
-            // const localUser = await userSession.getOrCreateLocalUser();
+            // const localUser = await userSession.getOrCreateUser();
 
         } else {
             // Email field may need to be set enabled and required
@@ -29,8 +36,8 @@ module.exports = {
         // Return action as a function
         return async function(res) {
             // Perform Action
-            const localUser = await userSession.getOrCreateLocalUser();
-            const userFileDoc = await localUser.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
+            const user = await userSession.getOrCreateUser();
+            const userFileDoc = await user.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
 
             return {
                 message: "Phone Post has been created successfully",

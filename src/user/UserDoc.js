@@ -1,10 +1,9 @@
 import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
-import UserContentDB from "./file/UserContentDB";
+import UserContentCollection from "./file/UserContentCollection";
 
 
 
 export default class UserDoc {
-    static TABLE = 'user';
     constructor(data={}, db) {
         this.data = data;
         if(!db)
@@ -17,7 +16,7 @@ export default class UserDoc {
 
 
     async writeFile(title, content, keywords=[]) {
-        const userFileDB = new UserContentDB(this.db)
+        const userFileDB = new UserContentCollection(this.db)
         return userFileDB.createUserFile(this.getID(), title, content, keywords);
     }
 

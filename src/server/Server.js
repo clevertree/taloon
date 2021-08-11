@@ -9,8 +9,10 @@ import EmailServer from "./session/SessionServer";
 import SessionServer from "./session/SessionServer";
 import RequestHandler from "./RequestHandler";
 import UserSession from "../user/session/UserSession";
-import UserDB from "../user/UserDB";
+import UserCollection from "../user/UserCollection";
 
+import databases from "./databases";
+import UserContentCollection from "../user/file/UserContentCollection";
 
 export default class Server {
     constructor() {
@@ -100,11 +102,7 @@ export default class Server {
                 }
 
                 app.all(routePath, (req, res, next) => {
-                    const stats = {
-                        server: this,
-                        userSession: new UserSession(req.session, this.db),
-                    }
-                    requestCallback(req, res, next, stats);
+                    requestCallback(req, res, next, this);
                 });
                 console.log("Added Route: ", routePath, requestCallback);
             }
@@ -124,20 +122,26 @@ export default class Server {
 
     async connectDB(url=process.env.REACT_APP_DB_URL) {
         if(!this.db) {
-            const client = await new Promise((resolve, reject) => {
-                MongoClient.connect(url, function (err, db) {
-                    err ? reject(err) : resolve(db);
-                    console.log('Database connected: ' + url);
-                });
-            });
+            const client = await MongoClient.connect(url);
+            console.log('Database connected: ' + url);
             this.db = client.db(process.env.REACT_APP_DB_NAME);
+            this.collections = await initiateCollections(this.db, databases);
         }
     }
 
     getDB() { return this.db; }
-    getUserDB() { return new UserDB(this.db); }
+    getUserContentCollection() { return new UserContentCollection(this.db); }
+    // getUserDB() { return new UserCollection(this.db); }
+    getUserSession(session) { return new UserSession(session, this.db); }
 }
 
+async function initiateCollections(db, databases) {
+    const collections = {};
+    for(const database of databases) {
+        console.info(`Initiating Collection: `, database);
+        await database.initiateCollection(db);
+    }
+}
 
 // db.collection('Employee').insertOne({
 //     Employeeid: 4,

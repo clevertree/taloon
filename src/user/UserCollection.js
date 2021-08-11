@@ -1,19 +1,12 @@
 import UserDoc from "./UserDoc";
 
-export default class UserDB {
-    static TABLE = 'user';
+export default class UserCollection {
+    static NAME = 'user';
+    static async initiateCollection(db) {
+        const collectionExists = (await db.listCollections().toArray()).map(c => c.name).includes(this.NAME);
+        let collection = collectionExists ? db.collection(this.NAME) : await db.createCollection(this.NAME);
 
-    constructor(db) {
-        this.db = db;
-        this.collection = null;
-    }
-
-    async getCollection() {
-        if(this.collection)
-            return this.collection;
-        this.collection = this.db.collection(UserDB.TABLE);
-        await this.db.command({
-            collMod: UserDB.TABLE,
+        const options = {
             validator: {
                 $jsonSchema: {
                     required: ["email"],
@@ -28,16 +21,23 @@ export default class UserDB {
             },
             validationLevel: "moderate",
             validationAction: "error"
+        }
+        await db.command({
+            collMod: this.NAME,
+            ...options,
         })
-
-        await this.collection.createIndex( { email: 1 }, { unique: true } );
-        return this.collection;
+        await collection.createIndex( { email: 1 }, { unique: true } );
     }
 
+    constructor(db) {
+        this.db = db;
+        this.collection = db.collection(this.constructor.NAME);
+    }
+
+
     async searchUsers(query) {
-        const collection = await this.getCollection();
         const userDocs = await new Promise((resolve, reject) => {
-            collection
+            this.collection
                 .find(query)
                 .toArray((err, result) => err ? reject(err) : resolve(result));
         });
@@ -67,8 +67,7 @@ export default class UserDB {
             throw new Error("User already exists: " + email);
 
         const userDoc = {email};
-        const collection = await this.getCollection();
-        await collection.insertOne(userDoc);
+        await this.collection.insertOne(userDoc);
         console.log(`Created user: `, userDoc);
         return new UserDoc(userDoc, this.db);
     }

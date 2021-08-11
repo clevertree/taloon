@@ -7,4 +7,8 @@ if (result.error) {
 }
 
 const server = new Server()
-server.listen();
+server.listen()
+    .catch(err => {
+        console.error(err);
+        process.exit(1);
+    });

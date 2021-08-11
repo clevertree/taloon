@@ -15,7 +15,7 @@ module.exports = {
 
         // Check for active session
         // if (userSession.isActive()) {
-        //     // const localUser = await userSession.getOrCreateLocalUser();
+        //     // const localUser = await userSession.getOrCreateUser();
         //
         // } else {
         //     // Email field may need to be set enabled and required
@@ -29,7 +29,7 @@ module.exports = {
         // Return action as a function
         return async function(res) {
             // Perform Action
-            // const localUser = await userSession.getOrCreateLocalUser();
+            // const localUser = await userSession.getOrCreateUser();
             // const userFileDoc = await localUser.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
 
             return {

@@ -1,6 +1,6 @@
 import EmailServer from "../../server/email/EmailServer";
 import crypto from 'crypto';
-import UserDB from "../UserDB";
+import UserCollection from "../UserCollection";
 
 const active2FactorLogins = {};
 
@@ -16,11 +16,11 @@ export default class UserSession {
     /**
      * @returns {UserDoc}
      */
-    async getOrCreateLocalUser() {
+    async getOrCreateUser() {
         if(!this.session.email)
             throw new Error("No valid user session");
         const email = this.session.email;
-        const userDB = new UserDB(this.db);
+        const userDB = new UserCollection(this.db);
         let foundUser = await userDB.getUser({email}, false);
         if(foundUser)
             return foundUser;

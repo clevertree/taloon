@@ -17,7 +17,7 @@ export default class RequestHandler {
         this.config = config;
     }
 
-    async handleRequest(req, res, next, stats) {
+    async handleRequest(req, res, next, server) {
         try {
             switch(req.method.toLowerCase()) {
             case 'options':
@@ -28,16 +28,16 @@ export default class RequestHandler {
                 if(typeof this.config.handleGetRequest !== "function")
                     throw new Error(".handleGetRequest is not implemented for GET " + this.routePath);
                 res.setHeader('Content-Type', 'text/markdown');
-                return await this.config.handleGetRequest(req, res, stats);
+                return await this.config.handleGetRequest(req, res, server);
             case 'post':
                 if(this.isFormRequest(req)) {
                     if(typeof this.config.handleFormRequest !== "function")
                         throw new Error(".handleFormRequest is not implemented for FORM POST " + this.routePath);
-                    return await this.handleFormRequest(req, res, this.config.handleFormRequest, stats);
+                    return await this.handleFormRequest(req, res, this.config.handleFormRequest, server);
                 }
                 if(typeof this.config.handlePostRequest !== "function")
                     throw new Error(".handlePostRequest is not implemented for POST " + this.routePath);
-                return await this.config.handlePostRequest(req, res, stats);
+                return await this.config.handlePostRequest(req, res, server);
             }
         } catch (err) {
             console.error("Error submitting form: ", err);
@@ -58,7 +58,7 @@ export default class RequestHandler {
 
 
 
-    async handleFormRequest(req, res, formHandlerCallback, stats={}) {
+    async handleFormRequest(req, res, formHandlerCallback, server) {
         let markdownPath = req.headers['content-path'];
         if (!markdownPath)
             throw new Error("Missing header: content-path");
@@ -99,7 +99,7 @@ export default class RequestHandler {
                 defaultValidations[element.name] = element.validationMessage;
 
         // Perform action preview
-        const callback = await formHandlerCallback(form, req, stats);
+        const callback = await formHandlerCallback(form, req, server);
         if(typeof callback !== "function")
             throw new Error("Form action callback returned a non-function: " + typeof callback);
 

@@ -5,8 +5,8 @@ export default class UserContentDoc {
 
     getID() { return this.data._id; }
     getOwnerID() { return this.data.owner; }
-    getKeywords() { return this.data.keywords; }
+    getKeywords() { return this.data.keywords || []; }
     getActions() { return this.data.actions || []; }
-    getContent() { return this.data.content || []; }
+    getContent() { return this.data.content; }
 
 }
