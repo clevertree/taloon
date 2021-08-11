@@ -1,28 +1,43 @@
-// import path from "path";
-// import fs from "fs";
-// import UserSession from "../../../src/user/UserSession";
-// TODO: search for existing offers before posting request?
+module.exports = {
 
-module.exports = function RequestPhoneServiceAction(form, req) {
-    // Handle Validations
+    handleGetRequest: (req, res) => {
+        res.send("# WTF");
+        // Return markdown content
+    },
 
-    // Check for active session
-    // const userSession = new UserSession(req.session);
-    // if (userSession.isActive()) {
-    // } else {
-    //     form.elements["email"].setCustomValidity("Please Register or Log in to request a phone.");
-    // }
+    handleFormRequest: async (form, req, stats) => {
+        // const {userSession} = stats;
+        // Load form inputs
+        // let inputEmail = form.elements.email;
+        // let inputFileName = form.elements.fileName;
 
-    // Return action as a function
-    return function(res) {
-        // Perform Action
+        // Handle Validations
 
-        return {
-            message: "Phone Request has been sent",
-            events: [
-                ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 2000],
-            ]
+        // Check for active session
+        // if (userSession.isActive()) {
+        //     // const localUser = await userSession.getOrCreateLocalUser();
+        //
+        // } else {
+        //     // Email field may need to be set enabled and required
+        //     inputEmail.required = true;
+        //     inputEmail.disabled = false;
+        //     inputEmail.setCustomValidity("Please Register or Log in to become a phone sponsor.");
+        // }
+
+        // const fileName = inputFileName.value;
+
+        // Return action as a function
+        return async function(res) {
+            // Perform Action
+            // const localUser = await userSession.getOrCreateLocalUser();
+            // const userFileDoc = await localUser.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
+
+            return {
+                message: "TODO Phone Request has been created successfully ",
+                events: [
+                    // ['redirect', `/service/phone/post.js?_id=${userFileDoc.getID()}`, 2000],
+                ]
+            }
         }
     }
 }
-

@@ -1,5 +1,5 @@
 import React from "react";
-import AppEvents from "../../event/AppEvents";
+import AppEvents from "../../components/event/AppEvents";
 import './SessionButton.css';
 
 export default class SessionButton extends React.Component {

@@ -14,9 +14,6 @@ This section is a work in progress. Please check back soon.
     <label title="Title">
         <input type="text" name="title" id="title" placeholder="I need a smart phone (and optionally call/text service)" required />
     </label>
-    <label title="File Name">
-        <input type="text" name="fileName" id="fileName" placeholder="phone.md" required />
-    </label>
   </fieldset>
   <fieldset>
     <legend>Is this offer currently Active?</legend>

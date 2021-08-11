@@ -8,7 +8,7 @@ import {MongoClient} from "mongodb";
 import EmailServer from "./session/SessionServer";
 import SessionServer from "./session/SessionServer";
 import RequestHandler from "./RequestHandler";
-import UserSession from "../user/UserSession";
+import UserSession from "../user/session/UserSession";
 import UserDB from "../user/UserDB";
 
 
@@ -22,13 +22,6 @@ export default class Server {
         this.db = null;
 
         app.use(allowAccessControl);
-        // app.use((req, res, next) => {
-        //     req.server = this;
-        //     next();
-        // })
-
-        app.use(express.static(process.env.REACT_APP_PATH_BUILD));
-        app.use('/content', express.static(process.env.REACT_APP_PATH_CONTENT, {fallthrough: false}));
         // app.use(express.static(BUILD_FILES));
 
         app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -44,6 +37,17 @@ export default class Server {
         // FormHandler.setupRoutes(app);
 
         this.setupRoutes(app);
+
+        // Access Website Content
+        app.use(express.static(process.env.REACT_APP_PATH_CONTENT, {index: 'index.md',
+        setHeaders: (res, filePath) => {
+            const relativeFilePath = path.relative(path.resolve(process.env.REACT_APP_PATH_CONTENT), filePath);
+            console.log(relativeFilePath);
+            res.setHeader('Content-Path', relativeFilePath)
+        }}));
+
+        // Access ReactJS / static files
+        app.use(express.static(process.env.REACT_APP_PATH_BUILD));
 
 
 
@@ -67,8 +71,16 @@ export default class Server {
                 indexHTML = updateMetaTagsMD(req, indexHTML, markdownHTML)
                 // console.log('Directory index found: ', req.path, pathIndexMD);
             }
-
-            res.send(indexHTML);
+            switch(req.headers["content-type"]) {
+                case 'text/markdown':
+                    console.warn('Markdown page not found: ', req.path);
+                    res.setHeader('Content-Type', 'text/markdown');
+                    res.send("# Page not found");
+                    break;
+                default:
+                    console.log('Sending index file: ', req.path, req.headers["content-type"]);
+                    res.send(indexHTML);
+            }
         })
 
     }
@@ -176,7 +188,8 @@ function allowAccessControl(req, res, next) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Handler-Type, Form-Path, Form-Position, Form-Preview');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Path, Handler-Type, Form-Position, Form-Preview');
+    res.header('Access-Control-Expose-Headers', 'Content-Path');
     next();
 }
 

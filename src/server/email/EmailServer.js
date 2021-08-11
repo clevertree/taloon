@@ -31,7 +31,7 @@ export default class EmailServer {
     }
 
     static async sendMarkdownTemplateEmail(to, subject, markdownPath, replaceParams={}, from=process.env.REACT_APP_EMAIL_FROM) {
-        const pathMD = path.resolve(process.env.REACT_APP_PATH_CONTENT + markdownPath);
+        const pathMD = path.resolve(path.join(process.env.REACT_APP_PATH_CONTENT, markdownPath));
         if (!fs.existsSync(pathMD))
             throw new Error("Email template not found: " + pathMD);
 

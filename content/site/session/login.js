@@ -1,4 +1,4 @@
-import UserSession from "../../../src/user/UserSession";
+import UserSession from "../../../src/user/session/UserSession";
 
 module.exports = function LogInAction(form, req) {
 

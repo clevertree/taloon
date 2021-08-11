@@ -1,17 +1,45 @@
 import UserDoc from "./UserDoc";
 
 export default class UserDB {
+    static TABLE = 'user';
+
     constructor(db) {
         this.db = db;
+        this.collection = null;
+    }
+
+    async getCollection() {
+        if(this.collection)
+            return this.collection;
+        this.collection = this.db.collection(UserDB.TABLE);
+        await this.db.command({
+            collMod: UserDB.TABLE,
+            validator: {
+                $jsonSchema: {
+                    required: ["email"],
+                    properties: {
+                        email: {
+                            bsonType: "string",
+                            pattern: "^.+\@.+$",
+                            description: "required and must be a valid email address"
+                        },
+                    }
+                }
+            },
+            validationLevel: "moderate",
+            validationAction: "error"
+        })
+
+        await this.collection.createIndex( { email: 1 }, { unique: true } );
+        return this.collection;
     }
 
     async searchUsers(query) {
+        const collection = await this.getCollection();
         const userDocs = await new Promise((resolve, reject) => {
-            this.db.collection(UserDoc.TABLE)
+            collection
                 .find(query)
-                .toArray(function(err, result) {
-                    err ? reject(err) : resolve(result);
-                });
+                .toArray((err, result) => err ? reject(err) : resolve(result));
         });
         return userDocs.map(userDoc => new UserDoc(userDoc, this.db));
     }
@@ -39,7 +67,8 @@ export default class UserDB {
             throw new Error("User already exists: " + email);
 
         const userDoc = {email};
-        await this.db.collection(UserDoc.TABLE).insertOne(userDoc);
+        const collection = await this.getCollection();
+        await collection.insertOne(userDoc);
         console.log(`Created user: `, userDoc);
         return new UserDoc(userDoc, this.db);
     }

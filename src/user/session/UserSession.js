@@ -1,7 +1,6 @@
-import EmailServer from "../server/email/EmailServer";
+import EmailServer from "../../server/email/EmailServer";
 import crypto from 'crypto';
-import UserDoc from "./UserDoc";
-import UserDB from "./UserDB";
+import UserDB from "../UserDB";
 
 const active2FactorLogins = {};
 
@@ -15,9 +14,7 @@ export default class UserSession {
     getEmail() { return this.session.email; }
 
     /**
-     *
-     * @param orCreate
-     * @returns {Promise<null|UserDoc>}
+     * @returns {UserDoc}
      */
     async getOrCreateLocalUser() {
         if(!this.session.email)

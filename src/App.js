@@ -19,7 +19,7 @@ class App extends Component {
         this.state = {
             portrait: false,
             title: "The Traveling Merchant",
-            pathname: document.location.pathname,
+            pathname: document.location.pathname + document.location.search,
             activeModal: null
         };
 
@@ -74,7 +74,7 @@ class App extends Component {
 
 
     renderHeader() {
-        let src = `./${process.env.REACT_APP_PATH_SITE}/header.md`;
+        let src = `/${process.env.REACT_APP_PATH_SITE}/header.md`;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
@@ -83,7 +83,7 @@ class App extends Component {
     }
 
     renderFooter() {
-        let src = `./${process.env.REACT_APP_PATH_SITE}/footer.md`;
+        let src = `/${process.env.REACT_APP_PATH_SITE}/footer.md`;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}
@@ -95,15 +95,15 @@ class App extends Component {
     renderContent() {
         let src = "./index.md";
         if(this.state.pathname)
-            src = this.state.pathname;
-        if(src[0] === '/')
-            src = '.' + src;
-        if(!src.endsWith('.md')) {
-            if(src.endsWith('/'))
-                src += 'index.md';
-            else if(!src.endsWith('.md'))
-                src += '.md';
-        }
+            src = this.state.pathname.toString();
+        // if(src[0] === '/')
+        //     src = '.' + src;
+        // if(!src.endsWith('.md')) {
+        //     if(src.endsWith('/'))
+        //         src += 'index.md';
+        //     else if(!src.endsWith('.md'))
+        //         src += '.md';
+        // }
         // console.log('src', src);
         // Remove previous meta tags
         for(const metaElm of document.head.querySelectorAll(

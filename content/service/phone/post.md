@@ -21,9 +21,6 @@ This section is a work in progress. Please check back soon.
     <label title="Title">
         <input type="text" name="title" placeholder="Offering Nexus5X with Sim (Text & Talk)" required />
     </label>
-    <label title="File Name">
-        <input type="text" name="fileName" placeholder="phone.md" required />
-    </label>
   </fieldset>
   <fieldset>
     <legend>Is this offer currently Active?</legend>

@@ -27,23 +27,22 @@ export default class RequestHandler {
             case 'get':
                 if(typeof this.config.handleGetRequest !== "function")
                     throw new Error(".handleGetRequest is not implemented for GET " + this.routePath);
-                return this.config.handleGetRequest(req, res, stats);
+                res.setHeader('Content-Type', 'text/markdown');
+                return await this.config.handleGetRequest(req, res, stats);
             case 'post':
                 if(this.isFormRequest(req)) {
                     if(typeof this.config.handleFormRequest !== "function")
                         throw new Error(".handleFormRequest is not implemented for FORM POST " + this.routePath);
-                    return this.handleFormRequest(req, res, this.config.handleFormRequest, stats);
+                    return await this.handleFormRequest(req, res, this.config.handleFormRequest, stats);
                 }
                 if(typeof this.config.handlePostRequest !== "function")
                     throw new Error(".handlePostRequest is not implemented for POST " + this.routePath);
-                return this.config.handlePostRequest(req, res, stats);
+                return await this.config.handlePostRequest(req, res, stats);
             }
         } catch (err) {
             console.error("Error submitting form: ", err);
             // res.statusMessage = err.message;
-            return res.status(400).send(JSON.stringify({
-                message: err.message,
-            }));
+            return res.status(400).send(err.message);
         }
     }
 
@@ -60,14 +59,14 @@ export default class RequestHandler {
 
 
     async handleFormRequest(req, res, formHandlerCallback, stats={}) {
-        let markdownPath = req.headers['form-path'];
+        let markdownPath = req.headers['content-path'];
         if (!markdownPath)
-            throw new Error("Missing parameter: markdownPath");
+            throw new Error("Missing header: content-path");
         markdownPath = path.join(process.env.REACT_APP_PATH_CONTENT, markdownPath);
 
         let formPosition = req.headers['form-position'];
         if(!formPosition)
-            throw new Error("Missing parameter: formPosition");
+            throw new Error("Missing header: form-position");
         if (Number.isNaN(Number.parseInt(formPosition)))
             throw new Error("Invalid integer: formPosition");
         formPosition = Number.parseInt(formPosition);

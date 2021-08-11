@@ -82,12 +82,12 @@ export default class Form extends React.Component {
                 AppEvents.emit('modal:close', 500)
             return;
         }
-        formAction = path.resolve(path.dirname(this.props.markdownPath), formAction);
+        const postURL = new URL(formAction, new URL(this.props.markdownPath, process.env.REACT_APP_API_ENDPOINT)+'')+'';
         const formValues = this.getFormValues();
         const formPosition = this.getFormPosition();
 
-        let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
-        const formPath = this.props.markdownPath.split('?').shift();
+        // let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
+        // const formPath = this.props.markdownPath.split('?').shift();
         // postURL.search = `markdownPath=${this.props.markdownPath.split('?').shift()}&formPosition=${formPosition}${preview ? '&preview=true' : ''}`;
         // console.log("Submitting form ", postURL + '', formValues, form);
 
@@ -103,13 +103,13 @@ export default class Form extends React.Component {
         let events = [];
         let valueChanges = {};
         try {
-            const response = await fetch(postURL + '', {
+            const response = await fetch(postURL, {
                 credentials: "include",
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
                     'Handler-Type': 'form',
-                    'Form-Path': formPath,
+                    'Content-Path': this.props.markdownPath,
                     'Form-Position': formPosition,
                     'Form-Preview': preview ? 'true' : 'false',
                 },

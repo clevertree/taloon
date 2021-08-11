@@ -8,7 +8,7 @@ import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
-import SessionButton from "../form/session/SessionButton";
+import SessionButton from "../../user/session/SessionButton";
 import LocationButton from "../form/location/LocationButton";
 
 
@@ -29,10 +29,11 @@ export default class MarkdownPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            content: null
+            content: null,
+            contentPath: this.props.src,
         }
         this.options = {
-            createElement: (type, props, children) => this.createElement(type, props, children),
+            createElement: this.createElement.bind(this),
         };
         // this.formCount = 0;
         this.devRefreshIntervalID = null
@@ -53,10 +54,15 @@ export default class MarkdownPage extends React.Component {
             this.fetchSrc().then();
     }
 
-    async fetchSrc(options={cache: "force-cache"}) {
-        const url = resolveContentURL(this.props.src);
+    async fetchSrc(options={
+        cache: "force-cache",
+        headers: {
+            'Content-Type': 'text/markdown',
+        }
+    }) {
+        const contentURL = new URL(this.props.src, process.env.REACT_APP_API_ENDPOINT).toString();
 
-        const response = await fetch(url, options);
+        const response = await fetch(contentURL, options);
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
         if(response.status !== 200) {
@@ -64,12 +70,15 @@ export default class MarkdownPage extends React.Component {
 
         } else if (responseType.startsWith('text/markdown')) {
             let content = await response.text();
+            const newState = {content};
+            if(response.headers.get('content-path'))
+                newState.contentPath = response.headers.get('content-path');
             // content = replaceStringParameters(content, replaceParams);
-            this.setState({content});
+            this.setState(newState);
         } else {
             this.setState({content: "Invalid Type: " + responseType});
         }
-        if (isDevMode()) {
+        if (process.env.NODE_ENV === 'development') {
             clearInterval(this.devRefreshIntervalID);
             this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.devRefreshIntervalAmount);
         }
@@ -91,19 +100,19 @@ export default class MarkdownPage extends React.Component {
     }
 
     createElement(type, props, children) {
-        const markdownURL = resolveContentURL(this.props.src);
+        const contentURL = new URL(this.state.contentPath, process.env.REACT_APP_API_ENDPOINT).toString();
         if (this.props.onEachTag)
             this.props.onEachTag(type, props, children);
         // console.log('createElement', type, props, children)
         switch(type) {
             case 'meta':        return null;
             case 'a':           return <A {...props} children={children} />;
-            case 'img':         return <Img {...props} src={new URL(props.src, markdownURL).toString()} />;
+            case 'img':         return <Img {...props} src={new URL(props.src, contentURL).toString()} />;
             case 'form':
                 return <Form
                     {...props}
                     className={props.className || "theme-default"}
-                    markdownPath={this.props.src}
+                    markdownPath={this.state.contentPath}
                     method="post"
                     children={children}
                 />;
@@ -129,15 +138,6 @@ export default class MarkdownPage extends React.Component {
 }
 
 
-function resolveContentURL(src) {
-    if(src[0] === '/')
-        src = '.' + src;
-    const contentURL = new URL(process.env.REACT_APP_PATH_CONTENT + '/', document.location.origin).toString();
-    return new URL(src, contentURL).toString();
-}
-
-const isDevMode = () => !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-
 function Img(props) {
     return <img {...props} alt={props.alt} />;
 }
@@ -146,28 +146,3 @@ function A(props) {
     // eslint-disable-next-line jsx-a11y/anchor-has-content
     return <a {...props}/>;
 }
-
-// function replaceStringParameters(content, replaceParams) {
-//     if(!replaceParams)
-//         replaceParams = {};
-//     if(typeof replaceParams === "string")
-//         replaceParams = new URLSearchParams(replaceParams);
-//     if(replaceParams instanceof URLSearchParams) {
-//         const objParams = {};
-//         replaceParams.forEach((value, key) => {
-//             objParams[key] = value;
-//         });
-//         replaceParams = objParams;
-//     }
-//
-//     // Replace template variables
-//     content = content.replace(/\${([^}]+)}/g, (match, fieldName) => {
-//         if(replaceParams.hasOwnProperty(fieldName)) {
-//             const value = replaceParams[fieldName];
-//             return value.toString().replace(/<[^>]*>?/gm, '');
-//         }
-//         return "";
-//     })
-//     return content;
-// }
-
