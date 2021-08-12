@@ -1,0 +1,108 @@
+import path from "path";
+import fs from "fs";
+import {JSDOM} from "jsdom";
+
+export default class FormHandler {
+
+    constructor(req, formHTML) {
+        if ((req.headers['handler-type']||'').toLowerCase() !== 'form')
+            throw new Error("Invalid form request header: handler-type must === 'form'");
+
+        let formPosition = req.headers['form-position'];
+        if(!formPosition)
+            throw new Error("Missing header: form-position");
+        if (Number.isNaN(Number.parseInt(formPosition)))
+            throw new Error("Invalid integer: formPosition");
+        this.formPosition = Number.parseInt(formPosition);
+
+        this.isPreview = (req.headers['form-preview']||'').toLowerCase() !== 'false';
+
+        const DOM = new JSDOM(formHTML);
+        const document = DOM.window.document;
+
+        const forms = [...document.querySelectorAll('form')];
+        if (!forms[formPosition])
+            throw new Error(`Form Position ${formPosition} not found`);
+        this.form = forms[formPosition];
+
+        // Set form values based on request body
+        for (const element of this.form.elements)
+            if (element.name)
+                element.value = req.body[element.name];
+
+        this.values = req.body;
+
+        // Get failed validations
+        this.defaultValidations = {};
+        for (const element of this.form.elements)
+            if(element.name && !element.checkValidity())
+                this.defaultValidations[element.name] = element.validationMessage;
+
+        this.handleFormSubmission = this.handleFormSubmission.bind(this);
+    }
+
+    async handleFormSubmission(res, actionCallback) {
+
+        // Get failed validations
+        const validations = {};
+        for (const element of this.form.elements)
+            if(element.name && !element.checkValidity() && this.defaultValidations[element.name] !== element.validationMessage)
+                validations[element.name] = element.validationMessage;
+
+        // Get value changes
+        const valueChanges = {}
+        for (const element of this.form.elements)
+            if(element.name && (element.value !== this.values[element.name]))
+                valueChanges[element.name] = element.value;
+
+
+        // Return Validations on Preview
+        if (this.isPreview)
+            return res.status(202).send({validations, valueChanges, preview: true});
+
+        if (!this.form.checkValidity())
+            return res.status(400).send({validations, valueChanges, message: "Form failed validation"}); // Shouldn't happen
+
+        console.log("Executing", this.form.action, this.values);
+
+        // Perform action
+        const responseJSON = await actionCallback(res);
+        if(responseJSON) {
+            if(typeof responseJSON !== "object")
+                throw new Error("Invalid action response object");
+            return res.status(200).send(responseJSON);
+        }
+    }
+
+
+    // static handleRequest() {
+    //     module.exports = (req, res) => new (this.constructor)().handleRequest(req, res).then();
+    // }
+
+    isFormRequest(req) {
+        return (req.headers['handler-type']||'').toLowerCase() === 'form';
+    }
+
+
+
+    async handleFormRequest(req, res, formHandlerCallback, server) {
+
+        // Return Validations on Preview
+        if (formPreview)
+            return res.status(202).send({validations, valueChanges, preview: true});
+
+        if (!form.checkValidity())
+            return res.status(400).send({validations, valueChanges, message: "Form failed validation"}); // Shouldn't happen
+
+        console.log("Executing", form.action, req.body);
+
+        // Perform action
+        const responseJSON = await callback(res);
+        if(responseJSON) {
+            if(typeof responseJSON !== "object")
+                throw new Error("Invalid action response object");
+            return res.status(200).send(responseJSON);
+        }
+    }
+
+}

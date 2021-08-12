@@ -150,7 +150,10 @@ export default class Form extends React.Component {
         // Update values
         for(const key in valueChanges)
             if(valueChanges.hasOwnProperty(key))
-                form.elements[key].value = valueChanges[key];
+                if(form.elements[key])
+                    form.elements[key].value = valueChanges[key];
+                else
+                    console.warn("Form field not found: " + key, form);
 
         // Send events
         for(const [eventName, ...eventArgs] of events)

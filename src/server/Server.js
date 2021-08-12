@@ -7,12 +7,12 @@ import {MongoClient} from "mongodb";
 
 import EmailServer from "./session/SessionServer";
 import SessionServer from "./session/SessionServer";
-import RequestHandler from "./RequestHandler";
 import UserSession from "../user/session/UserSession";
 import UserCollection from "../user/UserCollection";
 
 import databases from "./databases";
 import UserContentCollection from "../user/file/UserContentCollection";
+import FormHandler from "./form/FormHandler";
 
 export default class Server {
     constructor() {
@@ -95,14 +95,18 @@ export default class Server {
                 if(handlerConfig.default)
                     handlerConfig = handlerConfig.default;
                 let requestCallback = handlerConfig;
-                if(typeof handlerConfig !== 'function') {
-                    const requestHandler = new RequestHandler(routePath, handlerConfig);
-                    // requestCallback = (req, res) => requestHandler.handleRequest(req, res);
-                    requestCallback = requestHandler.handleRequest.bind(requestHandler);
-                }
+                // if(typeof handlerConfig !== 'function') {
+                //     const requestHandler = new RequestHandler(routePath, handlerConfig);
+                //     // requestCallback = (req, res) => requestHandler.handleRequest(req, res);
+                //     requestCallback = requestHandler.handleRequest.bind(requestHandler);
+                // }
 
                 app.all(routePath, (req, res, next) => {
-                    requestCallback(req, res, next, this);
+                    if(req.method.toLowerCase() === 'options') {
+                        next();
+                    } else {
+                        requestCallback(req, res, this);
+                    }
                 });
                 console.log("Added Route: ", routePath, requestCallback);
             }
@@ -133,6 +137,7 @@ export default class Server {
     getUserContentCollection() { return new UserContentCollection(this.db); }
     // getUserDB() { return new UserCollection(this.db); }
     getUserSession(session) { return new UserSession(session, this.db); }
+    getFormHandler(req, formHTML) { return new FormHandler(req, formHTML); }
 }
 
 async function initiateCollections(db, databases) {
