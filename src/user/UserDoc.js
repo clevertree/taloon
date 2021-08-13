@@ -15,7 +15,16 @@ export default class UserDoc {
     getEmail() { return this.data.email; }
 
 
-    async writeFile(title, content, keywords=[]) {
+    async hasFile(title) {
+        const userFileDB = new UserContentCollection(this.db)
+        const userFile = await userFileDB.queryUserFile({
+            ownerID: this.getID(),
+            title
+        }, false);
+        return !!userFile;
+    }
+
+    async createFile(title, content, keywords=[]) {
         const userFileDB = new UserContentCollection(this.db)
         return userFileDB.createUserFile(this.getID(), title, content, keywords);
     }
@@ -26,7 +35,7 @@ export default class UserDoc {
         let markdownContent = template.generate(values);
 
         // Write file
-        return await this.writeFile(title, markdownContent);
+        return await this.createFile(title, markdownContent);
     }
 
 

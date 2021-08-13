@@ -56,7 +56,7 @@ export default class Form extends React.Component {
 
         let children = this.props.children;
 
-        return <FormContext.Provider value={this}>
+        return <FormContext.Provider value={this.state}>
             <form
                 action={this.props.action}
                 className={className}
@@ -82,9 +82,10 @@ export default class Form extends React.Component {
                 AppEvents.emit('modal:close', 500)
             return;
         }
-        const postURL = new URL(formAction, new URL(this.props.markdownPath, process.env.REACT_APP_API_ENDPOINT)+'')+'';
+        const baseURL = new URL(this.props.markdownPath, process.env.REACT_APP_API_ENDPOINT)+'';
+        const postURL = new URL(formAction, baseURL)+'';
         const formValues = this.getFormValues();
-        const formPosition = this.getFormPosition();
+        // const formPosition = this.getFormPosition();
 
         // let postURL = new URL(formAction, process.env.REACT_APP_API_ENDPOINT);
         // const formPath = this.props.markdownPath.split('?').shift();
@@ -108,14 +109,20 @@ export default class Form extends React.Component {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Handler-Type': 'form',
-                    'Content-Path': this.props.markdownPath,
-                    'Form-Position': formPosition,
+                    // 'Handler-Type': 'form',
+                    // 'Content-Path': this.props.markdownPath,
+                    // 'Form-Position': formPosition,
                     'Form-Preview': preview ? 'true' : 'false',
                 },
                 body: JSON.stringify(formValues)
             });
-            const responseJson = await response.json();
+            let responseJson;
+            if(response.headers.get('content-type').startsWith('application/json'))
+                responseJson = await response.json();
+            else
+                responseJson = await response.text();
+            if(typeof responseJson === "string")
+                responseJson = {message: responseJson};
             console.log(`${preview ? "Preview " : ""}Response: `, responseJson, response);
             newState.message = responseJson.message;
             newState.success = response.status === 200;
@@ -170,12 +177,12 @@ export default class Form extends React.Component {
     }
 
 
-    getFormPosition() {
-        const form = this.ref.form.current;
-        const bodyElm = form.closest('.markdown-body, body');
-        const formElms = bodyElm.getElementsByTagName('form');
-        return [...formElms].indexOf(form);
-    }
+    // getFormPosition() {
+    //     const form = this.ref.form.current;
+    //     const bodyElm = form.closest('.markdown-body, body');
+    //     const formElms = bodyElm.getElementsByTagName('form');
+    //     return [...formElms].indexOf(form);
+    // }
 
     getFormValues() {
         const form = this.ref.form.current;

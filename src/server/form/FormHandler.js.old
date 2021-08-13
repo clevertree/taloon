@@ -1,19 +1,27 @@
 import path from "path";
-import fs from "fs";
 import {JSDOM} from "jsdom";
+import ContentManager from "../content/ContentManager";
 
 export default class FormHandler {
 
-    constructor(req, formHTML) {
+    constructor(req) {
         if ((req.headers['handler-type']||'').toLowerCase() !== 'form')
             throw new Error("Invalid form request header: handler-type must === 'form'");
+
+        let contentPath = req.headers['content-path'];
+        if (!contentPath)
+            throw new Error("Missing header: content-path");
+
+        const formHTML = await new ContentManager().loadContent(contentPath);
+
+
 
         let formPosition = req.headers['form-position'];
         if(!formPosition)
             throw new Error("Missing header: form-position");
         if (Number.isNaN(Number.parseInt(formPosition)))
             throw new Error("Invalid integer: formPosition");
-        this.formPosition = Number.parseInt(formPosition);
+        formPosition = Number.parseInt(formPosition);
 
         this.isPreview = (req.headers['form-preview']||'').toLowerCase() !== 'false';
 

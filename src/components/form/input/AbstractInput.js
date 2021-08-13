@@ -21,8 +21,8 @@ export default class AbstractInput extends React.Component {
      */
     render() {
         return <FormContext.Consumer>
-            {(form) => {
-                let validation = "", validations = form.state.validations || {};
+            {(formState) => {
+                let validation = "", validations = formState.validations || {};
                 if (this.props.name) {
                     if (validations[this.props.name])
                         validation = validations[this.props.name];

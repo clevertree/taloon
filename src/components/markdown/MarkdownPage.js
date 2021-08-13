@@ -71,8 +71,8 @@ export default class MarkdownPage extends React.Component {
         } else if (responseType.startsWith('text/markdown')) {
             let content = await response.text();
             const newState = {content};
-            if(response.headers.get('content-path'))
-                newState.contentPath = response.headers.get('content-path');
+            // if(response.headers.get('content-path'))
+            //     newState.contentPath = response.headers.get('content-path');
             // content = replaceStringParameters(content, replaceParams);
             this.setState(newState);
         } else {

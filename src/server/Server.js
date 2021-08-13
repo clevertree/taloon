@@ -5,14 +5,12 @@ import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
 import {MongoClient} from "mongodb";
 
-import EmailServer from "./session/SessionServer";
-import SessionServer from "./session/SessionServer";
 import UserSession from "../user/session/UserSession";
-import UserCollection from "../user/UserCollection";
 
 import databases from "./databases";
 import UserContentCollection from "../user/file/UserContentCollection";
-import FormHandler from "./form/FormHandler";
+import SessionServer from "./session/SessionServer";
+import EmailServer from "./email/EmailServer";
 
 export default class Server {
     constructor() {
@@ -41,12 +39,12 @@ export default class Server {
         this.setupRoutes(app);
 
         // Access Website Content
-        app.use(express.static(process.env.REACT_APP_PATH_CONTENT, {index: 'index.md',
-        setHeaders: (res, filePath) => {
-            const relativeFilePath = path.relative(path.resolve(process.env.REACT_APP_PATH_CONTENT), filePath);
-            console.log(relativeFilePath);
-            res.setHeader('Content-Path', relativeFilePath)
-        }}));
+        app.use(express.static(process.env.REACT_APP_PATH_CONTENT, {index: 'index.md'}));
+        // setHeaders: (res, filePath) => {
+        //     const relativeFilePath = path.relative(path.resolve(process.env.REACT_APP_PATH_CONTENT), filePath);
+        //     console.log(relativeFilePath);
+        //     res.setHeader('Content-Path', relativeFilePath)
+        // }}));
 
         // Access ReactJS / static files
         app.use(express.static(process.env.REACT_APP_PATH_BUILD));
@@ -101,11 +99,15 @@ export default class Server {
                 //     requestCallback = requestHandler.handleRequest.bind(requestHandler);
                 // }
 
-                app.all(routePath, (req, res, next) => {
+                app.all(routePath, async (req, res, next) => {
                     if(req.method.toLowerCase() === 'options') {
                         next();
                     } else {
-                        requestCallback(req, res, this);
+                        try {
+                            await requestCallback(req, res, this);
+                        } catch (e) {
+                            res.status(400).send(e.message);
+                        }
                     }
                 });
                 console.log("Added Route: ", routePath, requestCallback);
@@ -137,7 +139,7 @@ export default class Server {
     getUserContentCollection() { return new UserContentCollection(this.db); }
     // getUserDB() { return new UserCollection(this.db); }
     getUserSession(session) { return new UserSession(session, this.db); }
-    getFormHandler(req, formHTML) { return new FormHandler(req, formHTML); }
+    // getFormHandler(req) { return new FormHandler(req); }
 }
 
 async function initiateCollections(db, databases) {
@@ -197,8 +199,8 @@ function allowAccessControl(req, res, next) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Path, Handler-Type, Form-Position, Form-Preview');
-    res.header('Access-Control-Expose-Headers', 'Content-Path');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Form-Preview');
+    // res.header('Access-Control-Expose-Headers', 'Content-Path');
     next();
 }
 

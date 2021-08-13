@@ -26,3 +26,4 @@ export default class SessionServer {
         return !!req.session.email;
     }
 }
+
