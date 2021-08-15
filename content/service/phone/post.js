@@ -1,3 +1,4 @@
+const ACTION_URL = '/service/phone/post.js';
 
 module.exports = async (req, res, server) => {
     // const userSession = server.getUserSession(req.session);
@@ -5,11 +6,17 @@ module.exports = async (req, res, server) => {
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
+            res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
             const userContentCollection = server.getUserContentCollection();
-            const contentDoc = await userContentCollection.queryUserFile(req.query);
-            res.setHeader('Content-Type', 'text/markdown');
-            res.send(contentDoc.getContent());
+            if(req.query._id) {
+                // TODO: move to request.js
+                const contentDoc = await userContentCollection.queryUserFile(req.query._id, ACTION_URL);
+                res.send(contentDoc.getContent());
+            } else {
+                const contentDocs = await userContentCollection.queryUserFiles({actions: ACTION_URL});
+                res.send('found ' + contentDocs.length);
+            }
             break;
 
         case 'post':
@@ -38,7 +45,7 @@ module.exports = async (req, res, server) => {
                 return res.status(202).send(response);
             // Check if any validations exist
             if(Object.values(validations).length > 0)
-                return res.status(400).send(response);
+                return res.status(400).send({message: "Form Validation Failed", ...response});
 
 
             // Perform Action
@@ -46,8 +53,8 @@ module.exports = async (req, res, server) => {
             const userFileDoc = await user.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
 
             // Send Response
-            response.message = "Phone Post has been created successfully";
-            events.push(['redirect', `/service/phone/post.js?_id=${userFileDoc.getID()}`, 2000]);
+            response.message = "New post has been created successfully";
+            events.push(['redirect', `${ACTION_URL}?_id=${userFileDoc.getID()}`, 4000]);
             return res.send(response);
     }
 }

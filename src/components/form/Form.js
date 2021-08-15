@@ -12,18 +12,18 @@ export default class Form extends React.Component {
     constructor(props) {
         super(props);
         this.cb = {
-            onSubmit: e => this.onSubmit(e),
-            onChange: e => this.onChangeDelay(e),
+            onSubmit: this.onSubmit.bind(this),
+            onChange: this.onChangeDelay.bind(this),
+            onRedirect: this.onRedirect.bind(this)
         }
         this.ref = {
             form: React.createRef()
         }
         this.state = {
             processing: false,
-            validations: {
-                '@session_required': 'Please login to complete this form'
-            },
+            validations: {},
             message: null,
+            status: 200,
         }
         this.timeouts = {
             onChange: null,
@@ -35,17 +35,27 @@ export default class Form extends React.Component {
 
     componentDidMount() {
         AppEvents.addEventListener('session:change', this.cb.onChange);
-        this.cb.onChange();
+        AppEvents.addEventListener('redirect', this.cb.onRedirect);
         this.doAuto();
+        this.cb.onChange();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if(prevProps.markdownPath !== this.props.markdownPath)
+        if(prevProps.markdownPath !== this.props.markdownPath) {
             this.doAuto();
+            if(this.state.message)
+                this.setState({
+                    message: null,
+                    status: 200,
+                    processing: false,
+                    validation: {}
+                })
+        }
     }
 
     componentWillUnmount() {
         AppEvents.removeEventListener('session:change', this.cb.onChange);
+        AppEvents.removeEventListener('redirect', this.cb.onRedirect);
         this.clearTimeouts();
     }
 
@@ -64,7 +74,8 @@ export default class Form extends React.Component {
                 onSubmit={this.cb.onSubmit}
                 onChange={this.cb.onChange}
             >
-                {this.state.message ? <div className={"message" + (this.state.success ? "" : " error")} children={this.state.message} /> : null }
+                {this.state.message ? <div className={"message" + (this.state.status === 200 ? "" : " error")} children={this.state.message} /> : null }
+                {this.state.redirectingTimeout ? <div className={"message redirecting"} children={`Redirecting in ${this.state.redirectingTimeout/1000} seconds...`} /> : null }
                 {children}
             </form>
         </FormContext.Provider>;
@@ -125,14 +136,14 @@ export default class Form extends React.Component {
                 responseJson = {message: responseJson};
             console.log(`${preview ? "Preview " : ""}Response: `, responseJson, response);
             newState.message = responseJson.message;
-            newState.success = response.status === 200;
+            newState.status = response.status;
             newState.validations = responseJson.validations || {}; // TODO: not triggering refresh
 
             events = responseJson.events || [];
             valueChanges = responseJson.valueChanges || {};
         } catch (err) {
             newState.message = `Invalid JSON Response: ${err.message}`;
-            newState.success = false;
+            newState.status = false;
         }
 
         newState.processing = false;
@@ -141,7 +152,7 @@ export default class Form extends React.Component {
 
         if(!preview) {
             form.scrollIntoView();
-            if(newState.success === true) {
+            if(newState.status === 200) {
                 this.clearFormStorage();
                 AppEvents.emit('form:success', newState)
             } else {
@@ -176,6 +187,21 @@ export default class Form extends React.Component {
         }, timeout);
     }
 
+    onRedirect(path, timeout) {
+        if(timeout) {
+            const interval = setInterval(() => {
+                timeout -= 1000;
+                if(timeout < 0) {
+                    timeout = null;
+                    clearInterval(interval);
+                }
+                this.setState({
+                    redirectingTimeout: timeout
+                })
+            }, 1000)
+        }
+        console.log('redirect', ...arguments)
+    }
 
     // getFormPosition() {
     //     const form = this.ref.form.current;

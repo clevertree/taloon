@@ -55,8 +55,9 @@ export default class UserContentCollection {
     /**
      * Search user file documents
      * @param {object} query
+     * @param {string} query._id The file GUID.
      * @param {string} query.actions The file actions.
-     * @param {string} query.owner The email of the owning user.
+     * @param {string} query.ownerID The email of the owning user.
      * @returns {Promise<UserContentDoc[]>}
      */
     async queryUserFiles(query) {
@@ -74,18 +75,14 @@ export default class UserContentCollection {
 
     /**
      * Search for a single user file document
-     * @param {object} query
+     * @param {string} _id
      * @param orThrow
-     * @param {string} query.actions The file actions.
-     * @param {string} query.owner The email of the owning user.
      * @returns {Promise<UserContentDoc>}
      */
-    async queryUserFile(query, orThrow=true) {
-        const files = await this.queryUserFiles(query);
+    async queryUserFile(_id, orThrow=true) {
+        const files = await this.queryUserFiles({_id});
         if(files.length === 0 && orThrow)
-            throw new Error("User file not found: " + JSON.stringify(query))
-        if(files.length > 1 && orThrow)
-            throw new Error("Multiple user files found: " + JSON.stringify(query))
+            throw new Error("User file ID not found: " + _id)
         return files[0] || null;
     }
 

@@ -30,7 +30,8 @@ export default class MarkdownPage extends React.Component {
         super(props);
         this.state = {
             content: null,
-            contentPath: this.props.src,
+            status: 200,
+            // contentPath: this.props.src,
         }
         this.options = {
             createElement: this.createElement.bind(this),
@@ -62,21 +63,23 @@ export default class MarkdownPage extends React.Component {
     }) {
         const contentURL = new URL(this.props.src, process.env.REACT_APP_API_ENDPOINT).toString();
 
+        this.setState({loading: true});
         const response = await fetch(contentURL, options);
+        this.setState({loading: false});
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
-        if(response.status !== 200) {
-            this.setState({content: "Markdown file not found: " + this.props.src});
+        // if(response.status !== 200) {
+        //     this.setState({content: "Markdown file not found: " + this.props.src});
 
-        } else if (responseType.startsWith('text/markdown')) {
+        if (responseType.startsWith('text/markdown')) {
             let content = await response.text();
-            const newState = {content};
+            const newState = {content, status: response.status};
             // if(response.headers.get('content-path'))
             //     newState.contentPath = response.headers.get('content-path');
             // content = replaceStringParameters(content, replaceParams);
             this.setState(newState);
         } else {
-            this.setState({content: "Invalid Type: " + responseType});
+            this.setState({content: "Invalid Type: " + responseType, status: 400});
         }
         if (process.env.NODE_ENV === 'development') {
             clearInterval(this.devRefreshIntervalID);
@@ -87,20 +90,27 @@ export default class MarkdownPage extends React.Component {
     render() {
         let className = 'markdown-body';
         if (this.props.className)
-            className += ' ' + this.props.className;
+            className += ` ${this.props.className}`;
         const options = Object.assign({}, this.options, this.props.options || {});
+        let content = this.state.content || "# No Content";
+        // if(this.state.loading) {
+        //     content = "# Loading: " + this.props.file;
+        //     className += ' loading';
+        // }
+        if(this.state.status !== 200) {
+            className += ' error';
+        }
         return (
             <Markdown
                 className={className}
                 options={options}>
-
-                {this.state.content || "Loading " + this.props.file}
+                {content}
             </Markdown>
         );
     }
 
     createElement(type, props, children) {
-        const contentURL = new URL(this.state.contentPath, process.env.REACT_APP_API_ENDPOINT).toString();
+        const contentURL = new URL(this.props.src, process.env.REACT_APP_API_ENDPOINT).toString();
         if (this.props.onEachTag)
             this.props.onEachTag(type, props, children);
         // console.log('createElement', type, props, children)
@@ -112,7 +122,7 @@ export default class MarkdownPage extends React.Component {
                 return <Form
                     {...props}
                     className={props.className || "theme-default"}
-                    markdownPath={this.state.contentPath}
+                    markdownPath={this.props.src}
                     method="post"
                     children={children}
                 />;

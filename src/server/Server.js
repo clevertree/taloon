@@ -1,5 +1,5 @@
 import fs from "fs";
-import express from "express";
+import express, {request} from "express";
 import path from "path";
 import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
@@ -93,6 +93,10 @@ export default class Server {
                 if(handlerConfig.default)
                     handlerConfig = handlerConfig.default;
                 let requestCallback = handlerConfig;
+                if(typeof requestCallback !== 'function')
+                    console.warn(routePath, 'export is not a function', requestCallback)
+
+
                 // if(typeof handlerConfig !== 'function') {
                 //     const requestHandler = new RequestHandler(routePath, handlerConfig);
                 //     // requestCallback = (req, res) => requestHandler.handleRequest(req, res);
@@ -106,7 +110,8 @@ export default class Server {
                         try {
                             await requestCallback(req, res, this);
                         } catch (e) {
-                            res.status(400).send(e.message);
+                            console.error(routePath, e);
+                            res.status(400).send(`${routePath}: ${e.stack}`);
                         }
                     }
                 });
