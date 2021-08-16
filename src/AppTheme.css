@@ -189,8 +189,10 @@
 .App.theme-default form > div.message:not(:empty),
 .App.theme-default form > div.error:not(:empty) {
     transform: scale(1);
-    max-height: 100px;
+    max-height: 12rem;
     padding: 1em;
+    overflow-y: auto;
+    white-space: pre;
 }
 
 /** Validation Text **/

@@ -5,6 +5,7 @@ import path from "path";
 import "./Form.css";
 
 const TIMEOUT_CHANGE = 1000;
+const TIMEOUT_AUTOFILL = 1;
 
 
 export default class Form extends React.Component {
@@ -75,7 +76,7 @@ export default class Form extends React.Component {
                 onChange={this.cb.onChange}
             >
                 {this.state.message ? <div className={"message" + (this.state.status === 200 ? "" : " error")} children={this.state.message} /> : null }
-                {this.state.redirectingTimeout ? <div className={"message redirecting"} children={`Redirecting in ${this.state.redirectingTimeout/1000} seconds...`} /> : null }
+                {this.state.redirectredirectingTimeout ? <div className={"message redirecting"} children={`Redirecting in ${this.state.redirectingTimeout/1000} seconds...`} /> : null }
                 {children}
             </form>
         </FormContext.Provider>;
@@ -200,7 +201,7 @@ export default class Form extends React.Component {
                 })
             }, 1000)
         }
-        console.log('redirect', ...arguments)
+        // console.log('redirect', ...arguments)
     }
 
     // getFormPosition() {
@@ -221,7 +222,7 @@ export default class Form extends React.Component {
         }, {});
     }
 
-    doAuto(timeout=500) {
+    doAuto(timeout=TIMEOUT_AUTOFILL) {
         this.timeouts.autoFill = setTimeout(() => {
             this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
             this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);

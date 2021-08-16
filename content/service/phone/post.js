@@ -1,22 +1,12 @@
-const ACTION_URL = '/service/phone/post.js';
-
-module.exports = async (req, res, server) => {
+const REQUEST_URL = require('./request.js').REQUEST_URL;
+module.exports = async function ServicePhonePost(req, res, server) {
     // const userSession = server.getUserSession(req.session);
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
-            res.setHeader('Content-Type', 'text/markdown');
-            // Return markdown content
-            const userContentCollection = server.getUserContentCollection();
-            if(req.query._id) {
-                // TODO: move to request.js
-                const contentDoc = await userContentCollection.queryUserFile(req.query._id, ACTION_URL);
-                res.send(contentDoc.getContent());
-            } else {
-                const contentDocs = await userContentCollection.queryUserFiles({actions: ACTION_URL});
-                res.send('found ' + contentDocs.length);
-            }
+            const markdownPage = server.getContentFile(`${__dirname}/post.view.md`);
+            res.send(markdownPage);
             break;
 
         case 'post':
@@ -50,11 +40,11 @@ module.exports = async (req, res, server) => {
 
             // Perform Action
             const user = await userSession.getOrCreateUser();
-            const userFileDoc = await user.createFileFromTemplate('./service/phone/request.template.md', req.body.title, req.body);
+            const userFileDoc = await user.createFileFromTemplate(`${__dirname}/request.template.md`, req.body.title, req.body);
 
             // Send Response
             response.message = "New post has been created successfully";
-            events.push(['redirect', `${ACTION_URL}?_id=${userFileDoc.getID()}`, 4000]);
+            events.push(['redirect', `${REQUEST_URL}?_id=${userFileDoc.getID()}`, 4000]);
             return res.send(response);
     }
 }

@@ -17,16 +17,16 @@ export default class UserDoc {
 
     async hasFile(title) {
         const userFileDB = new UserContentCollection(this.db)
-        const userFile = await userFileDB.queryUserFile({
+        const userFiles = await userFileDB.queryUserFiles({
             ownerID: this.getID(),
             title
         }, false);
-        return !!userFile;
+        return userFiles.length > 0;
     }
 
-    async createFile(title, content, keywords=[]) {
+    async createFile(title, content) {
         const userFileDB = new UserContentCollection(this.db)
-        return userFileDB.createUserFile(this.getID(), title, content, keywords);
+        return userFileDB.createUserFile(this.getID(), title, content);
     }
 
 

@@ -11,6 +11,7 @@ import databases from "./databases";
 import UserContentCollection from "../user/file/UserContentCollection";
 import SessionServer from "./session/SessionServer";
 import EmailServer from "./email/EmailServer";
+import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
 
 export default class Server {
     constructor() {
@@ -89,13 +90,28 @@ export default class Server {
         walk(process.env.REACT_APP_PATH_CONTENT, (file) => {
             if(file.endsWith('.js')) {
                 const routePath = '/' + path.relative(process.env.REACT_APP_PATH_CONTENT, file);
-                let handlerConfig = require(path.resolve(file));
-                if(handlerConfig.default)
-                    handlerConfig = handlerConfig.default;
-                let requestCallback = handlerConfig;
-                if(typeof requestCallback !== 'function')
-                    console.warn(routePath, 'export is not a function', requestCallback)
-
+                const absPath = path.resolve(file);
+                let handlerConfig = require(absPath);
+                const handlerCallback = async (req, res, next) => {
+                    if(req.method.toLowerCase() === 'options') {
+                        next();
+                    } else {
+                        try {
+                            if(process.env.NODE_ENV === 'development')
+                                delete require.cache[absPath];
+                            let handlerConfig = require(absPath);
+                            if(handlerConfig.default)
+                                handlerConfig = handlerConfig.default;
+                            let requestCallback = handlerConfig;
+                            if(typeof requestCallback !== 'function')
+                                console.warn(routePath, 'export is not a function', requestCallback)
+                            await requestCallback(req, res, this);
+                        } catch (e) {
+                            console.error(routePath, e);
+                            res.status(400).send(`${routePath}: ${e.stack}`);
+                        }
+                    }
+                };
 
                 // if(typeof handlerConfig !== 'function') {
                 //     const requestHandler = new RequestHandler(routePath, handlerConfig);
@@ -103,19 +119,13 @@ export default class Server {
                 //     requestCallback = requestHandler.handleRequest.bind(requestHandler);
                 // }
 
-                app.all(routePath, async (req, res, next) => {
-                    if(req.method.toLowerCase() === 'options') {
-                        next();
-                    } else {
-                        try {
-                            await requestCallback(req, res, this);
-                        } catch (e) {
-                            console.error(routePath, e);
-                            res.status(400).send(`${routePath}: ${e.stack}`);
-                        }
-                    }
-                });
-                console.log("Added Route: ", routePath, requestCallback);
+                if(routePath.endsWith('index.js')) {
+                    const indexPath = routePath.substr(0, routePath.length - 8);
+                    app.all(indexPath, handlerCallback);
+                    console.log("Added Route: ", indexPath, handlerConfig);
+                }
+                app.all(routePath, handlerCallback);
+                console.log("Added Route: ", routePath, handlerConfig);
             }
         })
     }
@@ -145,10 +155,11 @@ export default class Server {
     // getUserDB() { return new UserCollection(this.db); }
     getUserSession(session) { return new UserSession(session, this.db); }
     // getFormHandler(req) { return new FormHandler(req); }
+    getContentFile(path, values={}, safeValues={}) { return new MarkdownTemplate(path).generate(values, safeValues); }
 }
 
 async function initiateCollections(db, databases) {
-    const collections = {};
+    // const collections = {};
     for(const database of databases) {
         console.info(`Initiating Collection: `, database);
         await database.initiateCollection(db);

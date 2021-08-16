@@ -1,5 +1,6 @@
+const REQUEST_URL = '/service/phone/request.js';
 
-module.exports = async (req, res, server) => {
+module.exports = async function ServicePhoneRequest(req, res, server) {
     // const userSession = server.getUserSession(req.session);
 
     switch(req.method.toLowerCase()) {
@@ -7,9 +8,17 @@ module.exports = async (req, res, server) => {
         case 'get':
             // Return markdown content
             const userContentCollection = server.getUserContentCollection();
-            const contentDoc = await userContentCollection.queryUserFile(req.query);
-            res.setHeader('Content-Type', 'text/markdown');
-            res.send(contentDoc.getContent());
+            if(req.query._id) {
+                const contentDoc = await userContentCollection.queryUserFile(req.query._id, REQUEST_URL);
+                res.send(contentDoc.getContent());
+            } else {
+                // const contentDocs = await userContentCollection.queryUserFiles({actions: REQUEST_URL});
+                // res.send('found ' + contentDocs.length);
+
+                const markdownPage = server.getContentFile(`${__dirname}/index.view.md`);
+                res.send(markdownPage);
+                break;
+            }
             break;
 
         case 'post':
@@ -38,3 +47,4 @@ module.exports = async (req, res, server) => {
             return res.send(response);
     }
 }
+module.exports.REQUEST_URL = REQUEST_URL;

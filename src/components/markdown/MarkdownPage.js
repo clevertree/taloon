@@ -71,18 +71,15 @@ export default class MarkdownPage extends React.Component {
         // if(response.status !== 200) {
         //     this.setState({content: "Markdown file not found: " + this.props.src});
 
-        if (responseType.startsWith('text/markdown')) {
-            let content = await response.text();
-            const newState = {content, status: response.status};
-            // if(response.headers.get('content-path'))
-            //     newState.contentPath = response.headers.get('content-path');
-            // content = replaceStringParameters(content, replaceParams);
-            this.setState(newState);
-        } else {
-            this.setState({content: "Invalid Type: " + responseType, status: 400});
-        }
+        let content = await response.text();
+        const newState = {content, status: response.status, isMarkdown: responseType.startsWith('text/markdown')};
+        // if(response.headers.get('content-path'))
+        //     newState.contentPath = response.headers.get('content-path');
+        // content = replaceStringParameters(content, replaceParams);
+        this.setState(newState);
+
         if (process.env.NODE_ENV === 'development') {
-            clearInterval(this.devRefreshIntervalID);
+            clearTimeout(this.devRefreshIntervalID);
             this.devRefreshIntervalID = setTimeout(() => this.fetchSrc().then(), this.devRefreshIntervalAmount);
         }
     }

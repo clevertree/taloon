@@ -32,9 +32,9 @@ class App extends Component {
             }
         }
         this.cb = {
-            handleClick: e => this.handleClick(e),
-            handlePopState: e => this.handlePopState(e),
-            handleRedirect: e => this.handleRedirect(e),
+            handleClick: this.handleClick.bind(this),
+            handlePopState: this.handlePopState.bind(this),
+            handleRedirect: this.handleRedirect.bind(this),
             onEachTag: (tagName, props) => this.onEachTag(tagName, props),
             showModal: (path) => this.showModal(path),
             closeModal: (timeout) => this.closeModal(timeout)
@@ -186,7 +186,7 @@ class App extends Component {
 
     handleRedirect(pathname, timeout=TIMEOUT_REDIRECT) {
         setTimeout(() => {
-            console.info("Redirecting to ", pathname);
+            console.info("Redirecting to ", pathname, 'in', timeout);
             this.setState({
                 pathname
             });

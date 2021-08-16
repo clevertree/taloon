@@ -8,5 +8,7 @@ export default class UserContentDoc {
     getKeywords() { return this.data.keywords || []; }
     getActions() { return this.data.actions || []; }
     getContent() { return this.data.content; }
+    getLocation() { return this.data.location; }
+    getTitle() { return this.data.title; }
 
 }
