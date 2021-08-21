@@ -1,19 +1,97 @@
+body {
+    margin: 0;
+    font-family: "Open Sans", SansSerif, serif;
+    /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',*/
+    /*'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',*/
+    /*sans-serif;*/
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
 
-@keyframes buttonFadeIn {
-    0% {
-        transform: scale(1, 0.7);
-    }
-    50% {
-        transform: scale(1);
-    }
-    75% {
-        transform: scale(1, 0.9);
-    }
-    100% {
-        transform: scale(1);
+/** Main Container **/
+.App.theme-default {
+    position: relative;
+    background-color: #EEE;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    max-width: 1600px;
+}
+
+.App.theme-default > article {
+    padding: 0 1em 0 1em;
+}
+
+.App.theme-default > article > :last-child {
+    margin-bottom: 0.5em;
+}
+
+.App.theme-default > header,
+.App.theme-default > footer {
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+}
+
+.App.theme-default > header > a > img,
+.App.theme-default > footer > a > img {
+    display: block;
+    width: 100%;
+}
+
+
+/** Menu Container **/
+
+.App.theme-default menu {
+    margin: 0 0;
+    padding: 0 0;
+    background-color: #AAA;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    z-index: 3;
+    justify-content: space-evenly;
+    font-family: "Helvetica", Sans-serif, serif;
+    /*font-size: 1.5em;*/
+}
+
+@media only screen and (max-width: 800px) {
+    .App.theme-default menu {
     }
 }
+
+
+.App.theme-default menu > li {
+    font-weight: bold;
+    list-style: none;
+    border-radius: 14px;
+    text-align: center;
+    transition: background-color 1s, letter-spacing 1s, font-weight 1s;
+}
+.App.theme-default menu > li:hover {
+    color: white;
+    background-color: #6a737d;
+    text-shadow: #FFA 0 0 10px;
+    letter-spacing: .2rem;
+}
+
+
+.App.theme-default menu > li > a {
+    display: inline-block;
+    padding: .5em 2vw;
+    text-decoration: none;
+}
+.App.theme-default menu > li:hover > a {
+    color: white;
+}
+
+.App.theme-default menu > li > ul,
+.App.theme-default menu > li > menu {
+    display: none;
+}
+
+
 
 
 
@@ -116,10 +194,30 @@
 
     background-color: #61dafb;
     text-decoration: none;
-    transition: background-color 1s, letter-spacing 1s, color 1s, padding 1s, box-shadow 1s;
+    transition: background-color 1s, letter-spacing 1s, color 1s, padding 1s, box-shadow 1s, transform .5s;
     font-weight: bold;
-    animation: buttonFadeIn 1s ease-in-out forwards;
+    animation: buttonFadeIn 1s ease-in-out;
+    z-index: 1;
+    position: relative;
 }
+
+
+@keyframes buttonFadeIn {
+    0% {
+        transform: scale(1, 0.7);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1, 0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
 
 .App.theme-default form input[type=text] {
 }
@@ -148,6 +246,8 @@
     text-shadow: #FFA 0 0 10px;
     letter-spacing: .2rem;
     box-shadow: #000 0 0 12px;
+    transform: scale(1.05, 1.1);
+    z-index: 2;
 }
 
 /** Button Styles **/
@@ -157,6 +257,11 @@
     flex-grow: 1;
     display: block;
 }
+.App.theme-default form button.wide:hover,
+.App.theme-default a.button.wide:hover {
+    transform: scale(1.0, 1.2);
+}
+
 .App.theme-default form button.large,
 .App.theme-default a.button.large {
     font-size: 1.5em;

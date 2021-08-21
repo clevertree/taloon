@@ -3,8 +3,6 @@
 ${description}
 
 <form action="/service/phone/request.js">
-  <input type="hidden" name="location" value="${location}">
-  <input type="hidden" name="keywords" value="${keywords}">
   <fieldset>
     <legend>Your Location</legend>
     <label title="Location">

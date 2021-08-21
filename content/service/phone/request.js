@@ -1,4 +1,4 @@
-const REQUEST_URL = '/service/phone/request.js';
+const {REQUEST_URL} = require('./config.json')
 
 module.exports = async function ServicePhoneRequest(req, res, server) {
     // const userSession = server.getUserSession(req.session);

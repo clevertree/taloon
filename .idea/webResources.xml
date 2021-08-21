@@ -7,8 +7,8 @@
           <resourceRoots>
             <path value="file://$PROJECT_DIR$/public/files" />
             <path value="file://$PROJECT_DIR$/public/content" />
-            <path value="file://$PROJECT_DIR$/content" />
             <path value="file://$PROJECT_DIR$/src/action" />
+            <path value="file://$PROJECT_DIR$/content" />
           </resourceRoots>
         </entryData>
       </entry>

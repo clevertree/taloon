@@ -1,4 +1,4 @@
-const REQUEST_URL = require('./request.js').REQUEST_URL;
+const {REQUEST_URL, CONTENT_LABEL} = require('./config.json')
 module.exports = async function ServicePhonePost(req, res, server) {
     // const userSession = server.getUserSession(req.session);
 
@@ -40,7 +40,12 @@ module.exports = async function ServicePhonePost(req, res, server) {
 
             // Perform Action
             const user = await userSession.getOrCreateUser();
-            const userFileDoc = await user.createFileFromTemplate(`${__dirname}/request.template.md`, req.body.title, req.body);
+            const userFileDoc = await user.createFileFromTemplate(`${__dirname}/request.template.md`,
+                req.body.title,
+                req.body,
+                [CONTENT_LABEL],
+                req.body.location
+                );
 
             // Send Response
             response.message = "New post has been created successfully";

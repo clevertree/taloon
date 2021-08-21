@@ -1,6 +1,8 @@
 import './LocationButton.css';
 import React from "react";
+import GeoLocation from "../../../user/GeoLocation";
 
+const STORAGE_LOCATION = 'user:location';
 export default class LocationButton extends React.Component {
     constructor(props) {
         super(props);
@@ -11,12 +13,16 @@ export default class LocationButton extends React.Component {
             // showLogoutModal: e => this.showLogoutModal(e),
         }
         this.state = {
-            location: null,
+            // location: null,
             children: "Find Location"
         }
         this.ref = {
             button: React.createRef()
         }
+    }
+
+    componentDidMount() {
+        this.loadUserLocationFromStorage();
     }
 
     getClassName() { return 'button location-button'; }
@@ -47,7 +53,7 @@ export default class LocationButton extends React.Component {
         e.preventDefault();
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => this.onLocation(position, true));
+            navigator.geolocation.getCurrentPosition(this.onLocation.bind(this));
         } else {
             this.setState({
                 children: "Geolocation is not supported by this browser."
@@ -55,20 +61,35 @@ export default class LocationButton extends React.Component {
         }
     }
 
-    onLocation(position, updateInput=false) {
-        console.log("Location found", position.coords)
-        this.setState({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-        });
+    onLocation(position) {
+        console.log("Location found", ...arguments)
+        this.updateInputLocation(position.coords.latitude, position.coords.longitude, true);
+    }
+
+    updateInputLocation(latitude, longitude, force=false) {
+        const geoLocation = new GeoLocation(latitude, longitude);
+        // const newState = {
+        //     location: userLocation,
+        // };
+        // this.setState(newState);
+        localStorage.setItem(STORAGE_LOCATION, JSON.stringify(geoLocation.getCoordinates()));
 
         const forInput = this.props.for || this.props.htmlFor;
-        if(updateInput && forInput) {
+        if(forInput) {
             const body = this.ref.button.current.closest('form, body');
             const elmInput = body.querySelector(`input[name="${forInput}"]`);
-            if(!elmInput.value)
-                elmInput.value = `${position.coords.latitude},${position.coords.longitude}`
+            if(!elmInput.value || force) {
+                elmInput.value = geoLocation.toString();
+            }
+        }
+    }
+
+    loadUserLocationFromStorage() {
+        let locationString = localStorage.getItem(STORAGE_LOCATION);
+        if(locationString) {
+            console.log("Loading user location from storage", locationString);
+            const userLocation = GeoLocation.fromString(locationString);
+            this.updateInputLocation(userLocation.latitude, userLocation.longitude);
         }
     }
 }
-

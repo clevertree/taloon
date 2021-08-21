@@ -24,18 +24,18 @@ export default class UserDoc {
         return userFiles.length > 0;
     }
 
-    async createFile(title, content) {
+    async createFile(title, content, labels=null, location=null) {
         const userFileDB = new UserContentCollection(this.db)
-        return userFileDB.createUserFile(this.getID(), title, content);
+        return userFileDB.createUserFile(this.getID(), title, content, labels, location);
     }
 
 
-    async createFileFromTemplate(markdownPath, title, values) {
+    async createFileFromTemplate(markdownPath, title, values, labels=null, location=null) {
         const template = new MarkdownTemplate(markdownPath);
         let markdownContent = template.generate(values);
 
         // Write file
-        return await this.createFile(title, markdownContent);
+        return await this.createFile(title, markdownContent, labels, location);
     }
 
 

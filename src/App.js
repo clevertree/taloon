@@ -8,7 +8,6 @@ import AppEvents from "./components/event/AppEvents";
 
 import 'typeface-open-sans/index.css'
 import './components/menu/style/Menu.css';
-import './App.css';
 import './AppTheme.css';
 
 const TIMEOUT_REDIRECT = 5000;

@@ -14,9 +14,9 @@ AFOH is supported by local contributions and works with other organizations, gro
 > Many hands make light work.
 
 ## Services
-<a class="button wide" href="./service/request.js">I need a service</a>
+<a class="button wide" href="/service/request.md">I need a service</a>
 
-<a class="button wide" href="./service/post.js">I am offering a service</a>
+<a class="button wide" href="/service/post.md">I am offering a service</a>
 
 
 ```
