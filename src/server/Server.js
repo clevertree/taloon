@@ -5,10 +5,9 @@ import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
 import {MongoClient} from "mongodb";
 
-import UserSession from "../user/session/UserSession";
+import UserSession from "./session/UserSession";
 
-import databases from "./databases";
-import UserContentCollection from "../user/file/UserContentCollection";
+import initiateCollections from "../db/databases";
 import SessionServer from "./session/SessionServer";
 import EmailServer from "./email/EmailServer";
 import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
@@ -131,40 +130,33 @@ export default class Server {
     }
 
     async listen(httpPort = process.env.REACT_APP_API_PORT) {
-        await this.connectDB();
         await new Promise((resolve, reject) => {
             this.app.listen(httpPort, function(err) {
                 err ? reject(err) : resolve();
                 console.log('Taloon Server listening on port: ' + httpPort);
             });
         })
-
+        await this.connectDB();
     }
 
     async connectDB(url=process.env.REACT_APP_DB_URL) {
         if(!this.db) {
+            console.log('Connecting to Database: ' + url);
             const client = await MongoClient.connect(url);
-            console.log('Database connected: ' + url);
             this.db = client.db(process.env.REACT_APP_DB_NAME);
-            this.collections = await initiateCollections(this.db, databases);
+            this.dbms = await initiateCollections(this.db);
         }
     }
 
     getDB() { return this.db; }
-    getUserContentCollection() { return new UserContentCollection(this.db); }
+    getCollectionManager(collectionName) { return this.dbms[collectionName]; }
+    // getUserContentCollection() { return new ContentCollection(this.db); }
     // getUserDB() { return new UserCollection(this.db); }
     getUserSession(session) { return new UserSession(session, this.db); }
     // getFormHandler(req) { return new FormHandler(req); }
     getContentFile(path, values={}, safeValues={}) { return new MarkdownTemplate(path).generate(values, safeValues); }
 }
 
-async function initiateCollections(db, databases) {
-    // const collections = {};
-    for(const database of databases) {
-        console.info(`Initiating Collection: `, database);
-        await database.initiateCollection(db);
-    }
-}
 
 // db.collection('Employee').insertOne({
 //     Employeeid: 4,

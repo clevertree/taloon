@@ -8,7 +8,7 @@ import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
-import SessionButton from "../../user/session/SessionButton";
+import SessionButton from "../session/SessionButton";
 import LocationButton from "../form/location/LocationButton";
 
 

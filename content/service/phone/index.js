@@ -7,8 +7,8 @@ module.exports = async function ServicePhoneIndex(req, res, server, routePath) {
         case 'get':
             const {title, location, distance} = req.body;
             const searchValues = {title, location, distance, labels: CONTENT_LABEL};
-            const userContentCollection = server.getUserContentCollection();
-            const userFileDocs = await userContentCollection.queryUserFiles(searchValues);
+            const userContentCollection = server.getCollectionManager('user');
+            const userFileDocs = await userContentCollection.query(searchValues);
             // TODO: partial text & location searches
 
             const safeValues = {

@@ -47,4 +47,3 @@ module.exports = async function ServicePhoneRequest(req, res, server) {
             return res.send(response);
     }
 }
-module.exports.REQUEST_URL = REQUEST_URL;

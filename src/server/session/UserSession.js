@@ -1,6 +1,7 @@
-import EmailServer from "../../server/email/EmailServer";
+import EmailServer from "../email/EmailServer";
 import crypto from 'crypto';
-import UserCollection from "../UserCollection";
+import UserSchema from "../../db/user/UserSchema";
+import MarkdownTemplate from "../../components/markdown/MarkdownTemplate";
 
 const active2FactorLogins = {};
 
@@ -20,12 +21,15 @@ export default class UserSession {
         if(!this.session.email)
             throw new Error("No valid user session");
         const email = this.session.email;
-        const userDB = new UserCollection(this.db);
+        const userDB = new UserSchema(this.db);
         let foundUser = await userDB.getUser({email}, false);
         if(foundUser)
             return foundUser;
         return await userDB.createUser(email);
     }
+
+
+    /** Session Status **/
 
     login(req, email) {
         console.log('Logging In ', email);
