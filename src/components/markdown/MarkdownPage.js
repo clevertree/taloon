@@ -9,7 +9,7 @@ import Input from "../form/input/Input";
 import Form from "../form/Form";
 import FieldSet from "../form/FieldSet";
 import SessionButton from "../session/SessionButton";
-import LocationButton from "../form/location/LocationButton";
+import LocationButton from "../location/LocationButton";
 
 
 // noinspection HtmlRequiredAltAttribute

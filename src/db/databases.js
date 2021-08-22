@@ -1,5 +1,5 @@
-import UserSchema from "./user/UserSchema";
-import ContentSchema from "./file/ContentSchema";
+import UserSchema from "./UserSchema";
+import ContentSchema from "./ContentSchema";
 
 export default async function initiateCollections(db) {
     const collections = {};

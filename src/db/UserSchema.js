@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import MarkdownTemplate from "../../components/markdown/MarkdownTemplate";
+import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
 
 export default async function UserSchema(db, collections) {
     const CLN_NAME = 'user';

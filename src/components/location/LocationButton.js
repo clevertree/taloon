@@ -1,6 +1,6 @@
 import './LocationButton.css';
 import React from "react";
-import GeoLocation from "../../../db/user/GeoLocation";
+import GeoLocation from "./GeoLocation";
 
 const STORAGE_LOCATION = 'user:location';
 export default class LocationButton extends React.Component {

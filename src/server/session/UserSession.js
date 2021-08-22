@@ -1,6 +1,6 @@
 import EmailServer from "../email/EmailServer";
 import crypto from 'crypto';
-import UserSchema from "../../db/user/UserSchema";
+import UserSchema from "../../db/UserSchema";
 import MarkdownTemplate from "../../components/markdown/MarkdownTemplate";
 
 const active2FactorLogins = {};
