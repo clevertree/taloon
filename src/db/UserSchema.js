@@ -21,92 +21,106 @@ export default async function UserSchema(db, collections) {
             }
         },
         validationLevel: "moderate",
-        validationAction: "error"
+        // validationAction: "warn"
     }
     await db.command({
         collMod: CLN_NAME,
         ...options,
     })
 
-    // Create Index
+    /** Create Indices **/
+
     await collection.createIndex({email: 1}, {unique: true});
 
-    // Helper methods
-    collection.queryAll = async function (query) {
-        processQuery(query);
-        const cursor = collection.find(query);
+    /** Helper methods **/
+
+    collection.queryUsers = async function (query) {
+        const cursor = collection.find(processQuery(query));
         const docList = await cursor.toArray();
         return docList.map(processDoc);
     };
-    collection.queryOne = async function (query) {
-        processQuery(query);
-        const doc = await collection.findOne(query);
-        return doc ? processDoc(doc) : null;
-    };
     collection.getUser = async function (query, throwException=true) {
-        const userDoc = await collection.queryOne(query)
-        if(userDoc || !throwException)
-            return userDoc;
-        throw new Error("User not found " + JSON.stringify(query))
+        const doc = await collection.findOne(processQuery(query));
+        if (!doc) {
+            if(throwException)
+                throw new Error("User not found " + JSON.stringify(query));
+            return null;
+        }
+        return processDoc(doc);
     };
-    collection.userExists = async function (query) {
-        const userDoc = await collection.queryOne(query)
-        return !!userDoc;
+    collection.existsUser = async function (query) {
+        return await collection.find(processQuery(query)).limit(1).count() > 0;
     };
     collection.createUser = async function (email) {
-        if(await this.userExists({email}))
+        if(await this.existsUser({email}))
             throw new Error("User already exists: " + email);
         let userDoc = {email};
         const {insertedId} = await collection.insertOne(userDoc);
-        userDoc = collection.queryOne({_id: insertedId});
+        userDoc = await collection.getUser({_id: insertedId});
         console.log(`Created user: `, userDoc);
         return userDoc;
     };
-
-    /** User Content Methods **/
-
-    collection.hasFile = async function(ownerID, title) {
-        const contentSchema = collections.content;
-        const contentDocs = await contentSchema.queryAllContent({
-            ownerID,
-            title
-        }, false);
-        return contentDocs.length > 0;
-    }
-
-    collection.createFile = async function(ownerID, title, content, labels=null, location=null) {
-        const contentSchema = collections.content;
-        return contentSchema.createContent(ownerID, title, content, labels, location);
-    }
+    collection.deleteUsers = async function (query) {
+        const {deletedCount} = await collection.deleteMany(processQuery(query));
+        console.log(`Deleted ${deletedCount} users`);
+        return deletedCount;
+    };
 
 
-    collection.createFileFromTemplate = async function(markdownPath, title, values, labels=null, location=null) {
-        const template = new MarkdownTemplate(markdownPath);
-        let markdownContent = template.generate(values);
-
-        // Write file
-        return await this.createFile(title, markdownContent, labels, location);
-    }
-
-
-    // Private Functions
-    function processQuery(query) {
-        if(query._id && !(query._id instanceof ObjectId))
-            query._id = new ObjectId(query._id);
-    }
-
-    function processDoc(doc) {
-        Object.setPrototypeOf(doc, UserDocPrototype)
-    }
+    /** Model **/
 
     const UserDocPrototype = {
         getIDString: function() { return this._id+''; },
-        getEmail: function() { return this.email; }
+        getEmail: function() { return this.email; },
+
+        /** User Content Methods **/
+
+        hasFile: async function(title) {
+            const contentSchema = collections.content;
+            return await contentSchema.exists({
+                ownerID: this._id,
+                title
+            }, false);
+        },
+
+        createContent: async function(title, content, labels=null, location=null) {
+            const contentSchema = collections.content;
+            return contentSchema.createContent(this._id, title, content, labels, location);
+        },
+
+
+        createFileFromTemplate: async function(markdownPath, title, values, labels=null, location=null) {
+            const template = new MarkdownTemplate(markdownPath);
+            let markdownContent = template.generate(values);
+
+            // Write file
+            return await this.createContent(title, markdownContent, labels, location);
+        }
     }
 
-    // Run Tests
-    // const newUser = await collection.createUser('omfg@wut.com');
-    // const users = await collection.queryAll({});
+
+    /** Private Function **/
+
+    function processQuery(query) {
+        if(query._id && !(query._id instanceof ObjectId))
+            query._id = new ObjectId(query._id);
+        return query;
+    }
+
+    function processDoc(doc) {
+        Object.setPrototypeOf(doc, UserDocPrototype);
+        return doc;
+    }
+
+
+    /** Run Tests **/
+
+    collection['$test'] = async function () {
+        await collection.deleteUsers({email: 'omfg@wut.com'});
+        const newUser = await collection.createUser('omfg@wut.com');
+        const users = await collection.queryUsers({});
+        // console.log(users, newUser);
+    }
 
     return collection;
 }

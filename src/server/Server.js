@@ -1,5 +1,5 @@
 import fs from "fs";
-import express, {request} from "express";
+import express from "express";
 import path from "path";
 import {JSDOM} from "jsdom";
 import bodyParser from "body-parser";
@@ -7,7 +7,7 @@ import {MongoClient} from "mongodb";
 
 import UserSession from "./session/UserSession";
 
-import initiateCollections from "../db/databases";
+import {initiateCollections} from "../db/";
 import SessionServer from "./session/SessionServer";
 import EmailServer from "./email/EmailServer";
 import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
@@ -16,6 +16,12 @@ export default class Server {
     constructor() {
 
 // const BUILD_FILES = path.resolve(BUILD_INDEX, 'files');
+
+    }
+
+    setupExpress() {
+        if(this.app)
+            throw new Error("Express is already configured");
 
         const app = express();
         this.app = app;
@@ -130,6 +136,7 @@ export default class Server {
     }
 
     async listen(httpPort = process.env.REACT_APP_API_PORT) {
+        await this.setupExpress();
         await new Promise((resolve, reject) => {
             this.app.listen(httpPort, function(err) {
                 err ? reject(err) : resolve();
@@ -139,20 +146,26 @@ export default class Server {
         await this.connectDB();
     }
 
-    async connectDB(url=process.env.REACT_APP_DB_URL) {
+    async connectDB(url=process.env.REACT_APP_DB_URL, dbName=process.env.REACT_APP_DB_NAME) {
         if(!this.db) {
-            console.log('Connecting to Database: ' + url);
+            console.log(`Connecting to Database: ${url}/${dbName}`);
             const client = await MongoClient.connect(url);
-            this.db = client.db(process.env.REACT_APP_DB_NAME);
-            this.dbms = await initiateCollections(this.db);
+            this.db = client.db(dbName);
+            this.collections = await initiateCollections(this.db);
         }
+        return this.collections;
     }
 
     getDB() { return this.db; }
-    getCollectionManager(collectionName) { return this.dbms[collectionName]; }
+    getAllCollections() { return this.collections; }
+    getCollection(collectionName) {
+        if(!this.collections[collectionName])
+            throw new Error("Collection name not found: " + collectionName);
+        return this.collections[collectionName];
+    }
     // getUserContentCollection() { return new ContentCollection(this.db); }
     // getUserDB() { return new UserCollection(this.db); }
-    getUserSession(session) { return new UserSession(session, this.db); }
+    getUserSession(session) { return new UserSession(session, this); }
     // getFormHandler(req) { return new FormHandler(req); }
     getContentFile(path, values={}, safeValues={}) { return new MarkdownTemplate(path).generate(values, safeValues); }
 }

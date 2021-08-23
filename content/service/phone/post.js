@@ -1,6 +1,7 @@
 const {REQUEST_URL, CONTENT_LABEL} = require('./config.json')
 module.exports = async function ServicePhonePost(req, res, server) {
     // const userSession = server.getUserSession(req.session);
+    // const {user: userCollection, content: contentCollection} = server.getAllCollections();
 
     switch(req.method.toLowerCase()) {
         default:
