@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
 import GeoLocation from "../components/location/GeoLocation";
 
-export default async function UserSchema(db) {
+export default async function UserSchema(db, collections) {
     const CLN_NAME = 'content';
     const collectionExists = (await db.listCollections().toArray()).map(c => c.name).includes(CLN_NAME);
     let collection = collectionExists ? db.collection(CLN_NAME) : await db.createCollection(CLN_NAME);
@@ -80,16 +80,21 @@ export default async function UserSchema(db) {
         // UserContentCollection.processForm(docData, content)
         validateDoc(newDoc);
         const {insertedId} = await collection.insertOne(newDoc);
-        newDoc = collection.queryOne({_id: insertedId});
-        console.log(`Created user file: `, insertedId, newDoc);
-        return newDoc;
+        newDoc = await collection.findOne({_id: insertedId});
+        console.log(`Created content entry: `, insertedId, newDoc);
+        return processDoc(newDoc);
+    };
+    collection.deleteContent = async function (query) {
+        const {deletedCount} = await collection.deleteMany(processQuery(query));
+        console.log(`Deleted ${deletedCount} content entries`);
+        return deletedCount;
     };
 
     /** Model **/
 
     const ContentDocPrototype = {
-        getIDString: function() { return this._id+''; },
-        getEmail: function() { return this.email; },
+        getID: function() { return this._id; },
+        // getEmail: function() { return this.email; },
         getOwnerID: function() { return this.ownerID+''; },
         getContent: function() { return this.content; },
         getLocation: function() {
@@ -116,7 +121,7 @@ export default async function UserSchema(db) {
     }
 
     function processLocationString(cString) {
-        let [lon, lat] = cString.split(/\s*[\s,]\s*/, 2).map(l => parseFloat(l));
+        let [lon, lat] = typeof cString === 'string' ? cString.split(/\s*[\s,]\s*/, 2).map(l => parseFloat(l)) : cString;
         const isLatitude = lat => isFinite(lat) && Math.abs(lat) <= 90;
         const isLongitude = lat => isFinite(lat) && Math.abs(lat) <= 180;
         if(!isLatitude)
@@ -130,25 +135,29 @@ export default async function UserSchema(db) {
     }
 
     function validateDoc(doc) {
-        for(const key in doc) {
-            if(doc.hasOwnProperty(key)) {
-                switch(key) {
-                    case 'content': break;
-                    default:
-                        doc[key] = stripHTML(doc[key]);
-                }
-            }
-        }
-    }
-
-    function stripHTML(text) {
-        return text.toString().replace(/<[^>]*>?/gm, '');
+        doc.title = doc.title.toString().replace(/<[^>]*>?/gm, ''); // Strip HTML Tags
+        if(doc.labels && !Array.isArray(doc.labels))
+            doc.labels = [doc.labels];
     }
 
 
-    // Run Tests
-    // const newUser = await collection.createUser('omfg@wut.com');
-    // const users = await collection.queryAll({});
+    /** Run Tests **/
+
+    collection['$test'] = async function () {
+        const {user: userCollection} = collections;
+        const email = 'test@wut.com';
+        if(!(await userCollection.existsUser({email})))
+            await userCollection.createUser('test@wut.com');
+        const testUser = await userCollection.getUser({email})
+
+        let content = await collection.createContent(testUser.getID(), 'test content', 'test content', 'test', [90, -100]);
+        let results = await collection.queryContent({labels: 'test'});
+        expect(results.length).toBeGreaterThanOrEqual(1);
+        let deleteCount = await collection.deleteContent({_id:content.getID()})
+        expect(deleteCount).toBe(1);
+        deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
+        expect(deleteCount).toBe(1);
+    }
 
     return collection;
 }

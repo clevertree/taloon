@@ -9,7 +9,8 @@ import Server from "../server/Server";
 
 test('Database test', async () => {
     const server = new Server();
-    const collections = await server.connectDB(process.env.REACT_APP_DB_URL, process.env.REACT_APP_DB_NAME + '_test');
+    await server.connectDB(process.env.REACT_APP_DB_URL, process.env.REACT_APP_DB_NAME + '_test');
+    const collections = server.getCollections();
     for(const name in collections) {
         if(collections.hasOwnProperty(name)) {
             const collection = collections[name];
@@ -17,4 +18,5 @@ test('Database test', async () => {
                 await collection['$test']();
         }
     }
+    await server.closeDB();
 });

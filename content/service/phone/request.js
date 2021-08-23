@@ -1,11 +1,12 @@
 const {REQUEST_URL} = require('./config.json')
 
-module.exports = async function ServicePhoneRequest(req, res, server) {
+export default async function ServicePhoneRequest(req, res, server) {
     // const userSession = server.getUserSession(req.session);
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
+            res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
             const userContentCollection = server.getUserContentCollection();
             if(req.query._id) {
@@ -46,4 +47,19 @@ module.exports = async function ServicePhoneRequest(req, res, server) {
             // events.push(['redirect', `/service/phone/post.js?_id=${userFileDoc.getID()}`, 2000]);
             return res.send(response);
     }
+}
+
+
+/** Unit Tests **/
+export async function $test(agent, routePath) {
+    await agent
+        .post(routePath)
+        .send({name: 'john'})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    await agent
+        .get(routePath)
+        .expect(200)
+        .expect('Content-Type', /json/)
 }

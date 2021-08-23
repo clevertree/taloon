@@ -1,20 +1,21 @@
 const {CONTENT_LABEL} = require('./config.json')
-module.exports = async function ServicePhoneIndex(req, res, server, routePath) {
+export default async function ServicePhoneIndex(req, res, server, routePath) {
     // const userSession = server.getUserSession(req.session);
+    const {user: userCollection, content: contentCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
             const {title, location, distance} = req.body;
             const searchValues = {title, location, distance, labels: CONTENT_LABEL};
-            const userContentCollection = server.getCollectionManager('user');
-            const userFileDocs = await userContentCollection.query(searchValues);
+            const userFileDocs = await contentCollection.queryContent(searchValues);
             // TODO: partial text & location searches
 
             const safeValues = {
                 results: processResults(userFileDocs)
             }
             const markdownPage = server.getContentFile(`${__dirname}/index.view.md`, {}, safeValues);
+            res.setHeader('Content-Type', 'text/markdown');
             res.send(markdownPage);
             break;
 
@@ -28,8 +29,8 @@ module.exports = async function ServicePhoneIndex(req, res, server, routePath) {
     }
 }
 
-
-function processResults(userFileDocs) {
+/** Process Search Results into HTML **/
+export function processResults(userFileDocs) {
     return `
 <table>
   <thead>
@@ -47,4 +48,18 @@ function processResults(userFileDocs) {
   </tbody>
 </table>
 `
+}
+
+/** Unit Tests **/
+export async function $test(agent, routePath) {
+    await agent
+        .post(routePath)
+        .send({name: 'john'})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    await agent
+        .get(routePath)
+        .expect(200)
+        .expect('Content-Type', /markdown/)
 }

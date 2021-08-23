@@ -54,11 +54,11 @@ export default async function UserSchema(db, collections) {
     collection.createUser = async function (email) {
         if(await this.existsUser({email}))
             throw new Error("User already exists: " + email);
-        let userDoc = {email};
-        const {insertedId} = await collection.insertOne(userDoc);
-        userDoc = await collection.getUser({_id: insertedId});
-        console.log(`Created user: `, userDoc);
-        return userDoc;
+        let newDoc = {email};
+        const {insertedId} = await collection.insertOne(newDoc);
+        newDoc = await collection.findOne({_id: insertedId});
+        console.log(`Created user: `, newDoc);
+        return processDoc(newDoc);
     };
     collection.deleteUsers = async function (query) {
         const {deletedCount} = await collection.deleteMany(processQuery(query));
@@ -70,7 +70,7 @@ export default async function UserSchema(db, collections) {
     /** Model **/
 
     const UserDocPrototype = {
-        getIDString: function() { return this._id+''; },
+        getID: function() { return this._id; },
         getEmail: function() { return this.email; },
 
         /** User Content Methods **/
@@ -116,9 +116,15 @@ export default async function UserSchema(db, collections) {
     /** Run Tests **/
 
     collection['$test'] = async function () {
-        await collection.deleteUsers({email: 'omfg@wut.com'});
-        const newUser = await collection.createUser('omfg@wut.com');
-        const users = await collection.queryUsers({});
+        const email = 'test@wut.com';
+        if(!(await collection.existsUser({email})))
+            await collection.createUser('test@wut.com');
+        const testUser = await collection.getUser({email})
+
+        const results = await collection.queryUsers({email});
+        expect(results.length).toBe(1);
+        const deleteCount = await collection.deleteUsers({email});
+        expect(deleteCount).toBe(1);
         // console.log(users, newUser);
     }
 

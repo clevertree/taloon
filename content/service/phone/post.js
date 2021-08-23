@@ -1,12 +1,13 @@
 const {REQUEST_URL, CONTENT_LABEL} = require('./config.json')
-module.exports = async function ServicePhonePost(req, res, server) {
+export default async function ServicePhonePost(req, res, server) {
     // const userSession = server.getUserSession(req.session);
-    // const {user: userCollection, content: contentCollection} = server.getAllCollections();
+    // const {user: userCollection, content: contentCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
-            const markdownPage = server.getContentFile(`${__dirname}/post.view.md`);
+            const markdownPage = require(`./post.view.md`);
+            res.setHeader('Content-Type', 'text/markdown');
             res.send(markdownPage);
             break;
 
@@ -53,4 +54,19 @@ module.exports = async function ServicePhonePost(req, res, server) {
             events.push(['redirect', `${REQUEST_URL}?_id=${userFileDoc.getID()}`, 4000]);
             return res.send(response);
     }
+}
+
+/** Unit Tests **/
+export async function $test(agent, routePath) {
+    await agent
+        .post(routePath)
+        .send({name: 'john'})
+        .set('Accept', 'application/json')
+        .set('Form-Preview', 'false')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    await agent
+        .get(routePath)
+        .expect(200)
+        .expect('Content-Type', /json/)
 }
