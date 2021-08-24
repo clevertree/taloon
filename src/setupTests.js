@@ -12,4 +12,4 @@ process.env.REACT_APP_API_PORT = 10001;
 process.env.REACT_APP_DB_NAME += '_test';
 
 // Disable console.log
-jest.spyOn(global.console, 'log').mockImplementation(() => jest.fn());
+// jest.spyOn(global.console, 'log').mockImplementation(() => jest.fn());

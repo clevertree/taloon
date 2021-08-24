@@ -1,22 +1,26 @@
-const {REQUEST_URL} = require('./config.json')
+import path from "path";
 
-export default async function ServicePhoneRequest(req, res, server) {
+const {REQUEST_URL} = require('./phone.config.json')
+
+export default async function ServicePhoneRequest(req, res, server, routePath) {
+    const PATH_ASSETS = path.join(path.dirname(routePath), 'assets');
+
     // const userSession = server.getUserSession(req.session);
+    const {UserPost:userPostCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
             res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
-            const userContentCollection = server.getUserContentCollection();
             if(req.query._id) {
-                const contentDoc = await userContentCollection.queryUserFile(req.query._id, REQUEST_URL);
+                const contentDoc = await userPostCollection.getUserPost(req.query, REQUEST_URL);
                 res.send(contentDoc.getContent());
             } else {
                 // const contentDocs = await userContentCollection.queryUserFiles({actions: REQUEST_URL});
                 // res.send('found ' + contentDocs.length);
 
-                const markdownPage = server.getContentFile(`${__dirname}/index.view.md`);
+                const markdownPage = server.getContentFile(`${PATH_ASSETS}/index.view.md`);
                 res.send(markdownPage);
                 break;
             }
@@ -51,15 +55,26 @@ export default async function ServicePhoneRequest(req, res, server) {
 
 
 /** Unit Tests **/
-export async function $test(agent, routePath) {
-    await agent
-        .post(routePath)
-        .send({name: 'john'})
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200)
+export async function $test(agent, server, routePath) {
+
+    /** Test GET Request **/
     await agent
         .get(routePath)
         .expect(200)
+        .expect('Content-Type', /markdown/)
+
+    /** Test POST Request **/
+    await agent
+        .post(routePath)
+        .send({title: 'Test Request'})
+        .set('Accept', 'application/json')
+        .set('Form-Preview', 'false')
+        .expect(isJSONError)
+        .expect(200)
         .expect('Content-Type', /json/)
+
+    function isJSONError(res) {
+        if(!res.type.includes('json') || res.status !== 200)
+            throw new Error(res.text);
+    }
 }

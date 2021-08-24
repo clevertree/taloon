@@ -19,7 +19,7 @@ export default class RouteManager {
                         let requestCallback = handlerConfig;
                         if(typeof requestCallback !== 'function')
                             console.warn(routePath, 'export is not a function', requestCallback)
-                        await requestCallback(req, res, server);
+                        await requestCallback(req, res, server, routePath);
                     } catch (e) {
                         console.error(routePath, e);
                         res.status(400).send(`${routePath}: ${e.stack}`);

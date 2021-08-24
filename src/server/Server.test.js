@@ -21,7 +21,7 @@ test('Server test', async () => {
     for(const [absPath, routePath] of fileList) {
         let handlerConfig = require(absPath);
         if(handlerConfig['$test'])
-            await handlerConfig['$test'](agent, routePath);
+            await handlerConfig['$test'](agent, server, routePath);
     }
 
     /** Test listening **/

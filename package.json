@@ -33,7 +33,7 @@
     "build": "sh ./scripts/build.sh",
     "deploy": "sh ./scripts/deploy.sh",
     "server": "sh ./scripts/server.sh",
-    "test": "react-scripts test",
+    "test": "react-scripts test --silent --detectOpenHandles",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

@@ -1,12 +1,12 @@
 import {ObjectId} from "mongodb";
 import GeoLocation from "../components/location/GeoLocation";
 
-export default async function UserSchema(db, collections) {
-    const CLN_NAME = 'content';
+export default async function UserPostSchema(db, collections) {
+    const CLN_NAME = 'UserPost';
     const collectionExists = (await db.listCollections().toArray()).map(c => c.name).includes(CLN_NAME);
     let collection = collectionExists ? db.collection(CLN_NAME) : await db.createCollection(CLN_NAME);
 
-    // Create Collection SCHEMA
+    /** Collection SCHEMA **/
     const options = {
         validator: {
             $jsonSchema: {
@@ -44,29 +44,27 @@ export default async function UserSchema(db, collections) {
     })
 
     /** Create Indices **/
-
     await collection.createIndex({ownerID: 1, title: 1}, {unique: true});
 
     /** Helper methods **/
-
-    collection.queryContent = async function (query) {
+    collection.queryUserPosts = async function (query) {
         const cursor = collection.find(processQuery(query));
         const docList = await cursor.toArray();
         return docList.map(processDoc);
     };
-    collection.getContent = async function (query, throwException = true) {
+    collection.getUserPost = async function (query, throwException = true) {
         const doc = await collection.findOne(processQuery(query));
         if (!doc) {
             if(throwException)
-                throw new Error("Content not found " + JSON.stringify(query));
+                throw new Error(`${CLN_NAME} not found ${JSON.stringify(query)}`);
             return null;
         }
         return processDoc(doc);
     };
-    collection.contentExists = async function (query) {
+    collection.existsUserPosts = async function (query) {
         return await collection.find(processQuery(query)).limit(1).count() > 0;
     };
-    collection.createContent = async function (ownerID, title, content, labels=null, location=null) {
+    collection.createUserPost = async function (ownerID, title, content, labels=null, location=null) {
         let newDoc = {
             ownerID,
             title,
@@ -81,12 +79,12 @@ export default async function UserSchema(db, collections) {
         validateDoc(newDoc);
         const {insertedId} = await collection.insertOne(newDoc);
         newDoc = await collection.findOne({_id: insertedId});
-        console.log(`Created content entry: `, insertedId, newDoc);
+        console.log(`Created ${CLN_NAME} entry: `, insertedId, newDoc);
         return processDoc(newDoc);
     };
-    collection.deleteContent = async function (query) {
+    collection.deleteUserPosts = async function (query) {
         const {deletedCount} = await collection.deleteMany(processQuery(query));
-        console.log(`Deleted ${deletedCount} content entries`);
+        console.log(`Deleted ${deletedCount} ${CLN_NAME}${deletedCount === 1 ? '' : 's'}`);
         return deletedCount;
     };
 
@@ -144,16 +142,16 @@ export default async function UserSchema(db, collections) {
     /** Run Tests **/
 
     collection['$test'] = async function () {
-        const {user: userCollection} = collections;
+        const {User: userCollection} = collections;
         const email = 'test@wut.com';
-        if(!(await userCollection.existsUser({email})))
+        if(!(await userCollection.existsUsers({email})))
             await userCollection.createUser('test@wut.com');
         const testUser = await userCollection.getUser({email})
 
-        let content = await collection.createContent(testUser.getID(), 'test content', 'test content', 'test', [90, -100]);
-        let results = await collection.queryContent({labels: 'test'});
+        let content = await collection.createUserPost(testUser.getID(), 'test content', 'test content', 'test', [90, -100]);
+        let results = await collection.queryUserPosts({labels: 'test'});
         expect(results.length).toBeGreaterThanOrEqual(1);
-        let deleteCount = await collection.deleteContent({_id:content.getID()})
+        let deleteCount = await collection.deleteUserPosts({_id:content.getID()})
         expect(deleteCount).toBe(1);
         deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
         expect(deleteCount).toBe(1);

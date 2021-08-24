@@ -1,20 +1,20 @@
-const {CONTENT_LABEL} = require('./config.json')
+const {CONTENT_LABEL} = require('./phone.config.json')
 export default async function ServicePhoneIndex(req, res, server, routePath) {
     // const userSession = server.getUserSession(req.session);
-    const {user: userCollection, content: contentCollection} = server.getCollections();
+    const {User: userCollection, UserPost: userPostCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
             const {title, location, distance} = req.body;
             const searchValues = {title, location, distance, labels: CONTENT_LABEL};
-            const userFileDocs = await contentCollection.queryContent(searchValues);
+            const userFileDocs = await userPostCollection.queryUserPosts(searchValues);
             // TODO: partial text & location searches
 
             const safeValues = {
                 results: processResults(userFileDocs)
             }
-            const markdownPage = server.getContentFile(`${__dirname}/index.view.md`, {}, safeValues);
+            const markdownPage = server.getContentFile(`${__dirname}/assets/index.view.md`, {}, safeValues);
             res.setHeader('Content-Type', 'text/markdown');
             res.send(markdownPage);
             break;
@@ -30,28 +30,30 @@ export default async function ServicePhoneIndex(req, res, server, routePath) {
 }
 
 /** Process Search Results into HTML **/
+// TODO: send <results>JSON</results>
 export function processResults(userFileDocs) {
-    return `
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Location</th>
-    </tr>
-  </thead>
-  <tbody>${userFileDocs.map(userFileDoc => `
-    <tr>
-      <td>${userFileDoc.getTitle()}</td>
-      <td>${userFileDoc.getLocation()}</td>
-    </tr>`
-    ).join('')}
-  </tbody>
-</table>
-`
+    return `<searchResults>${JSON.stringify(userFileDocs)}</searchResults>`;
+//     return `
+// <table>
+//   <thead>
+//     <tr>
+//       <th>Title</th>
+//       <th>Location</th>
+//     </tr>
+//   </thead>
+//   <tbody>${userFileDocs.map(userFileDoc => `
+//     <tr>
+//       <td>${userFileDoc.getTitle()}</td>
+//       <td>${userFileDoc.getLocation()}</td>
+//     </tr>`
+//     ).join('')}
+//   </tbody>
+// </table>
+// `
 }
 
 /** Unit Tests **/
-export async function $test(agent, routePath) {
+export async function $test(agent, server, routePath) {
     await agent
         .post(routePath)
         .send({name: 'john'})

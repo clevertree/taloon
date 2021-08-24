@@ -12,18 +12,15 @@ export default class UserSession {
     isActive() { return !!this.session.email; }
     getEmail() { return this.session.email; }
 
-    /**
-     * @returns {UserDoc}
-     */
     async getOrCreateUser() {
         if(!this.session.email)
             throw new Error("No valid user session");
         const email = this.session.email;
-        const userDB = this.server.getCollection('user');
-        let foundUser = await userDB.getUser({email}, false);
+        const {User:userCollection} = this.server.getCollections();
+        let foundUser = await userCollection.getUser({email}, false);
         if(foundUser)
             return foundUser;
-        return await userDB.createUser(email);
+        return await userCollection.createUser(email);
     }
 
 
@@ -69,7 +66,7 @@ export default class UserSession {
 
 
 
-    async processSend2FactorEmailRequest(req) {
+    async processSend2FactorEmailRequest(req, pathLogin, path2FactorEmail) {
         const values = Object.assign({}, req.body);
         if(!req.body.email)
             throw new Error("Invalid email");
@@ -79,12 +76,12 @@ export default class UserSession {
         values.remoteAddress = req.headers['x-forwarded-for'] ||
             req.socket.remoteAddress ||
             null;
-        values.host = process.env.REACT_APP_PATH_PUBLIC || req.headers.origin;
+        values.host = req.headers.origin || process.env.REACT_APP_ORIGIN;
         values.codeUrl = new URL(
-            `${process.env.REACT_APP_PATH_SITE}/session/login-2factor.md?email=${email}&code=${code2Factor}`,
+            `${pathLogin}?service=email-2factor-response&email=${email}&code=${code2Factor}`,
             values.host);
         values.loginUrl = new URL(
-            `${process.env.REACT_APP_PATH_SITE}/session/login.md?email=${email}`,
+            `${pathLogin}?email=${email}`,
             values.host);
 
         // Add 2 Factor
@@ -104,20 +101,10 @@ Ref: ${req.headers.referrer || 'N/A'}
         await EmailServer.sendMarkdownTemplateEmail(
             email,
             'Use this code to log in',
-            `/${process.env.REACT_APP_PATH_SITE}/session/login-2factor.email.md`,
+            path2FactorEmail,
             values)
 
-        let storeFormValues = {email};
-        if(process.env.NODE_ENV === 'development')
-            storeFormValues.code = code2Factor;
-
-        return {
-            message: "A 2-Factor code sent to your email address. Please use it to log in",
-            events: [
-                ['form:save', `/${process.env.REACT_APP_PATH_SITE}/session/login.js`, storeFormValues],
-                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/session/login-2factor.md`]
-            ]
-        };
+        return {email, code2Factor};
     }
 
 
@@ -132,17 +119,6 @@ Ref: ${req.headers.referrer || 'N/A'}
         // Reset session
         req.session = {
             email
-        };
-
-        return {
-            message: "You are now logged in. This modal will close automatically.",  // Redirecting...
-            redirect: `${process.env.REACT_APP_PATH_SITE}/session/`,
-            events: [
-                ['modal:show', `/${process.env.REACT_APP_PATH_SITE}/session/login-success.md`],
-                ['modal:close', 5000],
-                ['session:change'],
-                // ['redirect', `${process.env.REACT_APP_PATH_SITE}/user/`, 5000], // TODO: redirect optionally
-            ]
         };
     }
 
