@@ -121,6 +121,6 @@ export async function $test(agent, server, routePath) {
 
     function isJSONError(res) {
         if(!res.type.includes('json') || res.status !== 200)
-            throw new Error(res.text);
+            throw new Error(`${routePath}: ${res.text}`);
     }
 }

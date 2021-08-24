@@ -2,9 +2,6 @@
 
 `$ npm i`
 
-## Install Windows
-`mklink /J public\content C:\dev\taloon\content`
-
 ## Run
 
 In the project directory, you can run:

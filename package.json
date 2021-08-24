@@ -11,7 +11,7 @@
     "cookie-session": "^1.4.0",
     "dotenv": "^10.0.0",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.6",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "jsdom": "^16.6.0",
@@ -33,7 +33,8 @@
     "build": "sh ./scripts/build.sh",
     "deploy": "sh ./scripts/deploy.sh",
     "server": "sh ./scripts/server.sh",
-    "test": "react-scripts test --silent --detectOpenHandles",
+    "test": "react-scripts test",
+    "test-silent": "react-scripts test --silent",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

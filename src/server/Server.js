@@ -60,7 +60,7 @@ export default class Server {
                     return res.status(200).send("No Options")
 
                 case 'post':
-                    return res.status(400).send("Invalid Post")
+                    return res.status(400).send("Invalid Post: " + req.path)
                 default:
             }
             // if(req.path.startsWith(`/${process.env.REACT_APP_PATH_CONTENT}`) && req.path.endsWith('.md'))
