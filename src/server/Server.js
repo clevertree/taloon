@@ -135,8 +135,9 @@ export default class Server {
     }
     getUserSession(session) { return new UserSession(session, this); }
     // getFormHandler(req) { return new FormHandler(req); }
-    getContentFile(path, values={}, safeValues={}) {
-        return new MarkdownTemplate(path).generate(values, safeValues);
+    async getContentFile(path, values={}, safeValues={}) {
+        const template = new MarkdownTemplate(path);
+        return await template.generate(values, safeValues);
     }
     getRelativeContentPath(absolutePath) {
         const absContentPath = path.resolve(process.env.REACT_APP_PATH_CONTENT);

@@ -1,5 +1,7 @@
 const {CONTENT_LABEL} = require('./phone.config.json')
 export default async function ServicePhoneIndex(req, res, server) {
+    const PATH_BASE = server.getRelativeContentPath(__dirname);
+    const PATH_ASSETS = `${PATH_BASE}/assets`;
     // const userSession = server.getUserSession(req.session);
     const {User: userCollection, UserPost: userPostCollection} = server.getCollections();
 
@@ -14,7 +16,7 @@ export default async function ServicePhoneIndex(req, res, server) {
             const safeValues = {
                 results: processResults(userFileDocs)
             }
-            const markdownPage = server.getContentFile(`${__dirname}/assets/index.view.md`, {}, safeValues);
+            const markdownPage = await server.getContentFile(`${PATH_ASSETS}/index.view.md`, {}, safeValues);
             res.setHeader('Content-Type', 'text/markdown');
             res.send(markdownPage);
             break;

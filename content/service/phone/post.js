@@ -1,15 +1,17 @@
 import SiteConfig from "../../config.json";
 import {CONTENT_LABEL} from "./phone.config.json";
 
-export default async function ServicePhonePost(req, res, server, routePath) {
-    const PATH_ASSETS = server.getRelativeContentPath(__dirname) + '/assets';
+export default async function ServicePhonePost(req, res, server) {
+    const PATH_BASE = server.getRelativeContentPath(__dirname);
+    const PATH_ASSETS = `${PATH_BASE}/assets`;
+    const PATH_INDEX = `${PATH_BASE}/index.js`;
     // const userSession = server.getUserSession(req.session);
     // const {user: userCollection, content: contentCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
-            const markdownPage = server.getContentFile(`${PATH_ASSETS}/post.view.md`);
+            const markdownPage = await server.getContentFile(`${PATH_ASSETS}/post.view.md`);
             res.setHeader('Content-Type', 'text/markdown');
             res.send(markdownPage);
             break;
@@ -56,8 +58,7 @@ export default async function ServicePhonePost(req, res, server, routePath) {
 
             // Send Response
             response.message = "New post has been created successfully";
-            const indexURL = routePath.replace('/post.js', '/index.js');
-            events.push(['redirect', `${indexURL}?_id=${userFileDoc.getID()}`, 4000]);
+            events.push(['redirect', `${PATH_INDEX}?_id=${userFileDoc.getID()}`, 4000]);
             return res.send(response);
     }
 }
