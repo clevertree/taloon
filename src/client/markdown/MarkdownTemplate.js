@@ -1,18 +1,12 @@
-import path from "path";
-import fs from "fs";
+import ContentUtil from "../../util/ContentUtil";
 
 export default class MarkdownTemplate {
     constructor(markdownPath) {
         this.path = markdownPath;
     }
 
-    generate(values, safeValues={}) {
-        let markdownPath = this.path;
-        if (!fs.existsSync(markdownPath))
-            markdownPath = path.join(process.env.REACT_APP_PATH_CONTENT, this.path);
-        if (!fs.existsSync(markdownPath))
-            throw new Error("Markdown template not found: " + markdownPath);
-        let markdownContent = fs.readFileSync(markdownPath, 'utf8');
+    async generate(values, safeValues={}) {
+        let markdownContent = await ContentUtil.fetchTextFile(this.path)
 
         // Replace template variables
         markdownContent = markdownContent.replace(/\${([^}]+)}/g, (match, fieldName) => {

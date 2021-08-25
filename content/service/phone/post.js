@@ -1,9 +1,8 @@
 import SiteConfig from "../../config.json";
 import {CONTENT_LABEL} from "./phone.config.json";
-import path from "path";
 
 export default async function ServicePhonePost(req, res, server, routePath) {
-    const PATH_ASSETS = path.join(path.dirname(routePath), 'assets');
+    const PATH_ASSETS = server.getRelativeContentPath(__dirname) + '/assets';
     // const userSession = server.getUserSession(req.session);
     // const {user: userCollection, content: contentCollection} = server.getCollections();
 

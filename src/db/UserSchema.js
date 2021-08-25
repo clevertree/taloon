@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
+import MarkdownTemplate from "../client/markdown/MarkdownTemplate";
 
 export default async function UserSchema(db, collections) {
     const CLN_NAME = 'User';
@@ -89,7 +89,7 @@ export default async function UserSchema(db, collections) {
 
         createFileFromTemplate: async function(markdownPath, title, values, labels=null, location=null) {
             const template = new MarkdownTemplate(markdownPath);
-            let markdownContent = template.generate(values);
+            let markdownContent = await template.generate(values);
 
             // Write file
             return await this.createUserPost(title, markdownContent, labels, location);

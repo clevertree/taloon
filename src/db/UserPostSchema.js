@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import GeoLocation from "../components/location/GeoLocation";
+import GeoLocation from "../client/location/GeoLocation";
 
 export default async function UserPostSchema(db, collections) {
     const CLN_NAME = 'UserPost';

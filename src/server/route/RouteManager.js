@@ -14,11 +14,12 @@ export default class RouteManager {
                         if(process.env.NODE_ENV === 'development')
                             delete require.cache[absPath];
                         let handlerConfig = require(absPath);
-                        if(handlerConfig.__esModule === true)
-                            handlerConfig = handlerConfig.default;
                         let requestCallback = handlerConfig;
-                        if(typeof requestCallback !== 'function')
-                            console.warn(routePath, 'export is not a function', requestCallback)
+                        if(requestCallback.__esModule === true)
+                            requestCallback = requestCallback.default;
+                        if(typeof requestCallback !== 'function') {
+                            console.warn(routePath, 'export is not a function', requestCallback, handlerConfig)
+                        }
                         await requestCallback(req, res, server, routePath);
                     } catch (e) {
                         console.error(routePath, e);

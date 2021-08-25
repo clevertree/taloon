@@ -1,7 +1,7 @@
 import React from "react";
 import AppEvents from "../event/AppEvents";
+import ContentUtil from "../../util/ContentUtil";
 import './SessionButton.css';
-import SiteConfig from "../util/SiteConfig";
 
 
 export default class SessionButton extends React.Component {
@@ -71,12 +71,12 @@ export default class SessionButton extends React.Component {
     }
 
     async showLoginModal(e) {
-        const {PATH_LOGIN} = await SiteConfig.loadSiteConfig();
+        const {PATH_LOGIN} = await ContentUtil.fetchDefaultConfig();
         e.preventDefault();
         AppEvents.emit('modal:show', PATH_LOGIN);
     }
     async showLogoutModal(e) {
-        const {PATH_LOGOUT} = await SiteConfig.loadSiteConfig();
+        const {PATH_LOGOUT} = await ContentUtil.fetchDefaultConfig();
         e.preventDefault();
         AppEvents.emit('modal:show', PATH_LOGOUT);
     }

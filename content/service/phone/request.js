@@ -1,9 +1,8 @@
-import path from "path";
 
 const {REQUEST_URL} = require('./phone.config.json')
 
-export default async function ServicePhoneRequest(req, res, server, routePath) {
-    const PATH_ASSETS = path.join(path.dirname(routePath), 'assets');
+export default async function ServicePhoneRequest(req, res, server) {
+    const PATH_ASSETS = server.getRelativeContentPath(__dirname) + '/assets';
 
     // const userSession = server.getUserSession(req.session);
     const {UserPost:userPostCollection} = server.getCollections();

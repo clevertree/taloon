@@ -1,5 +1,5 @@
 const {CONTENT_LABEL} = require('./phone.config.json')
-export default async function ServicePhoneIndex(req, res, server, routePath) {
+export default async function ServicePhoneIndex(req, res, server) {
     // const userSession = server.getUserSession(req.session);
     const {User: userCollection, UserPost: userPostCollection} = server.getCollections();
 

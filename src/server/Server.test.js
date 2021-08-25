@@ -10,10 +10,9 @@ import request from "supertest";
 import RouteManager from "./route/RouteManager";
 
 test('Server test', async () => {
-    const testPort = parseInt(process.env.REACT_APP_API_PORT);
     const server = new Server();
     const app = server.getExpressApp();
-    await server.listen(testPort);
+    await server.listen();
     await server.connectDB();
 
     const agent = request.agent(app);

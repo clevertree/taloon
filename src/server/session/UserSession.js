@@ -1,5 +1,6 @@
 import EmailServer from "../email/EmailServer";
 import crypto from 'crypto';
+import ContentUtil from "../../util/ContentUtil";
 
 const active2FactorLogins = {};
 
@@ -38,18 +39,9 @@ export default class UserSession {
         this.session = req.session = null;
     }
 
-    processLogOutRequest(req) {
-        this.logout(req);
-        return {
-            message: "You have been logged out. This modal will close automatically.",
-            redirect: `${process.env.REACT_APP_PATH_SITE}/session/`,
-            events: [
-                ['modal:show', `${process.env.REACT_APP_PATH_SITE}/session/logout-success.md`],
-                ['modal:close', 5000],
-                ['session:change']
-            ]
-        }
-    }
+    // async processLogOutRequest(req) {
+    //     this.logout(req);
+    // }
 
 
 

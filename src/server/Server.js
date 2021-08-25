@@ -11,7 +11,7 @@ import {initiateCollections} from "../db/";
 import SessionServer from "./session/SessionServer";
 import EmailServer from "./email/EmailServer";
 import RouteManager from "./route/RouteManager";
-import MarkdownTemplate from "../components/markdown/MarkdownTemplate";
+import MarkdownTemplate from "../client/markdown/MarkdownTemplate";
 
 export default class Server {
     constructor() {
@@ -137,6 +137,10 @@ export default class Server {
     // getFormHandler(req) { return new FormHandler(req); }
     getContentFile(path, values={}, safeValues={}) {
         return new MarkdownTemplate(path).generate(values, safeValues);
+    }
+    getRelativeContentPath(absolutePath) {
+        const absContentPath = path.resolve(process.env.REACT_APP_PATH_CONTENT);
+        return '/' + path.relative(absContentPath, absolutePath)
     }
 }
 

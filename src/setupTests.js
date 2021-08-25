@@ -9,6 +9,7 @@ configure({ adapter: new Adapter() });
 
 // Prevent tests from reaching main server
 process.env.REACT_APP_API_PORT = 10001;
+process.env.REACT_APP_API_ENDPOINT = "http://localhost:" + process.env.REACT_APP_API_PORT;
 // process.env.REACT_APP_DB_NAME += '_test';
 
 // Disable console.log

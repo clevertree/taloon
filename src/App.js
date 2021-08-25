@@ -1,17 +1,17 @@
 import React, {Component} from "react";
 import packageJSON from '../package.json';
 
-import MarkdownPage from "./components/markdown/MarkdownPage";
-import MarkdownModal from "./components/modal/MarkdownModal";
+import MarkdownPage from "./client/markdown/MarkdownPage";
+import MarkdownModal from "./client/modal/MarkdownModal";
 
-import AppEvents from "./components/event/AppEvents";
+import AppEvents from "./client/event/AppEvents";
+import ContentUtil from "./util/ContentUtil";
 
 import 'typeface-open-sans/index.css'
-import './components/menu/style/Menu.css';
+import './client/menu/style/Menu.css';
 import './AppTheme.css';
 
 const TIMEOUT_REDIRECT = 5000;
-
 class App extends Component {
     constructor(props) {
         super(props);
@@ -19,7 +19,8 @@ class App extends Component {
             portrait: false,
             title: "The Traveling Merchant",
             pathname: document.location.pathname + document.location.search,
-            activeModal: null
+            activeModal: null,
+            siteConfig: {}
         };
 
         this.ref = {
@@ -38,6 +39,8 @@ class App extends Component {
             showModal: (path) => this.showModal(path),
             closeModal: (timeout) => this.closeModal(timeout)
         };
+        ContentUtil.fetchDefaultConfig()
+            .then(siteConfig => this.setState({siteConfig}));
     }
 
     componentDidMount() {
@@ -74,7 +77,7 @@ class App extends Component {
 
 
     renderHeader() {
-        let src = `/${process.env.REACT_APP_PATH_SITE}/header.md`;
+        let src = this.state.siteConfig.PATH_HEADER || `/site/header.md`;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
@@ -83,7 +86,7 @@ class App extends Component {
     }
 
     renderFooter() {
-        let src = `/${process.env.REACT_APP_PATH_SITE}/footer.md`;
+        let src = this.state.siteConfig.PATH_FOOTER || `/site/footer.md`;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}
