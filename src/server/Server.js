@@ -77,7 +77,7 @@ export default class Server {
                 case 'text/markdown':
                     console.warn('Markdown page not found: ', req.path);
                     res.setHeader('Content-Type', 'text/markdown');
-                    res.send("# Page not found");
+                    res.send("# Page not found: " + req.path);
                     break;
                 default:
                     console.log('Sending index file: ', req.path, req.headers["content-type"]);

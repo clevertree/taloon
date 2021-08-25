@@ -46,7 +46,7 @@ class App extends Component {
         AppEvents.addEventListener('modal:show', this.cb.showModal);
         AppEvents.addEventListener('redirect', this.cb.handleRedirect);
         // AppEvents.addEventListener('modal:close', this.cb.closeModal)
-
+        // this.loadSiteConfig();
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
@@ -58,6 +58,7 @@ class App extends Component {
 
     render() {
         let className = 'App theme-default ' + (this.state.portrait ? 'portrait' : 'landscape');
+        // TODO: loading config
         return (
             <AppContext.Provider value={this}>
                 <div className={className} >

@@ -1,6 +1,8 @@
 import React from "react";
 import AppEvents from "../event/AppEvents";
 import './SessionButton.css';
+import SiteConfig from "../util/SiteConfig";
+
 
 export default class SessionButton extends React.Component {
     constructor(props) {
@@ -20,7 +22,7 @@ export default class SessionButton extends React.Component {
     }
 
     componentDidMount() {
-        this.updateSession()
+        this.updateSession().then();
         AppEvents.addEventListener('session:change', this.cb.updateSession)
     }
 
@@ -68,13 +70,15 @@ export default class SessionButton extends React.Component {
         />;
     }
 
-    showLoginModal(e) {
+    async showLoginModal(e) {
+        const {PATH_LOGIN} = await SiteConfig.loadSiteConfig();
         e.preventDefault();
-        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/session/login.md`);
+        AppEvents.emit('modal:show', PATH_LOGIN);
     }
-    showLogoutModal(e) {
+    async showLogoutModal(e) {
+        const {PATH_LOGOUT} = await SiteConfig.loadSiteConfig();
         e.preventDefault();
-        AppEvents.emit('modal:show', `${process.env.REACT_APP_PATH_SITE}/session/logout.md`);
+        AppEvents.emit('modal:show', PATH_LOGOUT);
     }
 
 }

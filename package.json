@@ -11,7 +11,7 @@
     "test": "react-scripts test",
     "test-silent": "react-scripts test --silent",
     "eject": "react-scripts eject",
-    "prepare": "npx husky install & npx husky set .husky/pre-commit 'CI=true npm run test-silent'"
+    "prepare": "npx husky install"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
