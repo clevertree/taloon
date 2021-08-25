@@ -3,6 +3,16 @@
   "version": "0.1.10",
   "private": true,
   "homepage": "/",
+  "scripts": {
+    "start": "sh ./scripts/start.sh",
+    "build": "sh ./scripts/build.sh",
+    "deploy": "sh ./scripts/deploy.sh",
+    "server": "sh ./scripts/server.sh",
+    "test": "react-scripts test",
+    "test-silent": "react-scripts test --silent",
+    "eject": "react-scripts eject",
+    "prepare": "npx husky install & npx husky set .husky/pre-commit 'CI=true npm run test-silent'"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -10,11 +20,11 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
     "body-parser": "^1.19.0",
     "cookie-session": "^1.4.0",
-    "crypto": "^1.0.1",
     "dotenv": "^10.0.0",
     "enzyme": "^3.11.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
+    "husky": "^7.0.2",
     "jsdom": "^16.6.0",
     "markdown-to-jsx": "^7.1.3",
     "mongodb": "^4.0.1",
@@ -28,15 +38,9 @@
     "typeface-open-sans": "^1.1.13",
     "web-vitals": "^1.1.2"
   },
-  "scripts": {
-    "start": "sh ./scripts/start.sh",
-    "build": "sh ./scripts/build.sh",
-    "deploy": "sh ./scripts/deploy.sh",
-    "server": "sh ./scripts/server.sh",
-    "test": "react-scripts test",
-    "test-silent": "react-scripts test --silent",
-    "eject": "react-scripts eject"
-  },
+  "pre-push": [
+    "test-silent"
+  ],
   "eslintConfig": {
     "extends": [
       "react-app",
