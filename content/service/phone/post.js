@@ -89,6 +89,7 @@ export async function $test(agent, server, routePath) {
         .expect(200)
         .expect('Content-Type', /json/)
 
+    // console.log("Login Response: ", res.text);
 
     /** Test GET Request **/
     res = await agent

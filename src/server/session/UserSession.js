@@ -51,19 +51,6 @@ export default class UserSession {
         }
     }
 
-    async processLogInRequest(req) {
-        switch(req.body.service) {
-            case 'email':
-                return await this.processSend2FactorEmailRequest(req)
-
-            case 'email-2factor-response':
-                return this.processLoginWith2FactorRequest(req);
-            default:
-            case 'google':
-                throw new Error("Not implemented: " + req.body);
-        }
-    }
-
 
 
     async processSend2FactorEmailRequest(req, pathLogin, path2FactorEmail) {
@@ -108,7 +95,7 @@ Ref: ${req.headers.referrer || 'N/A'}
     }
 
 
-    processLoginWith2FactorRequest(req) {
+    async processLoginWith2FactorRequest(req) {
         const code2Factor = Number.parseInt(req.body.code);
         const email = req.body.email;
         if(active2FactorLogins[email] !== code2Factor)
@@ -116,10 +103,13 @@ Ref: ${req.headers.referrer || 'N/A'}
 
         delete active2FactorLogins[email];
 
+
         // Reset session
-        req.session = {
+        this.session = req.session = {
             email
         };
+
+        return await this.getOrCreateUser();
     }
 
 }

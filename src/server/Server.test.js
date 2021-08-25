@@ -26,6 +26,7 @@ test('Server test', async () => {
 
     /** Test listening **/
     await server.stopListening();
+    await server.closeDB();
 
     /** Test Routes **/
 

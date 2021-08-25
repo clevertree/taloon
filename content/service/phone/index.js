@@ -58,10 +58,15 @@ export async function $test(agent, server, routePath) {
         .post(routePath)
         .send({name: 'john'})
         .set('Accept', 'application/json')
+        .expect(isJSONError)
         .expect('Content-Type', /json/)
         .expect(200)
     await agent
         .get(routePath)
         .expect(200)
         .expect('Content-Type', /markdown/)
+    function isJSONError(res) {
+        if(!res.type.includes('json') || res.status !== 200)
+            throw new Error(`${routePath}: ${res.text}`);
+    }
 }

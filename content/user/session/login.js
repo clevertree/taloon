@@ -33,7 +33,7 @@ export default async function UserSessionLogIn(req, res, server, routePath) {
             return res.send(ret);
 
         case 'email-2factor-response':
-            userClient.processLoginWith2FactorRequest(req);
+            await userClient.processLoginWith2FactorRequest(req);
 
             return res.send({
                 message: "You are now logged in. This modal will close automatically.",  // Redirecting...

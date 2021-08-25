@@ -41,7 +41,7 @@ export default class RouteManager {
         const fileList = [];
         walk(process.env.REACT_APP_PATH_CONTENT, (file) => {
             if(file.endsWith('.js')) {
-                const routePath = '/' + path.relative(process.env.REACT_APP_PATH_CONTENT, file);
+                const routePath = '/' + path.posix.relative(process.env.REACT_APP_PATH_CONTENT, file);
                 const absPath = path.resolve(file);
                 fileList.push([absPath, routePath]);
             }
