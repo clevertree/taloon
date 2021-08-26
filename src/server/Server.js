@@ -15,6 +15,10 @@ import MarkdownTemplate from "../client/markdown/MarkdownTemplate";
 
 export default class Server {
     constructor() {
+        this.db = null;
+        this.dbClient = null;
+        this.app = null;
+        this.appServer = null;
 
 // const BUILD_FILES = path.resolve(BUILD_INDEX, 'files');
 //         this.setupExpress();
@@ -26,9 +30,6 @@ export default class Server {
 
         const app = express();
         this.app = app;
-        this.appServer = null;
-        this.db = null;
-        this.dbClient = null;
 
         app.use(allowAccessControl);
 

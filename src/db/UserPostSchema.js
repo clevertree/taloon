@@ -108,8 +108,10 @@ export default async function UserPostSchema(db, collections) {
     /** Private Functions **/
 
     function processQuery(query) {
-        if(query._id && !(query._id instanceof ObjectId))
-            query._id = new ObjectId(query._id);
+        // if(query._id && !(query._id instanceof ObjectId))
+        //     query._id = new ObjectId(query._id);
+        // if(query.ownerID && !(query.ownerID instanceof ObjectId))
+        //     query.ownerID = new ObjectId(query.ownerID);
         return query;
     }
 

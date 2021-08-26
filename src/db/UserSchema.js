@@ -100,8 +100,8 @@ export default async function UserSchema(db, collections) {
     /** Private Function **/
 
     function processQuery(query) {
-        if(query._id && !(query._id instanceof ObjectId))
-            query._id = new ObjectId(query._id);
+        // if(query._id && !(query._id instanceof ObjectId))
+        //     query._id = new ObjectId(query._id);
         return query;
     }
 

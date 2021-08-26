@@ -12,7 +12,7 @@ import RouteManager from "./route/RouteManager";
 test('Server test', async () => {
     const server = new Server();
     const app = server.getExpressApp();
-    await server.listen();
+    // await server.listen();
     await server.connectDB();
 
     const agent = request.agent(app);
@@ -24,7 +24,7 @@ test('Server test', async () => {
     }
 
     /** Test listening **/
-    await server.stopListening();
+    // await server.stopListening();
     await server.closeDB();
 
     /** Test Routes **/

@@ -9,7 +9,7 @@ import Server from "../server/Server";
 
 test('Database test', async () => {
     const server = new Server();
-    await server.listen();
+    // await server.listen();
     await server.connectDB(process.env.REACT_APP_DB_URL, process.env.REACT_APP_DB_NAME);
     const collections = server.getCollections();
     for(const name in collections) {
@@ -19,6 +19,6 @@ test('Database test', async () => {
                 await collection['$test']();
         }
     }
-    await server.stopListening();
+    // await server.stopListening();
     await server.closeDB();
 });
