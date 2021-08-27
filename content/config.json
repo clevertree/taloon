@@ -3,6 +3,7 @@
   "PATH_FOOTER": "/site/footer.md",
 
   "PATH_USER_HOME": "/user/",
-  "PATH_LOGIN": "/user/session/login.js",
-  "PATH_LOGOUT": "/user/session/logout.js"
+  "PATH_USER_LOGIN": "/user/session/login.js",
+  "PATH_USER_LOGOUT": "/user/session/logout.js",
+  "PATH_USER_SESSION": "/user/session/index.js"
 }

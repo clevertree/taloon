@@ -331,4 +331,6 @@ body {
 .App.theme-default form .validation-container.invalid > textarea {
     border-color: #F00;
     box-shadow: #F00 0 0 12px;
+    position: relative;
+    z-index: 2;
 }

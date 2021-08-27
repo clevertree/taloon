@@ -8,7 +8,6 @@ import {MongoClient} from "mongodb";
 import UserSession from "./session/UserSession";
 
 import {initiateCollections} from "../db/";
-import SessionServer from "./session/SessionServer";
 import EmailServer from "./email/EmailServer";
 import RouteManager from "./route/RouteManager";
 import MarkdownTemplate from "../client/markdown/MarkdownTemplate";
@@ -39,7 +38,7 @@ export default class Server {
         // }));
 
         // Setup Sessions
-        SessionServer.setupRoutes(app);
+        UserSession.setupRoutes(app);
 
         // Setup email server routing
         EmailServer.setupRoutes(app);

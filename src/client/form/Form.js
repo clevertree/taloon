@@ -5,8 +5,7 @@ import path from "path";
 import "./Form.css";
 
 const TIMEOUT_CHANGE = 1000;
-const TIMEOUT_AUTOFILL = 1;
-
+const TIMEOUT_AUTOFILL = 300;
 
 export default class Form extends React.Component {
 
@@ -38,7 +37,6 @@ export default class Form extends React.Component {
         AppEvents.addEventListener('session:change', this.cb.onChange);
         AppEvents.addEventListener('redirect', this.cb.onRedirect);
         this.doAuto();
-        this.cb.onChange();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -76,7 +74,7 @@ export default class Form extends React.Component {
                 onChange={this.cb.onChange}
             >
                 {this.state.message ? <div className={"message" + (this.state.status === 200 ? "" : " error")} children={this.state.message} /> : null }
-                {this.state.redirectredirectingTimeout ? <div className={"message redirecting"} children={`Redirecting in ${this.state.redirectingTimeout/1000} seconds...`} /> : null }
+                {this.state.redirectingTimeout ? <div className={"message redirecting"} children={`Redirecting in ${this.state.redirectingTimeout/1000} seconds...`} /> : null }
                 {children}
             </form>
         </FormContext.Provider>;
@@ -94,6 +92,9 @@ export default class Form extends React.Component {
                 AppEvents.emit('modal:close', 500)
             return;
         }
+        if(preview && (this.props.preview || this.props["data-preview"]) === 'off')
+            return;
+
         const baseURL = new URL(this.props.markdownPath, process.env.REACT_APP_API_ENDPOINT)+'';
         const postURL = new URL(formAction, baseURL)+'';
         const formValues = this.getFormValues();
@@ -180,11 +181,11 @@ export default class Form extends React.Component {
     }
 
 
-    async onChangeDelay(e, timeout=TIMEOUT_CHANGE) {
+    onChangeDelay(e, timeout=TIMEOUT_CHANGE) {
         clearTimeout(this.timeouts.onChange);
-        this.timeouts.onChange = setTimeout(() => {
+        this.timeouts.onChange = setTimeout(async () => {
             this.saveFormToStorage();
-            this.onSubmit(e, true)
+            await this.onSubmit(e, true)
         }, timeout);
     }
 
@@ -225,7 +226,8 @@ export default class Form extends React.Component {
     doAuto(timeout=TIMEOUT_AUTOFILL) {
         this.timeouts.autoFill = setTimeout(() => {
             this.doAutoFill(this.props.autofill || this.props["data-autofill"]);
-            this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
+            // this.doAutoSubmit(this.props.autosubmit || this.props["data-autosubmit"]);
+            this.onChangeDelay();
         }, timeout);
     }
 
@@ -296,7 +298,9 @@ export default class Form extends React.Component {
         const action = form.getAttribute('action');
         if(!action)
             return null;
-        const markdownDir = path.dirname(this.props.markdownPath);
+        let markdownDir = this.props.markdownPath;
+        if(!markdownDir.endsWith('/'))
+            markdownDir = path.dirname(markdownDir);
         if(!markdownDir)
             throw new Error("Invalid Markdown directory: " + this.props.markdownPath);
         return path.resolve(markdownDir, action)

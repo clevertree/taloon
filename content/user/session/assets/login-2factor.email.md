@@ -1,7 +1,7 @@
 We detected a login attempt on email account.
 If you are trying to log in, please use this code to confirm it's you:
 
-# ${code}
+# ${code2Factor}
 
 Also, you can click on this link:
 

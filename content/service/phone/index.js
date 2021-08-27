@@ -3,7 +3,7 @@ export default async function ServicePhoneIndex(req, res, server) {
     const PATH_BASE = server.getRelativeContentPath(__dirname);
     const PATH_ASSETS = `${PATH_BASE}/assets`;
     // const userSession = server.getUserSession(req.session);
-    const {User: userCollection, UserPost: userPostCollection} = server.getCollections();
+    const {UserPost: userPostCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
@@ -34,7 +34,7 @@ export default async function ServicePhoneIndex(req, res, server) {
 /** Process Search Results into HTML **/
 // TODO: send <results>JSON</results>
 export function processResults(userFileDocs) {
-    return `<searchResults>${JSON.stringify(userFileDocs)}</searchResults>`;
+    return `<results>${JSON.stringify(userFileDocs)}</results>`;
 //     return `
 // <table>
 //   <thead>

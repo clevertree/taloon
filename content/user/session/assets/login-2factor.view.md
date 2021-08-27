@@ -2,7 +2,7 @@
 
 Please check your email for a 2-factor authorization code and type it in the form below to start your session.
 
-<form action="login.js" autosubmit autofill autosave="off">
+<form action="login.js" autofill autosave="off">
 <input type="hidden" name="service" value="email-2factor-response">
 <fieldset>
     <legend>Your Email</legend>

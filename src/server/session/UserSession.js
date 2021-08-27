@@ -1,6 +1,5 @@
-import EmailServer from "../email/EmailServer";
 import crypto from 'crypto';
-import ContentUtil from "../../util/ContentUtil";
+import cookieSession from "cookie-session";
 
 const active2FactorLogins = {};
 
@@ -44,64 +43,35 @@ export default class UserSession {
     // }
 
 
-
-    async processSend2FactorEmailRequest(req, pathLogin, path2FactorEmail) {
-        const values = Object.assign({}, req.body);
-        if(!req.body.email)
-            throw new Error("Invalid email");
-        const email = values.email;
+    generate2FactorCode(email) {
         const code2Factor = crypto.randomInt(1000,9999);
-
-        values.remoteAddress = req.headers['x-forwarded-for'] ||
-            req.socket.remoteAddress ||
-            null;
-        values.host = req.headers.origin || process.env.REACT_APP_ORIGIN;
-        values.codeUrl = new URL(
-            `${pathLogin}?service=email-2factor-response&email=${email}&code=${code2Factor}`,
-            values.host);
-        values.loginUrl = new URL(
-            `${pathLogin}?email=${email}`,
-            values.host);
-
         // Add 2 Factor
         active2FactorLogins[email] = code2Factor;
         if(process.env.REACT_APP_2FACTOR_TIMEOUT)
             setTimeout(() => delete active2FactorLogins[email], process.env.REACT_APP_2FACTOR_TIMEOUT);
-
-        values.code = code2Factor;
-        values.sessionDetails =
-`Date: ${new Date().toLocaleString()}
-Email: ${values.email}
-IP Address: ${values.remoteAddress || 'N/A'}
-Browser: ${req.headers["user-agent"] || 'N/A'}
-Ref: ${req.headers.referrer || 'N/A'}
-`
-
-        await EmailServer.sendMarkdownTemplateEmail(
-            email,
-            'Use this code to log in',
-            path2FactorEmail,
-            values)
-
-        return {email, code2Factor};
+        return code2Factor;
     }
 
-
-    async processLoginWith2FactorRequest(req) {
-        const code2Factor = Number.parseInt(req.body.code);
-        const email = req.body.email;
+    loginWith2FactorCode(req, email, code2Factor) {
         if(active2FactorLogins[email] !== code2Factor)
             throw new Error("Invalid 2-Factor Code");
 
         delete active2FactorLogins[email];
+        this.login(req, email);
+    }
 
 
-        // Reset session
-        this.session = req.session = {
-            email
-        };
+    static setupRoutes(app) {
+        this.app = app;
 
-        return await this.getOrCreateUser();
+        app.set('trust proxy', 1) // trust first proxy
+
+        app.use(cookieSession({
+            name: process.env.REACT_APP_SESSION_COOKIE, // cookie name dictates the key name added to the request object
+            keys: process.env.REACT_APP_SESSION_KEYS.split(/[,;]+/g), // should be a large unguessable string
+        }));
+
+        // app.post('/session', this.handleSessionRequest)
     }
 
 }
