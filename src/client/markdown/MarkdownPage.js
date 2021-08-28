@@ -40,21 +40,24 @@ export default class MarkdownPage extends React.Component {
         // this.formCount = 0;
         this.devRefreshIntervalID = null
         this.devRefreshIntervalAmount = props.refreshInterval || 5000;
-        // console.log('props', props);
+        this.mounted = false;
     }
 
     componentDidMount() {
+        this.mounted = true;
         this.fetchSrc().then();
     }
 
     componentWillUnmount() {
-        clearInterval(this.devRefreshIntervalID);
+        this.mounted = false;
+        clearTimeout(this.devRefreshIntervalID);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.src !== prevProps.src)
             this.fetchSrc().then();
     }
+
 
     async fetchSrc(options={
         cache: "force-cache",
@@ -64,8 +67,10 @@ export default class MarkdownPage extends React.Component {
     }) {
         const contentURL = new URL(this.props.src, process.env.REACT_APP_API_ENDPOINT).toString();
 
+        if(!this.mounted) return;
         this.setState({loading: true});
         const response = await fetch(contentURL, options);
+        if(!this.mounted) return;
         this.setState({loading: false});
         const responseType = response.headers.get('content-type');
         // console.log("response: ", response, response.headers, responseType);
@@ -77,6 +82,7 @@ export default class MarkdownPage extends React.Component {
         // if(response.headers.get('content-path'))
         //     newState.contentPath = response.headers.get('content-path');
         // content = replaceStringParameters(content, replaceParams);
+        if(!this.mounted) return;
         this.setState(newState);
 
         if (process.env.NODE_ENV === 'development') {

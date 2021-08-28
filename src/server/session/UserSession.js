@@ -26,12 +26,13 @@ export default class UserSession {
 
     /** Session Status **/
 
-    login(req, email) {
-        console.log('Logging In ', email);
+    async login(req, email) {
         req.session = {
             email,
         };
         this.session = req.session;
+        const user = await this.getOrCreateUser();
+        console.log('Logged In: ', user.getEmail());
     }
 
     logout(req) {
@@ -52,12 +53,12 @@ export default class UserSession {
         return code2Factor;
     }
 
-    loginWith2FactorCode(req, email, code2Factor) {
+    async loginWith2FactorCode(req, email, code2Factor) {
         if(active2FactorLogins[email] !== code2Factor)
             throw new Error("Invalid 2-Factor Code");
 
         delete active2FactorLogins[email];
-        this.login(req, email);
+        await this.login(req, email);
     }
 
 
