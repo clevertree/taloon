@@ -5,7 +5,6 @@ import MarkdownPage from "./client/markdown/MarkdownPage";
 import MarkdownModal from "./client/modal/MarkdownModal";
 
 import AppEvents from "./client/event/AppEvents";
-import ContentUtil from "./util/ContentUtil";
 
 import 'typeface-open-sans/index.css'
 import './client/menu/style/Menu.css';
@@ -20,7 +19,6 @@ class App extends Component {
             title: "The Traveling Merchant",
             pathname: document.location.pathname + document.location.search,
             activeModal: null,
-            siteConfig: {}
         };
 
         this.ref = {
@@ -39,8 +37,6 @@ class App extends Component {
             showModal: (path) => this.showModal(path),
             closeModal: (timeout) => this.closeModal(timeout)
         };
-        ContentUtil.fetchDefaultConfig()
-            .then(siteConfig => this.setState({siteConfig}));
     }
 
     componentDidMount() {
@@ -49,7 +45,6 @@ class App extends Component {
         AppEvents.addEventListener('modal:show', this.cb.showModal);
         AppEvents.addEventListener('redirect', this.cb.handleRedirect);
         // AppEvents.addEventListener('modal:close', this.cb.closeModal)
-        // this.loadSiteConfig();
     }
     componentWillUnmount() {
         document.removeEventListener('click', this.cb.handleClick);
@@ -77,7 +72,7 @@ class App extends Component {
 
 
     renderHeader() {
-        let src = this.state.siteConfig.PATH_HEADER || `/site/header.md`;
+        let src = process.env.REACT_APP_PATH_HEADER;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
@@ -86,7 +81,7 @@ class App extends Component {
     }
 
     renderFooter() {
-        let src = this.state.siteConfig.PATH_FOOTER || `/site/footer.md`;
+        let src = process.env.REACT_APP_PATH_FOOTER;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}
@@ -168,7 +163,7 @@ class App extends Component {
                 // Allow navigation
                 // } else if(url.hash
             } else {
-                let pathname = url.pathname;
+                let pathname = url.pathname + url.search + url.hash;
                 if(pathname.substr(-1, 1) !== '/'
                     && pathname.split('/').pop().indexOf('.') === -1)
                     pathname += '/'

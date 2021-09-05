@@ -1,0 +1,15 @@
+table.search-results {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+table.search-results td,
+table.search-results th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+table.search-results th {
+    background-color: #6a737d;
+}

@@ -1,5 +1,3 @@
-const {PATH_USER_HOME, PATH_USER_LOGOUT} = require('../../config.json');
-
 module.exports = async function LogOutAction(req, res, server) {
     const PATH_BASE = server.getRelativeContentPath(__dirname);
     const PATH_ASSETS = `${PATH_BASE}/assets`;
@@ -32,7 +30,7 @@ module.exports = async function LogOutAction(req, res, server) {
         userClient.logout(req)
 
         response.message = "You have been logged out. This modal will close automatically.";
-        events.push(['modal:show', `${PATH_USER_LOGOUT}?view=logout-success`]);
+        events.push(['modal:show', `${process.env.REACT_APP_PATH_USER_LOGOUT}?view=logout-success`]);
         events.push(['modal:close', 4000]);
         events.push(['session:change']);
         res.send(response);

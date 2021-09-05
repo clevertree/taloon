@@ -1,4 +1,3 @@
-import SiteConfig from "../../config.json";
 import {CONTENT_LABEL} from "./phone.config.json";
 
 export default async function ServicePhonePost(req, res, server) {
@@ -71,12 +70,17 @@ export default async function ServicePhonePost(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
+    const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
     /** Test Login POST Request **/
-    const {PATH_USER_LOGIN} = SiteConfig;
     const email = 'test@wut.ohok';
-    const title = 'Test Post';
+    const title = '$ Unit Test Post';
+
+    // Delete existing user posts
+    // const user = await userCollection.getUser({email});
+    userPostCollection.deleteUserPosts({title})
+
     let res = await agent
-        .post(PATH_USER_LOGIN)
+        .post(process.env.REACT_APP_PATH_USER_LOGIN)
         .send({service: 'email', email})
         .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
@@ -87,7 +91,7 @@ export async function $test(agent, server, routePath) {
 
     /** Test Login 2Factor POST Request **/
     res = await agent
-        .post(PATH_USER_LOGIN)
+        .post(process.env.REACT_APP_PATH_USER_LOGIN)
         .send({service: 'email-2factor-response', code: code2Factor, email})
         .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
@@ -103,10 +107,6 @@ export async function $test(agent, server, routePath) {
         .expect(200)
         .expect('Content-Type', /markdown/)
 
-    // Delete existing user posts
-    const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
-    const user = await userCollection.getUser({email});
-    userPostCollection.deleteUserPosts({ownerID: user.getID()})
 
     /** Test POST Request **/
     res = await agent

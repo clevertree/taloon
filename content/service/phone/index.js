@@ -32,27 +32,26 @@ export default async function ServicePhoneIndex(req, res, server) {
 }
 
 /** Process Search Results into HTML **/
-// TODO: send <results>JSON</results>
 export function processResults(userFileDocs) {
-    return `<results>${JSON.stringify(userFileDocs)}</results>`;
-//     return `
-// <table>
-//   <thead>
-//     <tr>
-//       <th>Title</th>
-//       <th>Location</th>
-//     </tr>
-//   </thead>
-//   <tbody>${userFileDocs.map(userFileDoc => `
-//     <tr>
-//       <td>${userFileDoc.getTitle()}</td>
-//       <td>${userFileDoc.getLocation()}</td>
-//     </tr>`
-//     ).join('')}
-//   </tbody>
-// </table>
-// `
+    return `
+<table class="search-results">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Owner</th>
+    </tr>
+  </thead>
+  <tbody>${userFileDocs.map(userFileDoc => `
+    <tr>
+      <td><a href="request.js?_id=${userFileDoc.getID()}">${userFileDoc.getTitle()}</a></td>
+      <td><a href="${process.env.REACT_APP_PATH_USER_HOME}?_id=${userFileDoc.getOwnerID()}">${userFileDoc.getOwner().getTitle()}</a></td>
+    </tr>`
+    ).join('')}
+  </tbody>
+</table>
+`
 }
+
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {

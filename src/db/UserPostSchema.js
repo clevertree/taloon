@@ -47,19 +47,20 @@ export default async function UserPostSchema(db, collections) {
     await collection.createIndex({ownerID: 1, title: 1}, {unique: true});
 
     /** Helper methods **/
-    collection.queryUserPosts = async function (query) {
-        const cursor = collection.find(processQuery(query));
+    collection.queryUserPosts = async function (query, limit=20) {
+        // const cursor = collection.find(processQuery(query));
+        const cursor = collection.aggregate(processSearch(query, limit))
         const docList = await cursor.toArray();
         return docList.map(processDoc);
     };
     collection.getUserPost = async function (query, throwException = true) {
-        const doc = await collection.findOne(processQuery(query));
-        if (!doc) {
+        const docList = await collection.queryUserPosts(query, 1);
+        if (docList.length === 0) {
             if(throwException)
                 throw new Error(`${CLN_NAME} not found ${JSON.stringify(query)}`);
             return null;
         }
-        return processDoc(doc);
+        return docList[0];
     };
     collection.existsUserPosts = async function (query) {
         return await collection.find(processQuery(query)).limit(1).count() > 0;
@@ -93,30 +94,57 @@ export default async function UserPostSchema(db, collections) {
     const ContentDocPrototype = {
         getID: function() { return this._id; },
         // getEmail: function() { return this.email; },
-        getOwnerID: function() { return this.ownerID+''; },
+        getTitle: function() { return this.title; },
+        getOwner: function() { return this.owner; },
+        getOwnerID: function() { return this.ownerID; },
         getContent: function() { return this.content; },
         getLocation: function() {
             if(!this.data.location)
                 return null;
             return new GeoLocation(...this.location.coordinates);
         },
-        getTitle: function() { return this.data.title; },
-
     }
+    collection.DocumentPrototype = ContentDocPrototype;
 
 
     /** Private Functions **/
 
     function processQuery(query) {
-        // if(query._id && !(query._id instanceof ObjectId))
-        //     query._id = new ObjectId(query._id);
-        // if(query.ownerID && !(query.ownerID instanceof ObjectId))
-        //     query.ownerID = new ObjectId(query.ownerID);
-        return query;
+        const newQuery = Object.assign({}, query);
+        Object.keys(newQuery).forEach(key => newQuery[key] === undefined && delete newQuery[key])
+        if(newQuery._id && !(newQuery._id instanceof ObjectId))
+            newQuery._id = new ObjectId(newQuery._id);
+        if(query.ownerID && !(query.ownerID instanceof ObjectId))
+            query.ownerID = new ObjectId(query.ownerID);
+        return newQuery;
+    }
+
+    function processSearch(query, limit=20) {
+        const newQuery = processQuery(query);
+        return [
+            { "$match": newQuery},
+            // { "$sort": { "date": -1 } },
+            { "$limit": limit },
+            { "$lookup": {
+                    "localField": "ownerID",
+                    "from": "User",
+                    "foreignField": "_id",
+                    "as": "owner"
+                } },
+            { "$unwind": "$owner" },
+            // { "$project": {
+            //         "text": 1,
+            //         "date": 1,
+            //         "userinfo.name": 1,
+            //         "userinfo.country": 1
+            //     } }
+        ]
     }
 
     function processDoc(doc) {
         Object.setPrototypeOf(doc, ContentDocPrototype);
+        if(doc.owner)
+            Object.setPrototypeOf(doc.owner, collections.User.DocumentPrototype)
         return doc;
     }
 
@@ -146,14 +174,17 @@ export default async function UserPostSchema(db, collections) {
     collection['$test'] = async function () {
         const {User: userCollection} = collections;
         const email = 'test@wut.com';
+        const title = 'Unit Test Title';
+        const content = 'Unit Test Content';
         if(!(await userCollection.existsUsers({email})))
             await userCollection.createUser('test@wut.com');
         const testUser = await userCollection.getUser({email})
 
-        let content = await collection.createUserPost(testUser.getID(), 'test content', 'test content', 'test', [90, -100]);
+        await collection.deleteUserPosts({title})
+        let contentDoc = await collection.createUserPost(testUser.getID(), title, content, 'test', [90, -100]);
         let results = await collection.queryUserPosts({labels: 'test'});
         expect(results.length).toBeGreaterThanOrEqual(1);
-        let deleteCount = await collection.deleteUserPosts({_id:content.getID()})
+        let deleteCount = await collection.deleteUserPosts({_id:contentDoc.getID()})
         expect(deleteCount).toBe(1);
         deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
         expect(deleteCount).toBe(1);

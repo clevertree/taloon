@@ -32,8 +32,7 @@ export default class SessionButton extends React.Component {
     }
 
     async updateSession() {
-        const {PATH_USER_SESSION} = await SiteConfig.fetchDefaultConfig()
-        const postURL = new URL(PATH_USER_SESSION, process.env.REACT_APP_API_ENDPOINT).toString();
+        const postURL = new URL(process.env.REACT_APP_PATH_USER_SESSION, process.env.REACT_APP_API_ENDPOINT).toString();
         const response = await fetch(postURL + '', {
             credentials: "include",
             method: 'post',
@@ -73,14 +72,12 @@ export default class SessionButton extends React.Component {
     }
 
     async showLoginModal(e) {
-        const {PATH_USER_LOGIN} = await ContentUtil.fetchDefaultConfig();
         e.preventDefault();
-        AppEvents.emit('modal:show', PATH_USER_LOGIN);
+        AppEvents.emit('modal:show', process.env.REACT_APP_PATH_USER_LOGIN);
     }
     async showLogoutModal(e) {
-        const {PATH_USER_LOGOUT} = await ContentUtil.fetchDefaultConfig();
         e.preventDefault();
-        AppEvents.emit('modal:show', PATH_USER_LOGOUT);
+        AppEvents.emit('modal:show', process.env.REACT_APP_PATH_USER_LOGOUT);
     }
 
 }

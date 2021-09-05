@@ -25,8 +25,10 @@ reportWebVitals();
 // Learn more about service workers: https://cra.link/PWA
 serviceWorkerRegistration.register();
 
+const REACT_APP_PATH_MANIFEST='manifest.json'
+
 // Check for version upgrade
-const manifestURL = new URL(process.env.REACT_APP_PATH_MANIFEST, document.location.origin).toString();
+const manifestURL = new URL(REACT_APP_PATH_MANIFEST, document.location.origin).toString();
 fetch(manifestURL)
     .then(response => response.json())
     .then(manifestJSON => {

@@ -1,5 +1,5 @@
-import {ObjectId} from "mongodb";
 import MarkdownTemplate from "../client/markdown/MarkdownTemplate";
+import {ObjectId} from "mongodb";
 
 export default async function UserSchema(db, collections) {
     const CLN_NAME = 'User';
@@ -37,6 +37,9 @@ export default async function UserSchema(db, collections) {
         const docList = await cursor.toArray();
         return docList.map(processDoc);
     };
+    collection.getUserByID = async function (_id, throwException=true) {
+        return await collection.getUser({_id}, throwException);
+    };
     collection.getUser = async function (query, throwException=true) {
         const doc = await collection.findOne(processQuery(query));
         if (!doc) {
@@ -70,6 +73,7 @@ export default async function UserSchema(db, collections) {
     const UserDocPrototype = {
         getID: function() { return this._id; },
         getEmail: function() { return this.email; },
+        getTitle: function() { return this.title || this.email.split('@')[0]; },
 
         /** User Content Methods **/
 
@@ -95,13 +99,14 @@ export default async function UserSchema(db, collections) {
             return await this.createUserPost(title, markdownContent, labels, location);
         }
     }
+    collection.DocumentPrototype = UserDocPrototype;
 
 
     /** Private Function **/
 
     function processQuery(query) {
-        // if(query._id && !(query._id instanceof ObjectId))
-        //     query._id = new ObjectId(query._id);
+        if(query._id && !(query._id instanceof ObjectId))
+            query._id = new ObjectId(query._id);
         return query;
     }
 

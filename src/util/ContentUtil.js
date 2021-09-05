@@ -2,13 +2,7 @@ import {promises as fsp} from "fs";
 import path from "path";
 import EnvironmentUtil from "./EnvironmentUtil";
 
-let defaultConfig = null;
 export default class ContentUtil {
-    static async fetchDefaultConfig() {
-        if(!defaultConfig)
-            defaultConfig = await this.fetchJSONFile(process.env.REACT_APP_PATH_CONTENT_CONFIG)
-        return defaultConfig;
-    }
     static async fetchJSONFile(contentFilePath) {
         const content = await this.fetchTextFile(contentFilePath);
         return JSON.parse(content);

@@ -1,5 +1,5 @@
 
-const {REQUEST_URL} = require('./phone.config.json')
+const {CONTENT_LABEL} = require('./phone.config.json')
 
 export default async function ServicePhoneRequest(req, res, server) {
     const PATH_ASSETS = server.getRelativeContentPath(__dirname) + '/assets';
@@ -12,17 +12,13 @@ export default async function ServicePhoneRequest(req, res, server) {
         case 'get':
             res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
-            if(req.query._id) {
-                const contentDoc = await userPostCollection.getUserPost(req.query, REQUEST_URL);
-                res.send(contentDoc.getContent());
-            } else {
-                // const contentDocs = await userContentCollection.queryUserFiles({actions: REQUEST_URL});
-                // res.send('found ' + contentDocs.length);
-
-                const markdownPage = server.getContentFile(`${PATH_ASSETS}/index.view.md`);
-                res.send(markdownPage);
-                break;
-            }
+            if(!req.query._id)
+                throw new Error("Invalid Request ID");
+            const contentDoc = await userPostCollection.getUserPost({...req.query, labels: CONTENT_LABEL});
+            const content = await server.getContentFile(`${PATH_ASSETS}/request.view.md`, {}, {
+                content: contentDoc.getContent()
+            });
+            res.send(content);
             break;
 
         case 'post':
@@ -57,23 +53,23 @@ export default async function ServicePhoneRequest(req, res, server) {
 export async function $test(agent, server, routePath) {
 
     /** Test GET Request **/
-    await agent
-        .get(routePath)
-        .expect(200)
-        .expect('Content-Type', /markdown/)
+    // await agent
+    //     .get(routePath)
+    //     .expect(200)
+    //     .expect('Content-Type', /markdown/)
 
     /** Test POST Request **/
-    await agent
-        .post(routePath)
-        .send({title: 'Test Request'})
-        .set('Accept', 'application/json')
-        .set('Form-Preview', 'false')
-        .expect(isJSONError)
-        .expect(200)
-        .expect('Content-Type', /json/)
-
-    function isJSONError(res) {
-        if(!res.type.includes('json') || res.status !== 200)
-            throw new Error(res.text);
-    }
+    // await agent
+    //     .post(routePath)
+    //     .send({title: 'Test Request'})
+    //     .set('Accept', 'application/json')
+    //     .set('Form-Preview', 'false')
+    //     .expect(isJSONError)
+    //     .expect(200)
+    //     .expect('Content-Type', /json/)
+    //
+    // function isJSONError(res) {
+    //     if(!res.type.includes('json') || res.status !== 200)
+    //         throw new Error(res.text);
+    // }
 }

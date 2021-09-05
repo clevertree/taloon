@@ -10,7 +10,7 @@ import FieldSet from "../form/FieldSet";
 import SessionButton from "../session/SessionButton";
 import LocationButton from "../location/LocationButton";
 import Form from "../form/Form";
-import SearchResults from "../search/SearchResults";
+import Table from "../table/Table";
 
 
 // noinspection HtmlRequiredAltAttribute
@@ -134,8 +134,9 @@ export default class MarkdownPage extends React.Component {
             case 'input':       return <Input {...props} />
             case 'textarea':    return <TextArea {...props} />
             case 'select':      return <Select {...props} children={children}/>
+            case 'table':       return <Table {...props} children={children}/>
 
-            case 'results': return <SearchResults {...props} children={children}/>
+            // case 'results': return <SearchResults {...props} children={children}/>
 
             case 'session':     return <SessionButton {...props} />
             case 'location':    return <LocationButton {...props} />

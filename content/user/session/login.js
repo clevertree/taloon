@@ -1,6 +1,5 @@
 import EmailServer from "../../../src/server/email/EmailServer";
 
-const {PATH_USER_LOGIN} = require('../../config.json');
 
 export default async function UserSessionLogIn(req, res, server) {
     const PATH_BASE = server.getRelativeContentPath(__dirname);
@@ -62,8 +61,8 @@ export default async function UserSessionLogIn(req, res, server) {
                         host: req.headers.origin || process.env.REACT_APP_ORIGIN,
                     };
 
-                    values.codeUrl = new URL(`${PATH_USER_LOGIN}?service=email-2factor-response&email=${email}&code=${code2Factor}`, values.host);
-                    values.loginUrl = new URL(`${PATH_USER_LOGIN}?email=${email}`, values.host);
+                    values.codeUrl = new URL(`${process.env.REACT_APP_PATH_USER_LOGIN}?service=email-2factor-response&email=${email}&code=${code2Factor}`, values.host);
+                    values.loginUrl = new URL(`${process.env.REACT_APP_PATH_USER_LOGIN}?email=${email}`, values.host);
                     values.sessionDetails
                         = `Date: ${new Date().toLocaleString()}`
                         + `Email: ${values.email}`
@@ -83,8 +82,8 @@ export default async function UserSessionLogIn(req, res, server) {
                     let storeFormValues = {email};
 
                     response.message = "A 2-Factor code sent to your email address. Please use it to log in";
-                    events.push(['form:save', PATH_USER_LOGIN, storeFormValues]);
-                    events.push(['modal:show', `${PATH_USER_LOGIN}?view=login-2factor`]);
+                    events.push(['form:save', process.env.REACT_APP_PATH_USER_LOGIN, storeFormValues]);
+                    events.push(['modal:show', `${process.env.REACT_APP_PATH_USER_LOGIN}?view=login-2factor`]);
                     if(['test', 'development'].includes(process.env.NODE_ENV)) {
                         storeFormValues.code = code2Factor;
                         response.code2Factor = code2Factor;
@@ -118,7 +117,7 @@ export default async function UserSessionLogIn(req, res, server) {
 
                 response.message = "You are now logged in. This modal will close automatically.";
                 // events.push(['redirect', PATH_USER_HOME, 5000]);
-                events.push(['modal:show', `${PATH_USER_LOGIN}?view=login-success`]);
+                events.push(['modal:show', `${process.env.REACT_APP_PATH_USER_LOGIN}?view=login-success`]);
                 events.push(['modal:close', 4000]);
                 events.push(['session:change']);
             }
