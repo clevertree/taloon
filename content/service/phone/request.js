@@ -51,25 +51,34 @@ export default async function ServicePhoneRequest(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
+    const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
+    const title = '$ Unit Test Post';
+    const content = '$ Unit Test Content';
+    const email = 'test@wut.com';
+    const testUser = await userCollection.createUser(email);
+    const userPost = await userPostCollection.createUserPost(testUser.getID(), title, content, CONTENT_LABEL);
 
     /** Test GET Request **/
-    // await agent
-    //     .get(routePath)
-    //     .expect(200)
-    //     .expect('Content-Type', /markdown/)
+    await agent
+        .get(routePath + '?_id=' + userPost.getID())
+        .expect(200)
+        .expect('Content-Type', /markdown/)
 
     /** Test POST Request **/
-    // await agent
-    //     .post(routePath)
-    //     .send({title: 'Test Request'})
-    //     .set('Accept', 'application/json')
-    //     .set('Form-Preview', 'false')
-    //     .expect(isJSONError)
-    //     .expect(200)
-    //     .expect('Content-Type', /json/)
-    //
-    // function isJSONError(res) {
-    //     if(!res.type.includes('json') || res.status !== 200)
-    //         throw new Error(res.text);
-    // }
+    await agent
+        .post(routePath)
+        .send({title: 'Test Request'})
+        .set('Accept', 'application/json')
+        .set('Form-Preview', 'false')
+        .expect(isJSONError)
+        .expect(200)
+        .expect('Content-Type', /json/)
+
+    function isJSONError(res) {
+        if(!res.type.includes('json') || res.status !== 200)
+            throw new Error(res.text);
+    }
+
+    /** Clean up **/
+    await testUser.delete();
 }

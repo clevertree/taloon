@@ -70,14 +70,13 @@ export default async function ServicePhonePost(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
-    const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
+    // const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
     /** Test Login POST Request **/
     const email = 'test@wut.ohok';
     const title = '$ Unit Test Post';
 
     // Delete existing user posts
     // const user = await userCollection.getUser({email});
-    userPostCollection.deleteUserPosts({title})
 
     let res = await agent
         .post(process.env.REACT_APP_PATH_USER_LOGIN)
@@ -118,7 +117,7 @@ export async function $test(agent, server, routePath) {
         .expect(200)
         .expect('Content-Type', /json/)
 
-    res = await agent
+    res = await agent // Test duplicate error
         .post(routePath)
         .send({title})
         .set('Accept', 'application/json')

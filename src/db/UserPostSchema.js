@@ -66,6 +66,9 @@ export default async function UserPostSchema(db, collections) {
         return await collection.find(processQuery(query)).limit(1).count() > 0;
     };
     collection.createUserPost = async function (ownerID, title, content, labels=null, location=null) {
+        const {User: userCollection} = collections;
+        await userCollection.getUserByID(ownerID);
+
         let newDoc = {
             ownerID,
             title,

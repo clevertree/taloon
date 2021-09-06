@@ -8,12 +8,17 @@
 import Server from "./Server";
 import request from "supertest";
 import RouteManager from "./route/RouteManager";
+import {MongoClient} from "mongodb";
 
 test('Server test', async () => {
     const server = new Server();
     const app = server.getExpressApp();
     // await server.listen();
-    await server.connectDB();
+    const dbName = process.env.REACT_APP_DB_NAME + '_server_test';
+    const dbURL = process.env.REACT_APP_DB_URL;
+    let dbClient = await MongoClient.connect(dbURL);
+    await dbClient.db(dbName).dropDatabase();
+    await server.connectDB(dbURL, dbName);
 
     const agent = request.agent(app);
     const fileList = RouteManager.getRouteFileList();
@@ -29,5 +34,8 @@ test('Server test', async () => {
 
     /** Test Routes **/
 
+    /** Clean up **/
+    await dbClient.db(dbName).dropDatabase();
+    await dbClient.close();
 
 });

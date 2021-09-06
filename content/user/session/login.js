@@ -127,3 +127,39 @@ export default async function UserSessionLogIn(req, res, server) {
 
 }
 
+
+/** Unit Tests **/
+export async function $test(agent, server, routePath) {
+    // const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
+    /** Test Login POST Request **/
+    const email = 'test@wut.ohok';
+
+    // Delete existing user posts
+    // const user = await userCollection.getUser({email});
+
+    let res = await agent
+        .post(process.env.REACT_APP_PATH_USER_LOGIN)
+        .send({service: 'email', email})
+        .set('Accept', 'application/json')
+        .set('Form-Preview', 'false')
+        .expect(isJSONError)
+        .expect(200)
+        .expect('Content-Type', /json/)
+    const {code2Factor} = res.body;
+
+    /** Test Login 2Factor POST Request **/
+    res = await agent
+        .post(process.env.REACT_APP_PATH_USER_LOGIN)
+        .send({service: 'email-2factor-response', code: code2Factor, email})
+        .set('Accept', 'application/json')
+        .set('Form-Preview', 'false')
+        .expect(isJSONError)
+        .expect(200)
+        .expect('Content-Type', /json/)
+
+
+    function isJSONError(res) {
+        if(!res.type.includes('json') || res.status !== 200)
+            throw new Error(`${routePath}: ${res.text}`);
+    }
+}

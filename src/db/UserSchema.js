@@ -97,6 +97,10 @@ export default async function UserSchema(db, collections) {
 
             // Write file
             return await this.createUserPost(title, markdownContent, labels, location);
+        },
+
+        delete: async function() {
+            return await collection.deleteUsers({_id: this._id});
         }
     }
     collection.DocumentPrototype = UserDocPrototype;
