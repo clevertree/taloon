@@ -1,11 +1,9 @@
 import UserSchema from "./UserSchema";
-import UserPostSchema from "./UserPostSchema";
-import UserImageSchema from "./UserImageSchema";
+import UserFileSchema from "./UserFileSchema";
 
 export async function initiateCollections(db) {
     const collections = {};
     collections.User = await UserSchema(db, collections);
-    collections.UserPost = await UserPostSchema(db, collections);
-    collections.UserImage = await UserImageSchema(db, collections);
+    collections.UserFile = await UserFileSchema(db, collections);
     return collections;
 }

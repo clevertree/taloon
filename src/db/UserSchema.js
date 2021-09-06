@@ -77,26 +77,26 @@ export default async function UserSchema(db, collections) {
 
         /** User Content Methods **/
 
-        hasFile: async function(title) {
-            const {UserPost:userPostSchema} = collections;
-            return await userPostSchema.existsUserPosts({
+        hasFile: async function(filename) {
+            const {UserFile:userFileSchema} = collections;
+            return await userFileSchema.existsUserFiles({
                 ownerID: this._id,
-                title
+                filename
             }, false);
         },
 
-        createUserPost: async function(title, content, labels=null, location=null) {
-            const {UserPost:userPostSchema} = collections;
-            return userPostSchema.createUserPost(this._id, title, content, labels, location);
+        createFile: async function(filename, stream=null, metadata={}) {
+            const {UserFile:userFileSchema} = collections;
+            return await userFileSchema.createUserFile(this._id, filename, stream, metadata);
         },
 
 
-        createFileFromTemplate: async function(markdownPath, title, values, labels=null, location=null) {
+        createFileFromTemplate: async function(markdownPath, filename, values, metadata= {}) {
             const template = new MarkdownTemplate(markdownPath);
             let markdownContent = await template.generate(values);
 
             // Write file
-            return await this.createUserPost(title, markdownContent, labels, location);
+            return await this.createFile(filename, markdownContent, metadata);
         },
 
         delete: async function() {

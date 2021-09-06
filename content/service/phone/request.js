@@ -5,19 +5,19 @@ export default async function ServicePhoneRequest(req, res, server) {
     const PATH_ASSETS = server.getRelativeContentPath(__dirname) + '/assets';
 
     // const userSession = server.getUserSession(req.session);
-    const {UserPost:userPostCollection} = server.getCollections();
+    const {UserFile:userFileCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
-            res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
             let content;
             try {
                 if (!req.query._id)
                     throw new Error("Invalid Request ID");
-                const contentDoc = await userPostCollection.getUserPost({...req.query, labels: CONTENT_LABEL});
-                content = contentDoc.getContent();
+                const fileDoc = await userFileCollection.getUserFile({...req.query, labels: CONTENT_LABEL});
+                // res.setHeader('Content-Type', fileDoc.getContentType());
+                content = fileDoc.renderHTMLTag();
             } catch (e) {
                 content = `<error>${e}</error>`;
             }
@@ -55,16 +55,20 @@ export default async function ServicePhoneRequest(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
-    const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
-    const title = '$ Unit Test Post';
-    const content = '$ Unit Test Content';
+    const {User:userCollection, UserFile: userFileCollection} = server.getCollections();
+    const filename = 'test/unit-test.md';
+    const title = 'Unit Test File';
+    const content = '# Unit Test Content';
     const email = 'test@wut.com';
     const testUser = await userCollection.createUser(email);
-    const userPost = await userPostCollection.createUserPost(testUser.getID(), title, content, CONTENT_LABEL);
+    const userFile = await testUser.createFile(filename, content, {
+        title,
+        labels: CONTENT_LABEL
+    });
 
     /** Test GET Request **/
     await agent
-        .get(routePath + '?_id=' + userPost.getID())
+        .get(routePath + '?_id=' + userFile.getID())
         .expect(200)
         .expect('Content-Type', /markdown/)
 

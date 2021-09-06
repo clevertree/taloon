@@ -3,14 +3,14 @@ export default async function ServicePhoneIndex(req, res, server) {
     const PATH_BASE = server.getRelativeContentPath(__dirname);
     const PATH_ASSETS = `${PATH_BASE}/assets`;
     // const userSession = server.getUserSession(req.session);
-    const {UserPost: userPostCollection} = server.getCollections();
+    const {UserFile: userFileCollection} = server.getCollections();
 
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
             const {title, location, distance} = req.body;
             const searchValues = {title, location, distance, labels: CONTENT_LABEL};
-            const userFileDocs = await userPostCollection.queryUserPosts(searchValues);
+            const userFileDocs = await userFileCollection.queryUserFiles(searchValues);
             // TODO: partial text & location searches
 
             const safeValues = {

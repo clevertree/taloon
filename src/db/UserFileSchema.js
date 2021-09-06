@@ -1,41 +1,31 @@
 import {GridFSBucket, ObjectId} from "mongodb";
 import fs from "fs";
+import {Readable} from "stream";
 import {createTestUser} from "./UserSchema";
 
-export default async function UserImageSchema(db, collections) {
-    const CLN_NAME = 'UserImage';
+export default async function UserFileSchema(db, collections) {
+    const CLN_NAME = 'UserFile';
     // const collectionExists = (await db.listCollections().toArray()).map(c => c.name).includes(CLN_NAME);
     // let collection = collectionExists ? db.collection(CLN_NAME) : await db.createCollection(CLN_NAME);
-    const dbChunks = db.collection(CLN_NAME + '.chunks');
-    const collection = db.collection(CLN_NAME + '.files');
 
     const fsBucket = new GridFSBucket(db, {
         chunkSizeBytes: 1024,
         bucketName: CLN_NAME
     });
 
-
-    // fs.createReadStream('./package.json')
-    //     .pipe(collection.openUploadStream('package.json', {
-    //         metadata: {wut: 'ohok'}
-    //     }))
-    //     .on('error', function(error) {
-    //         throw error;
-    //     }).on('finish', function() {
-    //         console.log('done!');
-    //         process.exit(0);
-    //     });
+    const dbChunks = db.collection(CLN_NAME + '.chunks');
+    const collection = db.collection(CLN_NAME + '.files');
 
     /** Helper methods **/
-    fsBucket.queryUserImages = async function (query, limit=20) {
+    collection.queryUserFiles = async function (query, limit=20) {
         const newQuery = processSearch(query, limit);
         const cursor = collection.aggregate(newQuery);
         // const cursor = fsBucket.find(processQuery(query, {limit}))
         const docList = await cursor.toArray();
         return docList.map(processDoc);
     };
-    fsBucket.getUserImage = async function (query, throwException = true) {
-        const docList = await fsBucket.queryUserImages(query, 1);
+    collection.getUserFile = async function (query, throwException = true) {
+        const docList = await collection.queryUserFiles(query, 1);
         if (docList.length === 0) {
             if(throwException)
                 throw new Error(`${CLN_NAME} not found ${JSON.stringify(query)}`);
@@ -43,17 +33,17 @@ export default async function UserImageSchema(db, collections) {
         }
         return docList[0];
     };
-    // collection.existsUserImages = async function (query) {
-    //     return await collection.find(processQuery(query)).limit(1).count() > 0;
-    // };
+    collection.existsUserFiles = async function (query) {
+        return await collection.find(processQuery(query)).limit(1).count() > 0;
+    };
 
-    fsBucket.createUserImage = async function (ownerID, filename, stream, labels=null, metadata={}) {
+    collection.createUserFile = async function (ownerID, filename, stream, metadata={}) {
         const {User: userCollection} = collections;
         await userCollection.getUserByID(ownerID);
         metadata.ownerID = ownerID;
-        if(labels)
-            metadata.labels = labels;
         validateMetadata(metadata);
+        if(typeof stream === "string")
+            stream = stringToStream(stream);
 
         const {_id:insertedId} = await new Promise((resolve, reject) => {
             stream
@@ -67,13 +57,13 @@ export default async function UserImageSchema(db, collections) {
 
         // UserContentCollection.processForm(docData, content)
         // const {insertedId} = await collection.insertOne(metadata);
-        const userImageDoc = await fsBucket.getUserImage({_id: insertedId});
-        console.log(`Inserted ${CLN_NAME} file: `, userImageDoc);
-        return userImageDoc;
+        const userFileDoc = await collection.getUserFile({_id: insertedId});
+        console.log(`Inserted ${CLN_NAME} file: `, userFileDoc);
+        return userFileDoc;
         // return processDoc(metadata);
     };
 
-    fsBucket.deleteUserImageByID = async function (id) {
+    collection.deleteUserFileByID = async function (id) {
         await dbChunks.deleteMany({files_id:id});
         const {deletedCount} = await collection.deleteOne({_id:id});
         // const {deletedCount} = await collection.deleteMany(processQuery(query));
@@ -83,7 +73,7 @@ export default async function UserImageSchema(db, collections) {
 
     /** Model **/
 
-    const UserImagePrototype = {
+    const UserFilePrototype = {
         getID: function() { return this._id; },
         // getEmail: function() { return this.email; },
         getFileName: function() { return this.filename; },
@@ -101,9 +91,35 @@ export default async function UserImageSchema(db, collections) {
                     .pipe(res)
 
             });
+        },
+        getSrc: function() { return process.env.REACT_APP_SERVICE_IMAGE + '?_id=' + this.getID(); },
+        getFileExtension: function() { return this.filename.split('.').pop().toLowerCase(); },
+        renderHTMLTag: function() {
+            switch(this.getFileExtension()) {
+                case 'png':
+                case 'bmp':
+                case 'jpeg':
+                case 'jpg':
+                    return `<img alt="${this.getFileName()}" src="${this.getSrc()}" />`;
+                case 'md':
+                    return `<markdown alt="${this.getFileName()}" src="${this.getSrc()}" />`;
+                default:
+                    return `<file alt="${this.getFileName()}" src="${this.getSrc()}" />`;
+            }
+        },
+        getContentType: function() {
+            switch(this.getFileExtension()) {
+                case 'png': return 'image/png';
+                case 'bmp': return 'image/bmp';
+                case 'jpeg': return 'image/jpeg';
+                case 'jpg': return 'image/jpg';
+                case 'md': return 'text/markdown';
+                default: return 'text/plain';
+            }
+
         }
     }
-    fsBucket.DocumentPrototype = UserImagePrototype;
+    collection.DocumentPrototype = UserFilePrototype;
 
 
     /** Private Functions **/
@@ -147,7 +163,7 @@ export default async function UserImageSchema(db, collections) {
         ]
     }
     function processDoc(doc) {
-        Object.setPrototypeOf(doc, UserImagePrototype);
+        Object.setPrototypeOf(doc, UserFilePrototype);
         if(doc.owner)
             Object.setPrototypeOf(doc.owner, collections.User.DocumentPrototype)
         return doc;
@@ -162,22 +178,31 @@ export default async function UserImageSchema(db, collections) {
 
     /** Run Tests **/
 
-    fsBucket['$test'] = async function () {
+    collection['$test'] = async function () {
         const testUser = await createTestUser(collections.User);
 
         const fsStream = fs.createReadStream('./package.json')
-        const testImage = await fsBucket.createUserImage(testUser.getID(), 'package.json', fsStream, 'unit-test');
-        // await testImage.pipeStream(process.stdout);
-        // await collection.deleteUserImages({title})
-        // let contentDoc = await collection.createUserImage(testUser.getID(), title, content, 'test', [90, -100]);
-        let results = await fsBucket.queryUserImages({labels: 'unit-test'});
+        const testFile = await collection.createUserFile(testUser.getID(), 'package.json', fsStream, {
+            labels: 'unit-test'
+        });
+        // await testFile.pipeStream(process.stdout);
+        // await collection.deleteUserFiles({title})
+        // let contentDoc = await collection.createUserFile(testUser.getID(), title, content, 'test', [90, -100]);
+        let results = await collection.queryUserFiles({labels: 'unit-test'});
         expect(results.length).toBeGreaterThanOrEqual(1);
-        let deleteCount = await fsBucket.deleteUserImageByID(testImage.getID())
+        let deleteCount = await collection.deleteUserFileByID(testFile.getID())
         expect(deleteCount).toBe(1);
         deleteCount = await testUser.delete();
         // deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
         expect(deleteCount).toBe(1);
     }
 
-    return fsBucket;
+    return collection;
+}
+
+function stringToStream(str) {
+    const stream = new Readable();
+    stream.push(str);
+    stream.push(null); // EOF
+    return stream;
 }
