@@ -72,7 +72,7 @@ class App extends Component {
 
 
     renderHeader() {
-        let src = process.env.REACT_APP_PATH_HEADER;
+        let src = process.env.REACT_APP_SITE_HEADER;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'header', forceWrapper: true}}
@@ -81,7 +81,7 @@ class App extends Component {
     }
 
     renderFooter() {
-        let src = process.env.REACT_APP_PATH_FOOTER;
+        let src = process.env.REACT_APP_SITE_FOOTER;
         return <MarkdownPage
             refreshInterval={50000}
             options={{wrapper: 'footer', forceWrapper: true}}

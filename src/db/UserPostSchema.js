@@ -1,5 +1,6 @@
 import {ObjectId} from "mongodb";
 import GeoLocation from "../client/location/GeoLocation";
+import {createTestUser} from "./UserSchema";
 
 export default async function UserPostSchema(db, collections) {
     const CLN_NAME = 'UserPost';
@@ -94,7 +95,7 @@ export default async function UserPostSchema(db, collections) {
 
     /** Model **/
 
-    const ContentDocPrototype = {
+    const UserPostPrototype = {
         getID: function() { return this._id; },
         // getEmail: function() { return this.email; },
         getTitle: function() { return this.title; },
@@ -107,7 +108,7 @@ export default async function UserPostSchema(db, collections) {
             return new GeoLocation(...this.location.coordinates);
         },
     }
-    collection.DocumentPrototype = ContentDocPrototype;
+    collection.DocumentPrototype = UserPostPrototype;
 
 
     /** Private Functions **/
@@ -145,7 +146,7 @@ export default async function UserPostSchema(db, collections) {
     }
 
     function processDoc(doc) {
-        Object.setPrototypeOf(doc, ContentDocPrototype);
+        Object.setPrototypeOf(doc, UserPostPrototype);
         if(doc.owner)
             Object.setPrototypeOf(doc.owner, collections.User.DocumentPrototype)
         return doc;
@@ -175,13 +176,9 @@ export default async function UserPostSchema(db, collections) {
     /** Run Tests **/
 
     collection['$test'] = async function () {
-        const {User: userCollection} = collections;
-        const email = 'test@wut.com';
         const title = 'Unit Test Title';
         const content = 'Unit Test Content';
-        if(!(await userCollection.existsUsers({email})))
-            await userCollection.createUser('test@wut.com');
-        const testUser = await userCollection.getUser({email})
+        const testUser = await createTestUser(collections.User);
 
         await collection.deleteUserPosts({title})
         let contentDoc = await collection.createUserPost(testUser.getID(), title, content, 'test', [90, -100]);
@@ -189,7 +186,7 @@ export default async function UserPostSchema(db, collections) {
         expect(results.length).toBeGreaterThanOrEqual(1);
         let deleteCount = await collection.deleteUserPosts({_id:contentDoc.getID()})
         expect(deleteCount).toBe(1);
-        deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
+        deleteCount = await testUser.delete();
         expect(deleteCount).toBe(1);
     }
 

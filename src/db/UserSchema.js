@@ -70,7 +70,7 @@ export default async function UserSchema(db, collections) {
 
     /** Model **/
 
-    const UserDocPrototype = {
+    const UserPrototype = {
         getID: function() { return this._id; },
         getEmail: function() { return this.email; },
         getTitle: function() { return this.title || this.email.split('@')[0]; },
@@ -103,7 +103,7 @@ export default async function UserSchema(db, collections) {
             return await collection.deleteUsers({_id: this._id});
         }
     }
-    collection.DocumentPrototype = UserDocPrototype;
+    collection.DocumentPrototype = UserPrototype;
 
 
     /** Private Function **/
@@ -115,7 +115,7 @@ export default async function UserSchema(db, collections) {
     }
 
     function processDoc(doc) {
-        Object.setPrototypeOf(doc, UserDocPrototype);
+        Object.setPrototypeOf(doc, UserPrototype);
         return doc;
     }
 

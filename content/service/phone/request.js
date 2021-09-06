@@ -12,12 +12,16 @@ export default async function ServicePhoneRequest(req, res, server) {
         case 'get':
             res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
-            if(!req.query._id)
-                throw new Error("Invalid Request ID");
-            const contentDoc = await userPostCollection.getUserPost({...req.query, labels: CONTENT_LABEL});
-            const content = await server.getContentFile(`${PATH_ASSETS}/request.view.md`, {}, {
-                content: contentDoc.getContent()
-            });
+            let content;
+            try {
+                if (!req.query._id)
+                    throw new Error("Invalid Request ID");
+                const contentDoc = await userPostCollection.getUserPost({...req.query, labels: CONTENT_LABEL});
+                content = contentDoc.getContent();
+            } catch (e) {
+                content = `<error>${e}</error>`;
+            }
+            content = await server.getContentFile(`${PATH_ASSETS}/request.view.md`, {}, {content});
             res.send(content);
             break;
 

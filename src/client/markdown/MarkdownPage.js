@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Markdown from 'markdown-to-jsx';
 
-import './MarkdownPage.css'
 import Select from "../form/input/Select";
 import TextArea from "../form/input/TextArea";
 import Input from "../form/input/Input";
@@ -12,6 +11,7 @@ import LocationButton from "../location/LocationButton";
 import Form from "../form/Form";
 import Table from "../table/Table";
 
+import './MarkdownPage.css'
 
 // noinspection HtmlRequiredAltAttribute
 export default class MarkdownPage extends React.Component {
@@ -140,6 +140,8 @@ export default class MarkdownPage extends React.Component {
 
             case 'session':     return <SessionButton {...props} />
             case 'location':    return <LocationButton {...props} />
+
+            case 'error':       return <div {...props} className="error" children={children}/>
             // Filter out dangerous tags
             case 'iframe':
             case 'script':

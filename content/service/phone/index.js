@@ -44,7 +44,7 @@ export function processResults(userFileDocs) {
   <tbody>${userFileDocs.map(userFileDoc => `
     <tr>
       <td><a href="request.js?_id=${userFileDoc.getID()}">${userFileDoc.getTitle()}</a></td>
-      <td><a href="${process.env.REACT_APP_PATH_USER_HOME}?_id=${userFileDoc.getOwnerID()}">${userFileDoc.getOwner().getTitle()}</a></td>
+      <td><a href="${process.env.REACT_APP_SERVICE_SESSION}?view=user&_id=${userFileDoc.getOwnerID()}">${userFileDoc.getOwner().getTitle()}</a></td>
     </tr>`
     ).join('')}
   </tbody>

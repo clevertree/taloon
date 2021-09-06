@@ -1,11 +1,18 @@
+.markdown-body div.error,
 .markdown-body.error  {
     color: red;
     white-space: pre;
     background-color: #FEE;
-    margin: 1em;
     border-radius: 1em;
     border: 1px inset #FFF;
 }
+.markdown-body.error {
+    margin: 1em;
+}
+.markdown-body div.error {
+    padding: 1em;
+}
+
 
 /** Paragraph **/
 

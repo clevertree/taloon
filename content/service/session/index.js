@@ -5,6 +5,7 @@ export default async function UserSessionLogIn(req, res, server) {
     const PATH_BASE = server.getRelativeContentPath(__dirname);
     const PATH_ASSETS = `${PATH_BASE}/assets`;
 
+
     if(req.method.toLowerCase() !== 'post') {
         /** Get Request **/
         let view = (req.query.view || 'login').replace(/[^\w_-]+/g," ");;
@@ -19,13 +20,21 @@ export default async function UserSessionLogIn(req, res, server) {
         const isPreview = (req.headers['form-preview']||'').toLowerCase() !== 'false';
         const userClient = server.getUserSession(req.session);
 
-        switch(req.body.service) {
+        switch(req.body.method) {
             case 'email':
                 await handleEmailLogin();
                 break;
 
             case 'email-2factor-response':
                 await handle2FactorResponse();
+                break;
+
+            case 'status':
+                await handleStatusResponse();
+                break;
+
+            case 'logout':
+                await handleLogoutResponse();
                 break;
 
             default:
@@ -61,8 +70,8 @@ export default async function UserSessionLogIn(req, res, server) {
                         host: req.headers.origin || process.env.REACT_APP_ORIGIN,
                     };
 
-                    values.codeUrl = new URL(`${process.env.REACT_APP_PATH_USER_LOGIN}?service=email-2factor-response&email=${email}&code=${code2Factor}`, values.host);
-                    values.loginUrl = new URL(`${process.env.REACT_APP_PATH_USER_LOGIN}?email=${email}`, values.host);
+                    values.codeUrl = new URL(`${process.env.REACT_APP_SERVICE_SESSION}?view=email-2factor-response&email=${email}&code=${code2Factor}`, values.host);
+                    values.loginUrl = new URL(`${process.env.REACT_APP_SERVICE_SESSION}?view=login&email=${email}`, values.host);
                     values.sessionDetails
                         = `Date: ${new Date().toLocaleString()}`
                         + `Email: ${values.email}`
@@ -78,12 +87,12 @@ export default async function UserSessionLogIn(req, res, server) {
                         'Use this code to log in',
                         `${PATH_ASSETS}/login-2factor.email.md`,
                         values)
-                    
+
                     let storeFormValues = {email};
 
                     response.message = "A 2-Factor code sent to your email address. Please use it to log in";
-                    events.push(['form:save', process.env.REACT_APP_PATH_USER_LOGIN, storeFormValues]);
-                    events.push(['modal:show', `${process.env.REACT_APP_PATH_USER_LOGIN}?view=login-2factor`]);
+                    events.push(['form:save', process.env.REACT_APP_SERVICE_SESSION, storeFormValues]);
+                    events.push(['modal:show', `${process.env.REACT_APP_SERVICE_SESSION}?view=login-2factor`]);
                     if(['test', 'development'].includes(process.env.NODE_ENV)) {
                         storeFormValues.code = code2Factor;
                         response.code2Factor = code2Factor;
@@ -92,7 +101,7 @@ export default async function UserSessionLogIn(req, res, server) {
             }
             res.send(response);
         }
-    
+
         async function handle2FactorResponse() {
             // Validation
             const email = req.body.email;
@@ -117,10 +126,41 @@ export default async function UserSessionLogIn(req, res, server) {
 
                 response.message = "You are now logged in. This modal will close automatically.";
                 // events.push(['redirect', PATH_USER_HOME, 5000]);
-                events.push(['modal:show', `${process.env.REACT_APP_PATH_USER_LOGIN}?view=login-success`]);
+                events.push(['modal:show', `${process.env.REACT_APP_SERVICE_SESSION}?view=login-success`]);
                 events.push(['modal:close', 4000]);
                 events.push(['session:change']);
             }
+            res.send(response);
+        }
+
+        async function handleStatusResponse() {
+            /** Post Request **/
+            const userClient = server.getUserSession(req.session);
+            res.send({
+                isActive: userClient.isActive(),
+                email: userClient.getEmail() || null
+            });
+        }
+
+        async function handleLogoutResponse() {
+            // TODO: validation
+
+            // Check if form submission is a preview
+            if (isPreview)
+                return res.status(202).send(response);
+            // Check if any validations exist
+            if (Object.values(validations).length > 0)
+                return res.status(400).send({message: "Form Validation Failed", ...response});
+            // Perform Action
+
+            // User Client class handles the login requests
+            const userClient = server.getUserSession(req.session);
+            userClient.logout(req)
+
+            response.message = "You have been logged out. This modal will close automatically.";
+            events.push(['modal:show', `${process.env.REACT_APP_SERVICE_SESSION}?view=logout-success`]);
+            events.push(['modal:close', 4000]);
+            events.push(['session:change']);
             res.send(response);
         }
     }
@@ -138,8 +178,8 @@ export async function $test(agent, server, routePath) {
     // const user = await userCollection.getUser({email});
 
     let res = await agent
-        .post(process.env.REACT_APP_PATH_USER_LOGIN)
-        .send({service: 'email', email})
+        .post(process.env.REACT_APP_SERVICE_SESSION)
+        .send({method: 'email', email})
         .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
@@ -149,8 +189,8 @@ export async function $test(agent, server, routePath) {
 
     /** Test Login 2Factor POST Request **/
     res = await agent
-        .post(process.env.REACT_APP_PATH_USER_LOGIN)
-        .send({service: 'email-2factor-response', code: code2Factor, email})
+        .post(process.env.REACT_APP_SERVICE_SESSION)
+        .send({method: 'email-2factor-response', code: code2Factor, email})
         .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
@@ -163,3 +203,4 @@ export async function $test(agent, server, routePath) {
             throw new Error(`${routePath}: ${res.text}`);
     }
 }
+

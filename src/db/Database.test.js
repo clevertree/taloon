@@ -1,10 +1,3 @@
-
-// test('renders with server', () => {
-//   render(<App />);
-//   const linkElement = screen.getByText(/Content/i);
-//   expect(linkElement).toBeInTheDocument();
-// });
-
 import Server from "../server/Server";
 import {MongoClient} from "mongodb";
 

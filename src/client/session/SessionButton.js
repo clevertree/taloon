@@ -1,8 +1,6 @@
 import React from "react";
 import AppEvents from "../event/AppEvents";
-import ContentUtil from "../../util/ContentUtil";
 import './SessionButton.css';
-import SiteConfig from "../../util/ContentUtil";
 
 
 export default class SessionButton extends React.Component {
@@ -32,11 +30,14 @@ export default class SessionButton extends React.Component {
     }
 
     async updateSession() {
-        const postURL = new URL(process.env.REACT_APP_PATH_USER_SESSION, process.env.REACT_APP_API_ENDPOINT).toString();
+        const postURL = new URL(process.env.REACT_APP_SERVICE_SESSION, process.env.REACT_APP_API_ENDPOINT).toString();
         const response = await fetch(postURL + '', {
             credentials: "include",
             method: 'post',
             headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                method: 'status'
+            })
         });
         const responseJson = await response.json();
         console.log('session', postURL, responseJson);
@@ -73,11 +74,11 @@ export default class SessionButton extends React.Component {
 
     async showLoginModal(e) {
         e.preventDefault();
-        AppEvents.emit('modal:show', process.env.REACT_APP_PATH_USER_LOGIN);
+        AppEvents.emit('modal:show', process.env.REACT_APP_SERVICE_SESSION + "?view=login");
     }
     async showLogoutModal(e) {
         e.preventDefault();
-        AppEvents.emit('modal:show', process.env.REACT_APP_PATH_USER_LOGOUT);
+        AppEvents.emit('modal:show', process.env.REACT_APP_SERVICE_SESSION + "?view=logout");
     }
 
 }
