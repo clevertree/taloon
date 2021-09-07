@@ -184,10 +184,10 @@ export default async function UserPostSchema(db, collections) {
         let contentDoc = await collection.createUserPost(testUser.getID(), title, content, 'test', [90, -100]);
         let results = await collection.queryUserPosts({labels: 'test'});
         expect(results.length).toBeGreaterThanOrEqual(1);
-        let deleteCount = await collection.deleteUserPosts({_id:contentDoc.getID()})
-        expect(deleteCount).toBe(1);
-        deleteCount = await testUser.delete();
-        expect(deleteCount).toBe(1);
+        let deletedCount = await collection.deleteUserPosts({_id:contentDoc.getID()})
+        expect(deletedCount).toBe(1);
+        deletedCount = await testUser.delete();
+        expect(deletedCount).toBe(1);
     }
 
     return collection;

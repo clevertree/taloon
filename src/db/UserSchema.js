@@ -62,9 +62,9 @@ export default async function UserSchema(db, collections) {
         return processDoc(newDoc);
     };
     collection.deleteUsers = async function (query) {
-        const {deletedCount} = await collection.deleteMany(processQuery(query));
-        console.log(`Deleted ${deletedCount} ${CLN_NAME}${deletedCount === 1 ? '' : 's'}`);
-        return deletedCount;
+        const result = await collection.deleteMany(processQuery(query));
+        console.log(`Deleted ${result.deletedCount} ${CLN_NAME}${result.deletedCount === 1 ? '' : 's'}`);
+        return result;
     };
 
 
@@ -77,9 +77,10 @@ export default async function UserSchema(db, collections) {
 
         /** User Content Methods **/
 
-        hasFile: async function(filename) {
+        hasFile: async function(filename) { return !!await this.getFile(filename); },
+        getFile: async function(filename) {
             const {UserFile:userFileSchema} = collections;
-            return await userFileSchema.existsUserFiles({
+            return await userFileSchema.getUserFile({
                 ownerID: this._id,
                 filename
             }, false);
@@ -128,8 +129,8 @@ export default async function UserSchema(db, collections) {
 
         const results = await collection.queryUsers(query);
         expect(results.length).toBe(1);
-        const deleteCount = await collection.deleteUsers(query);
-        expect(deleteCount).toBe(1);
+        const {deletedCount} = await collection.deleteUsers(query);
+        expect(deletedCount).toBe(1);
         // console.log(users, newUser);
     }
 

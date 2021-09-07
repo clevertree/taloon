@@ -58,7 +58,6 @@ export async function $test(agent, server, routePath) {
     await agent
         .post(routePath)
         .send({name: 'john'})
-        .set('Accept', 'application/json')
         .expect(isJSONError)
         .expect('Content-Type', /json/)
         .expect(200)

@@ -10,6 +10,7 @@ export default async function ServicePhoneRequest(req, res, server) {
     switch(req.method.toLowerCase()) {
         default:
         case 'get':
+            res.setHeader('Content-Type', 'text/markdown');
             // Return markdown content
             let content;
             try {
@@ -55,7 +56,7 @@ export default async function ServicePhoneRequest(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
-    const {User:userCollection, UserFile: userFileCollection} = server.getCollections();
+    const {User:userCollection} = server.getCollections();
     const filename = 'test/unit-test.md';
     const title = 'Unit Test File';
     const content = '# Unit Test Content';
@@ -76,7 +77,6 @@ export async function $test(agent, server, routePath) {
     await agent
         .post(routePath)
         .send({title: 'Test Request'})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
         .expect(200)

@@ -180,7 +180,6 @@ export async function $test(agent, server, routePath) {
     let res = await agent
         .post(process.env.REACT_APP_SERVICE_SESSION)
         .send({method: 'email', email})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
         .expect(200)
@@ -191,7 +190,6 @@ export async function $test(agent, server, routePath) {
     res = await agent
         .post(process.env.REACT_APP_SERVICE_SESSION)
         .send({method: 'email-2factor-response', code: code2Factor, email})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
         .expect(200)

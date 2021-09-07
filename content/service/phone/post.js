@@ -27,7 +27,7 @@ export default async function ServicePhonePost(req, res, server) {
                 // const localUser = await userSession.getOrCreateUser();
                 const user = await userSession.getOrCreateUser();
                 if(await user.hasFile(req.body.filename))
-                    validations.filename = "This filename is already in use. Please try another"
+                    validations.filename = `This filename '${req.body.filename}' is already in use. Please try another.`
 
             }
 
@@ -69,35 +69,30 @@ export default async function ServicePhonePost(req, res, server) {
 
 /** Unit Tests **/
 export async function $test(agent, server, routePath) {
-    // const {User:userCollection, UserPost: userPostCollection} = server.getCollections();
-    /** Test Login POST Request **/
-    const email = 'test@wut.ohok';
-    const filename = 'unit-test-post.md';
-
+    const {User:userCollection, UserFile: userFileCollection} = server.getCollections();
     // Delete existing user posts
-    // const user = await userCollection.getUser({email});
+
+    /** Test Session Login **/
+    const email = 'test@wut.ohok';
+    const filename = 'title.json';
 
     let res = await agent
         .post(process.env.REACT_APP_SERVICE_SESSION)
         .send({method: 'email', email})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
-        .expect(isJSONError)
         .expect(200)
-        .expect('Content-Type', /json/)
     const {code2Factor} = res.body;
 
     /** Test Login 2Factor POST Request **/
     res = await agent
         .post(process.env.REACT_APP_SERVICE_SESSION)
         .send({method: 'email-2factor-response', code: code2Factor, email})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
-        .expect(isJSONError)
         .expect(200)
-        .expect('Content-Type', /json/)
 
-    // console.log("Login Response: ", res.text);
+    /** Test File POST **/
+    const {deletedCount} = await userFileCollection.deleteUserFiles({filename});
+    expect(deletedCount).toBeLessThanOrEqual(1);
 
     /** Test GET Request **/
     res = await agent
@@ -110,7 +105,6 @@ export async function $test(agent, server, routePath) {
     res = await agent
         .post(routePath)
         .send({filename})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect(isJSONError)
         .expect(200)
@@ -119,7 +113,6 @@ export async function $test(agent, server, routePath) {
     res = await agent // Test duplicate error
         .post(routePath)
         .send({filename})
-        .set('Accept', 'application/json')
         .set('Form-Preview', 'false')
         .expect('Content-Type', /json/)
         .expect(400)

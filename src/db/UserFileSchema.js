@@ -44,6 +44,9 @@ export default async function UserFileSchema(db, collections) {
         validateMetadata(metadata);
         if(typeof stream === "string")
             stream = stringToStream(stream);
+        if(stream instanceof Buffer)
+            stream = Readable.from(stream);
+        // const stream = Readable.from(myBuffer.toString());
 
         const {_id:insertedId} = await new Promise((resolve, reject) => {
             stream
@@ -63,12 +66,12 @@ export default async function UserFileSchema(db, collections) {
         // return processDoc(metadata);
     };
 
-    collection.deleteUserFileByID = async function (id) {
-        await dbChunks.deleteMany({files_id:id});
-        const {deletedCount} = await collection.deleteOne({_id:id});
+    collection.deleteUserFileByID = async function (_id) { return await collection.deleteUserFiles({_id}); }
+    collection.deleteUserFiles = async function (query) {
+        const result = await collection.deleteMany(processQuery(query));
         // const {deletedCount} = await collection.deleteMany(processQuery(query));
-        console.log(`Deleted ${deletedCount} ${CLN_NAME}${deletedCount === 1 ? '' : 's'}`);
-        return deletedCount;
+        console.log(`Deleted ${result.deletedCount} ${CLN_NAME}${result.deletedCount === 1 ? '' : 's'}`);
+        return result;
     };
 
     /** Model **/
@@ -190,11 +193,11 @@ export default async function UserFileSchema(db, collections) {
         // let contentDoc = await collection.createUserFile(testUser.getID(), title, content, 'test', [90, -100]);
         let results = await collection.queryUserFiles({labels: 'unit-test'});
         expect(results.length).toBeGreaterThanOrEqual(1);
-        let deleteCount = await collection.deleteUserFileByID(testFile.getID())
-        expect(deleteCount).toBe(1);
-        deleteCount = await testUser.delete();
-        // deleteCount = await userCollection.deleteUsers({_id: testUser.getID()});
-        expect(deleteCount).toBe(1);
+        let deleteResult = await collection.deleteUserFileByID(testFile.getID())
+        expect(deleteResult.deletedCount).toBe(1);
+        deleteResult = await testUser.delete();
+        // deletedCount = await userCollection.deleteUsers({_id: testUser.getID()});
+        expect(deleteResult.deletedCount).toBe(1);
     }
 
     return collection;
@@ -206,3 +209,4 @@ function stringToStream(str) {
     stream.push(null); // EOF
     return stream;
 }
+
